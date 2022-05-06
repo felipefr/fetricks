@@ -9,7 +9,7 @@ import ddfenics.fenics.wrapper_io as iofe
 
 class Mesh(df.Mesh):
     def __init__(self, meshFile, comm = df.MPI.comm_world):
-        super(EnrichedMesh,self).__init__(comm)
+        super().__init__(comm)
         
         if(meshFile[-3:] == 'xml'):
             df.File(meshFile) >> self            

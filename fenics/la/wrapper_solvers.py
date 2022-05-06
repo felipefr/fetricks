@@ -5,24 +5,30 @@ from timeit import default_timer as timer
 
 # Not tested yet
 # Hand-coded implementation of Newton Raphson (Necessary in some cases)
-def Newton(Nitermax = 10, tol = 1e-8):
-    A, Res = assemble_system(a_Newton, res, bc)
-    nRes0 = Res.norm("l2")
+def Newton(Jac, Res, bc, du, u, callbacks = None, Nitermax = 10, tol = 1e-8): 
+    A, b = df.assemble_system(Jac, Res, bc)
+    nRes0 = b.norm("l2")
     nRes = nRes0
+    
+    V = u.function_space()
     du.vector().set_local(np.zeros(V.dim()))
     u.vector().set_local(np.zeros(V.dim()))
       
-   	niter = 0
-
+    niter = 0
+    
     while nRes/nRes0 > tol and niter < Nitermax:
-        solve(A, du.vector(), Res, "superlu")
+        df.solve(A, du.vector(), b)
         u.assign(u + du)
-        model.update_alpha(tensor2mandel(eps_(u)))
-        A, Res = assemble_system(a_Newton, res, bc)
-        nRes = Res.norm("l2")
+        for callback in callbacks:
+            callback(u)
+            
+        
+        A, b = df.assemble_system(Jac, Res, bc)
+        nRes = b.norm("l2")
         print(" Residual:", nRes)
         niter += 1
-
+    
+    return u
 
 # Local projection is faster than the standard projection routine in DG spaces
 def local_project(v,V):
@@ -37,7 +43,39 @@ def local_project(v,V):
     u = df.Function(V)
     solver.solve_local_rhs(u)
     return u
+
+      
+def local_project_given_sol(v, V, u=None, dxm = None):
+    dv = df.TrialFunction(V)
+    v_ = df.TestFunction(V)
+    a_proj = df.inner(dv, v_)*dxm
+    b_proj = df.inner(v, v_)*dxm
+    solver = df.LocalSolver(a_proj, b_proj)
+    solver.factorize()
+    if u is None:
+        u = df.Function(V)
+        solver.solve_local_rhs(u)
+        return u
+    else:
+        solver.solve_local_rhs(u)
+        return
     
+    
+# def local_project_given_sol(v, V, u, metadata = {}):
+#     M = V.mesh()
+#     dv = df.TrialFunction(V)
+#     v_ = df.TestFunction(V)
+#     dx = df.Measure('dx', M, metadata = metadata)
+    
+#     a_proj = df.inner(dv, v_)*dx
+#     b_proj = df.inner(v, v_)*dx
+
+#     solver = df.LocalSolver(a_proj)
+#     solver.factorize()
+    
+#     b = df.assemble(b_proj)
+    
+#     solver.solve_local(u.vector(), b,  V.dofmap())
 
 def local_project_metadata(v,V, metadata = {}):
     M = V.mesh()
@@ -108,23 +146,3 @@ class LocalProjector:
         else:
             self.solver.solve_local(sol.vector(), b,  self.dofmap)
             return
-    
-# def local_project(v, V, dxm, u=None):
-#     dv = df.TrialFunction(V)
-#     v_ = df.TestFunction(V)
-#     a_proj = df.inner(dv, v_)*dxm
-#     b_proj = df.inner(v, v_)*dxm
-
-#     solver = df.LocalSolver(a_proj)
-#     solver.factorize()
-    
-#     b = df.assemble(b_proj)
-    
-#     if u is None:
-#         u = df.Function(V)
-#         solver.solve_local(u.vector(), b,  V.dofmap())
-#         # solver.solve_local_rhs(u)
-#         return u
-#     else:
-#         solver.solve_local(u.vector(), b,  V.dofmap())
-#         return
