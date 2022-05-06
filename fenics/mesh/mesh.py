@@ -7,7 +7,7 @@ from functools import reduce
 
 import ddfenics.fenics.wrapper_io as iofe
 
-class EnrichedMesh(df.Mesh):
+class Mesh(df.Mesh):
     def __init__(self, meshFile, comm = df.MPI.comm_world):
         super(EnrichedMesh,self).__init__(comm)
         

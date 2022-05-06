@@ -28,4 +28,3 @@ def getLameInclusions(nu1,E1,nu2,E2,M, op='cpp'):
     lame = getMyCoeff(materials, param, op = op)
     
     return lame
-

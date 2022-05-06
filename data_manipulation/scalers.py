@@ -6,15 +6,6 @@ import deepBND.core.data_manipulation.utils as dman
 
 import deepBND.core.data_manipulation.wrapper_h5py as myhd
 
-
-def writeDict(d):
-    f = open(d['files']['net_settings'],'w')
-    
-    for keys, value in zip(d.keys(),d.values()):
-        f.write("{0}: {1}\n".format(keys,value))
-        
-    f.close()
-
 def constructor_scaler(scalerType):    
     return {'MinMax': myMinMaxScaler() , 
             'Normalisation': myNormalisationScaler(), 
@@ -146,32 +137,6 @@ class myNormalisationScaler(myScaler):
         return np.array( [self.inv_scaler(x[:,i],i) for i in range(self.n)] ).T
 
 
-def getDatasetsXY(nX, nY, XYdatafile, scalerX = None, scalerY = None, Ylabel = 'Y', scalerType = 'MinMax'):
-    Xlist = []
-    Ylist = []
-    
-    if(type(XYdatafile) != type([])):
-        XYdatafile = [XYdatafile]
-    
-    for XYdatafile_i in XYdatafile:    
-        Xlist.append(myhd.loadhd5(XYdatafile_i, 'X')[:,:nX])
-        Ylist.append(myhd.loadhd5(XYdatafile_i, Ylabel)[:,:nY])
-    
-    X = np.concatenate(tuple(Xlist),axis = 0)
-    Y = np.concatenate(tuple(Ylist),axis = 0)
-    
-    if(type(scalerX) == type(None)):
-        scalerX = constructor_scaler(scalerType)            
-        scalerX.fit(X)
-    
-    if(type(scalerY) == type(None)):
-        scalerY = constructor_scaler(scalerType)            
-        scalerY.fit(Y)
-            
-    return scalerX.transform(X), scalerY.transform(Y), scalerX, scalerY
-
-
-
 def exportScale(filenameIn, filenameOut, nX, nY, Ylabel = 'Y', scalerType = "MinMax"):
     scalerX, scalerY = getDatasetsXY(nX, nY, filenameIn, Ylabel = Ylabel, scalerType = scalerType)[2:4]
     scalerLimits = np.zeros((max(nX,nY),4))
@@ -191,19 +156,5 @@ def importScale(filenameIn, nX, nY, scalerType = 'MinMax'): ## It was wrong (I h
     
     return scalerX, scalerY
 
-# def getTraining(ns_start, ns_end, nX, nY, Xdatafile, Ydatafile, scalerX = None, scalerY = None):
-#     X = np.zeros((ns_end - ns_start,nX))
-#     Y = np.zeros((ns_end - ns_start,nY))
-    
-#     X = myhd.loadhd5(Xdatafile, 'ellipseData')[ns_start:ns_end,:nX,2]
-#     Y = myhd.loadhd5(Ydatafile, 'Ylist')[ns_start:ns_end,:nY]
-
-#     if(type(scalerX) == type(None)):
-#         scalerX = MinMaxScaler()
-#         scalerX.fit(X)
-    
-#     if(type(scalerY) == type(None)):
-#         scalerY = MinMaxScaler()
-#         scalerY.fit(Y)
             
 #     return scalerX.transform(X), scalerY.transform(Y), scalerX, scalerY

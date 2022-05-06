@@ -2,8 +2,20 @@ import dolfin as df
 import numpy as np
 from timeit import default_timer as timer
 
-# sym. grad. tensor (for voigt and mandel conventions see elasticity wrappers)
-symgrad = lambda v: 0.5*(df.grad(v) + df.grad(v).T)
+
+# NON-FLATTENED FUNCTIONS
+def symgrad(v): 
+    return df.sym(df.grad(v))
+   
+
+# Condensed version of the Integral: test
+def Integral_shorter(u, dx, shape):
+    if(len(shape) == 1):
+        return np.array([ df.assemble(u[i]*dx) for i in range(shape[0])]) 
+
+    elif(len(shape) == 2):
+        return np.array( [ [ df.assemble(u[i, j]*dx) for j in range(shape[1])] 
+                          for i in range(shape[0]) ])
 
 # Vectorial and Tensorial integrals (Fenics integrals are scalars by default)
 def Integral(u,dx,shape):
@@ -67,9 +79,5 @@ class myfog_expression(df.UserExpression): # fog f,g : R2 -> R2, generalise
         
     def value_shape(self):
         return (2,)
-
-
-
-
 
 

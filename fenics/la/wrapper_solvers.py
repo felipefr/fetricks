@@ -15,6 +15,20 @@ def local_project(v,V):
     u = df.Function(V)
     solver.solve_local_rhs(u)
     return u
+    
+
+def local_project_metadata(v,V, metadata = {}):
+    M = V.mesh()
+    dv = df.TrialFunction(V)
+    v_ = df.TestFunction(V)
+    dx = df.Measure('dx', M, metadata = metadata)
+    a_proj = df.inner(dv,v_)*dx 
+    b_proj = df.inner(v,v_)*dx
+    solver = df.LocalSolver(a_proj,b_proj) 
+    solver.factorize()
+    u = df.Function(V)
+    solver.solve_local_rhs(u)
+    return u
 
 # PETSC krylov type solver with most common settings
 def solver_iterative(a,b, bcs, Uh):
@@ -47,3 +61,48 @@ def solver_direct(a,b, bcs, Uh, method = "superlu" ):
     df.solve(a == b,uh, bcs = bcs, solver_parameters={"linear_solver": method})
 
     return uh
+    
+class LocalProjector:
+    def __init__(self, V, dx):    
+        self.dofmap = V.dofmap()
+        
+        dv = df.TrialFunction(V)
+        v_ = df.TestFunction(V)
+        
+        a_proj = df.inner(dv, v_)*dx
+        self.b_proj = lambda u: df.inner(u, v_)*dx
+        
+        self.solver = df.LocalSolver(a_proj)
+        self.solver.factorize()
+        
+        self.sol = df.Function(V)
+    
+    def __call__(self, u, sol = None):
+        b = df.assemble(self.b_proj(u))
+        
+        if sol is None:
+            self.solver.solve_local(self.sol.vector(), b,  self.dofmap)
+            return self.sol
+        else:
+            self.solver.solve_local(sol.vector(), b,  self.dofmap)
+            return
+    
+# def local_project(v, V, dxm, u=None):
+#     dv = df.TrialFunction(V)
+#     v_ = df.TestFunction(V)
+#     a_proj = df.inner(dv, v_)*dxm
+#     b_proj = df.inner(v, v_)*dxm
+
+#     solver = df.LocalSolver(a_proj)
+#     solver.factorize()
+    
+#     b = df.assemble(b_proj)
+    
+#     if u is None:
+#         u = df.Function(V)
+#         solver.solve_local(u.vector(), b,  V.dofmap())
+#         # solver.solve_local_rhs(u)
+#         return u
+#     else:
+#         solver.solve_local(u.vector(), b,  V.dofmap())
+#         return
