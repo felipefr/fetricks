@@ -9,15 +9,12 @@ Created on Tue Apr 19 15:18:46 2022
 import sys
 import dolfin as df
 import numpy as np
-from material_model import materialModel 
+from .material_model import materialModel 
 
+from fetricks import *
 
-sys.path.insert(0, '../../core/')
-
-from fenicsUtils import (symgrad, tensor2mandel,  mandel2tensor, tr_mandel, Id_mandel_df,
-                        Id_mandel_np, LocalProjector)
-
-
+# mandel2tensor
+# LocalProjector
 
 class hyperlasticityModel(materialModel):
     
@@ -56,16 +53,14 @@ class hyperlasticityModel(materialModel):
     def epseps_de(self, de):
         return df.inner(self.eps, de)*self.eps
     
-    def tangent(self, de):
+    def tangent(self, de): # de have to be in mandel notation
         ee = df.inner(self.eps, self.eps)
         tre2 = tr_mandel(self.eps)**2.0
         
         lamb_ = self.lamb*( 1 + 3*self.alpha*tre2)
         mu_ = self.mu*( 1 + self.alpha*ee ) 
         
-        de_mandel = tensor2mandel(de)
-        
-        return self.sigma(lamb_, mu_, de_mandel)  + 4*self.mu*self.alpha*self.epseps_de(de_mandel)
+        return self.sigma(lamb_, mu_, de)  + 4*self.mu*self.alpha*self.epseps_de(de)
 
     def update_alpha(self, epsnew):
         

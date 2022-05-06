@@ -10,24 +10,21 @@ import sys
 import dolfin as df
 import numpy as np
 
-sys.path.insert(0, '../../core/')
+from .generic_gausspoint_expression import genericGaussPointExpression
+from fetricks import *
 
-from micmacsfenics.core.fenicsUtils import LocalProjector
-
-from generic_gausspoint_expression import genericGaussPointExpression
-    
 class materialModelExpression:
     def __init__(self, W, dxm):
         self.strain = df.Function(W) 
         self.projector = LocalProjector(W, dxm)
         
-        self.stress = genericGaussPointExpression(self.strain, self.stressHomogenisation , (3,))
-        self.tangent = genericGaussPointExpression(self.strain, self.tangentHomogenisation , (3,3,))
+        self.stress = genericGaussPointExpression(self.strain, self.stress , (3,))
+        self.tangent = genericGaussPointExpression(self.strain, self.tangent , (3,3,))
         
-    def stressHomogenisation(self, e, cell = None):
+    def stress(self, e, cell = None):
         pass
     
-    def tangentHomogenisation(self,e, cell = None):
+    def tangent(self,e, cell = None):
         pass
     
     def updateStrain(self, e):

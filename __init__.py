@@ -1,9 +1,9 @@
 from fetricks.mechanics.conversions import tensor2mandel,  tr_mandel, Id_mandel_np, Id_mandel_df
 from fetricks.fenics.misc import symgrad
-from fetricks.fenics.la.wrapper_solvers import Newton, local_project, local_project_given_sol
+from fetricks.fenics.la.wrapper_solvers import Newton, local_project, local_project_given_sol, LocalProjector
 
 
-__all__ = [
+__all__ = ['fenics', 
 'tensor2mandel', 'tr_mandel', 'Id_mandel_np', 'Id_mandel_df',
 'symgrad',
-'Newton', 'local_project', 'local_project_given_sol']
+'Newton', 'local_project', 'local_project_given_sol', 'LocalProjector']

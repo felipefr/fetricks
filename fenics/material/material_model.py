@@ -5,13 +5,7 @@ Created on Tue Apr 19 15:09:55 2022
 
 @author: felipe
 """
-
-
-
-import sys
-
-sys.path.insert(0, '../../core/')
-
+import fetricks as ft
 
 class materialModel:
     

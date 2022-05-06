@@ -8,20 +8,30 @@ Created on Mon Apr 25 12:50:48 2022
 import dolfin as df
 import numpy as np
 
-from material_model_expression import materialModelExpression
-from micmacsfenics.core.fenicsUtils import (symgrad, tensor2mandel,  mandel2tensor, tr_mandel, Id_mandel_np)
+from .material_model_expression import materialModelExpression 
+
+from fetricks import *
 
 # Constant materials params
-class hyperlasticityModelExpression(materialModelExpression):
+class hyperelasticityModelExpression(materialModelExpression):
     
     def __init__(self, W, dxm, param):
-        self.lamb = param['lamb']
-        self.mu = param['mu']
-        self.alpha = param['alpha']
+        
+        if('lamb' in param.keys()):
+            self.lamb = param['lamb']
+            self.mu = param['mu']
+            
+        else: 
+            E = param['E']
+            nu = param['nu']
+            self.lamb = E*nu/(1+nu)/(1-2*nu)
+            self.mu = E/2./(1+nu)
+            
+        self.alpha = param['alpha']  if 'alpha' in param.keys() else 0.0
         
         super().__init__(W, dxm)
     
-    def stressHomogenisation(self, e, cell = None): # elastic (I dont know why for the moment) # in mandel format
+    def stress(self, e, cell = None): # in mandel format
     
         ee = np.dot(e,e)
         tre2 = (e[0] + e[1])**2.0
@@ -32,7 +42,7 @@ class hyperlasticityModelExpression(materialModelExpression):
         return lamb_star*(e[0] + e[1])*Id_mandel_np + 2*mu_star*e
     
     
-    def tangentHomogenisation(self, e, cell = None): # elastic (I dont know why for the moment) # in mandel format
+    def tangent(self, e, cell = None): # in mandel format
         
         ee = np.dot(e,e)
         tre2 = (e[0] + e[1])**2.0
