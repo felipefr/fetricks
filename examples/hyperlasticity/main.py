@@ -279,28 +279,8 @@ file_results = XDMFFile("cook.xdmf")
 file_results.parameters["flush_output"] = True
 file_results.parameters["functions_share_mesh"] = True
 
-Nitermax, tol = 10, 1e-8  # parameters of the Newton-Raphson procedure
 
-A, Res = assemble_system(a_Newton, res, bc)
-nRes0 = Res.norm("l2")
-nRes = nRes0
-du.vector().set_local(np.zeros(V.dim()))
-u.vector().set_local(np.zeros(V.dim()))
-
-
-
-
-niter = 0
-while nRes/nRes0 > tol and niter < Nitermax:
-    solve(A, du.vector(), Res, "superlu")
-    u.assign(u + du)
-    model.update_alpha(tensor2mandel(eps_(u)))
-    A, Res = assemble_system(a_Newton, res, bc)
-    nRes = Res.norm("l2")
-    print(" Residual:", nRes)
-    niter += 1
-    
-
+## Solve here Newton Raphson
 
 file_results.write(u, 0.0)
 

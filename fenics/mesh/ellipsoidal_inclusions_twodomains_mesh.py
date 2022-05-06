@@ -1,8 +1,8 @@
 from deepBND.core.mesh.wrapper_gmsh import myGmsh
-from deepBND.core.mesh.ellipse_mesh import ellipseMesh
+from deepBND.core.mesh.ellipsoidal_inclusions_mesh import ellipsoidalInclusionsMesh
 import numpy as np
 
-class ellipseMesh2Domains(ellipseMesh):
+class ellipsoidalInclusionsTwoDomainsMesh(ellipsoidalInclusionsMesh):
     def __init__(self, x0L, y0L, LxL, LyL, NL, ellipseData, Lx, Ly , lcar, x0 = 0., y0 = 0. ):        
         self.x0 = x0
         self.y0 = y0

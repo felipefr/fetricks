@@ -2,6 +2,28 @@ import dolfin as df
 import numpy as np
 from timeit import default_timer as timer
 
+
+# Not tested yet
+# Hand-coded implementation of Newton Raphson (Necessary in some cases)
+def Newton(Nitermax = 10, tol = 1e-8):
+    A, Res = assemble_system(a_Newton, res, bc)
+    nRes0 = Res.norm("l2")
+    nRes = nRes0
+    du.vector().set_local(np.zeros(V.dim()))
+    u.vector().set_local(np.zeros(V.dim()))
+      
+   	niter = 0
+
+    while nRes/nRes0 > tol and niter < Nitermax:
+        solve(A, du.vector(), Res, "superlu")
+        u.assign(u + du)
+        model.update_alpha(tensor2mandel(eps_(u)))
+        A, Res = assemble_system(a_Newton, res, bc)
+        nRes = Res.norm("l2")
+        print(" Residual:", nRes)
+        niter += 1
+
+
 # Local projection is faster than the standard projection routine in DG spaces
 def local_project(v,V):
     M = V.mesh()

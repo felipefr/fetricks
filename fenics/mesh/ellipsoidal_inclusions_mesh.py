@@ -2,7 +2,7 @@ from deepBND.core.mesh.wrapper_gmsh import myGmsh
 import numpy as np
 
 
-class ellipseMesh2(myGmsh):
+class ellipsoidalInclusionsMesh(myGmsh):
     # def __init__(self, Lx = 1.0,Ly= 1.0, ellipseData = [], lcar = 0.05, ifPeriodic = False):
     def __init__(self, ellipseData, x0, y0, Lx, Ly , lcar):
         super().__init__()    
