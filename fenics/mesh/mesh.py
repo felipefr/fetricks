@@ -5,7 +5,7 @@ import os
 import dolfin as df
 from functools import reduce
 
-import ddfenics.fenics.wrapper_io as iofe
+import fetricks.fenics.postprocessing.wrapper_io as iofe
 
 class Mesh(df.Mesh):
     def __init__(self, meshFile, comm = df.MPI.comm_world):

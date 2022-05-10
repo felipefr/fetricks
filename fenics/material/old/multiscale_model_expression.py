@@ -8,7 +8,7 @@ Created on Mon Apr 25 12:50:48 2022
 import dolfin as df
 import numpy as np
 
-from material_model_expression import materialModelExpression
+from .material_model_expression import materialModelExpression
 from micmacsfenics.core.fenicsUtils import (symgrad, tensor2mandel,  mandel2tensor, tr_mandel, Id_mandel_np)
 
 class multiscaleModelExpression(materialModelExpression):
@@ -24,8 +24,8 @@ class multiscaleModelExpression(materialModelExpression):
         
         return self.micromodels[cell.index].getTangent(e)
     
-    def updateStrain(self, e):
-        super().updateStrain(e)
+    def update(self, e):
+        super().update(e)
         
         for m in self.micromodels:
             m.setUpdateFlag(False)

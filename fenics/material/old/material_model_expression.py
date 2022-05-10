@@ -11,21 +11,21 @@ import dolfin as df
 import numpy as np
 
 from .generic_gausspoint_expression import genericGaussPointExpression
-from fetricks import *
+import fetricks as ft
 
 class materialModelExpression:
     def __init__(self, W, dxm):
         self.strain = df.Function(W) 
-        self.projector = LocalProjector(W, dxm)
+        self.projector = ft.LocalProjector(W, dxm)
         
-        self.stress = genericGaussPointExpression(self.strain, self.stress , (3,))
-        self.tangent = genericGaussPointExpression(self.strain, self.tangent , (3,3,))
+        self.stress = genericGaussPointExpression(self.strain, self.stress_op , (3,))
+        self.tangent = genericGaussPointExpression(self.strain, self.tangent_op , (3,3,))
         
-    def stress(self, e, cell = None):
+    def stress_op(self, e, cell = None):
         pass
     
-    def tangent(self,e, cell = None):
+    def tangent_op(self,e, cell = None):
         pass
     
-    def updateStrain(self, e):
+    def update(self, e):
         self.projector(e, self.strain)

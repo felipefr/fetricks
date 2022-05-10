@@ -4,7 +4,6 @@ import numpy as np
 from fetricks.fenics.mesh.mesh import Mesh 
 
 import fetricks as ft 
-from fetricks.fenics.material.hyperelastic_model_expression import hyperelasticityModelExpression
 
 from timeit import default_timer as timer
 from functools import partial 
@@ -45,7 +44,7 @@ def F_ext(v):
 metadata = {"quadrature_degree": deg_stress, "quadrature_scheme": "default"}
 dxm = df.dx(metadata=metadata)
 
-model = hyperelasticityModelExpression(W, dxm, {'E': E, 'nu': nu, 'alpha': alpha})
+model = ft.hyperelasticModelExpression(W, dxm, {'E': E, 'nu': nu, 'alpha': alpha})
 
 u = df.Function(V, name="Total displacement")
 du = df.Function(V, name="Iteration correction")

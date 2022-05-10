@@ -7,6 +7,7 @@ Created on Wed Mar 24 18:18:10 2021
 """
 import dolfin as df
 import numpy as np
+from fetricks.fenics.misc import symgrad
 
 # VOIGT NOTATION
 def symgrad_voigt(v):

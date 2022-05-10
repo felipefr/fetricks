@@ -13,7 +13,7 @@ from .material_model_expression import materialModelExpression
 from fetricks import *
 
 # Constant materials params
-class hyperelasticityModelExpression(materialModelExpression):
+class hyperelasticModelExpression(materialModelExpression):
     
     def __init__(self, W, dxm, param):
         

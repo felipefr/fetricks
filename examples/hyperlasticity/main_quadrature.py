@@ -4,8 +4,6 @@ import numpy as np
 from fetricks.fenics.mesh.mesh import Mesh 
 
 import fetricks as ft 
-from fetricks.fenics.material.material_model import materialModel
-from fetricks.fenics.material.hyperelastic_model import hyperlasticityModel
 
 from timeit import default_timer as timer
 from functools import partial 
@@ -22,7 +20,7 @@ nu = 0.3
 alpha = 200.0
 ty = 5.0
 
-model = hyperlasticityModel({'E': E, 'nu': nu, 'alpha': alpha})
+model = ft.hyperelasticModel({'E': E, 'nu': nu, 'alpha': alpha})
 
 mesh = Mesh("./meshes/mesh_40.xdmf")
 

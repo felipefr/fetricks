@@ -8,6 +8,7 @@ from timeit import default_timer as timer
 def Newton(Jac, Res, bc, du, u, callbacks = None, Nitermax = 10, tol = 1e-8): 
     A, b = df.assemble_system(Jac, Res, bc)
     nRes0 = b.norm("l2")
+    nRes0 = nRes0 if nRes0>0.0 else 1.0
     nRes = nRes0
     
     V = u.function_space()
@@ -16,13 +17,15 @@ def Newton(Jac, Res, bc, du, u, callbacks = None, Nitermax = 10, tol = 1e-8):
       
     niter = 0
     
+    for bc_i in bc: # non-homogeneous dirichlet applied only in the first itereation
+        bc_i.homogenize()
+    
     while nRes/nRes0 > tol and niter < Nitermax:
         df.solve(A, du.vector(), b)
         u.assign(u + du)
         for callback in callbacks:
             callback(u)
             
-        
         A, b = df.assemble_system(Jac, Res, bc)
         nRes = b.norm("l2")
         print(" Residual:", nRes)

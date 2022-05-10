@@ -8,7 +8,7 @@ from functools import reduce
 from ddfenics.fenics.wrapper_io import exportMeshHDF5_fromGMSH
 from ddfenics.fenics.enriched_mesh import EnrichedMesh
 
-class myGmsh(pygmsh.built_in.Geometry):
+class Gmsh(pygmsh.built_in.Geometry):
     def __init__(self):
         super().__init__()   
         self.mesh = None
