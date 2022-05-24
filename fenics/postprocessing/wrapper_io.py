@@ -13,10 +13,6 @@ from timeit import default_timer as timer
 import meshio
 import h5py
 import xml.etree.ElementTree as ET
-from ddfenics.fenics.wrapper_expression import *
-import ddfenics.fenics.fenicsUtils as fela
-from ddfenics.fenics.wrapper_solvers import local_project
-
 
 def readXDMF_with_markers(meshFile, mesh, comm = MPI.comm_world):
 

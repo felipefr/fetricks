@@ -21,7 +21,7 @@ class materialModel:
     def tangent_op(self, e):
         pass
     
-    def createInternalVariables(self, W, W0, dxm):
+    def __createInternalVariables(self, W, Wtan, dxm):
         pass
     
     def update(self, e):
