@@ -5,8 +5,8 @@ import os
 import dolfin as df
 from functools import reduce
 
-from ddfenics.fenics.wrapper_io import exportMeshHDF5_fromGMSH
-from ddfenics.fenics.enriched_mesh import EnrichedMesh
+from fetricks.fenics.postprocessing.wrapper_io import exportMeshHDF5_fromGMSH
+from fetricks.fenics.mesh.mesh import Mesh
 
 class Gmsh(pygmsh.built_in.Geometry):
     def __init__(self):
@@ -68,7 +68,7 @@ class Gmsh(pygmsh.built_in.Geometry):
             print("exporting to fenics")
             self.write(savefile, 'fenics')
         
-        return EnrichedMesh(savefile)
+        return Mesh(savefile)
     
     def setNameMesh(self,nameMesh):
         nameMeshSplit = nameMesh.split('.')
