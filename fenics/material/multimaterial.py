@@ -15,7 +15,7 @@ def getMultimaterialExpression(param, M, op='cpp'):
     materials = M.subdomains.array().astype('int32')
     materials = materials - np.min(materials)
     
-    return getMyCoeff(materials, param, op = op)
+    return getMyCoeff(materials, param, op = op, mesh = M)
 
 
 def getLameExpression(nu1,E1,nu2,E2,M, op='cpp'):

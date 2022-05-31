@@ -1,4 +1,6 @@
 from dolfin import compile_cpp_code, UserExpression, CompiledExpression
+import dolfin as df
+from fetricks.fenics.la.wrapper_solvers import local_project
 
 code = """
 #include <pybind11/pybind11.h>
@@ -48,7 +50,11 @@ class myCoeff(UserExpression):
     def __init__(self, markers, coeffs, **kwargs):
         self.markers = markers
         self.coeffs = coeffs
-        self.ncoeff = coeffs.shape[1]
+        if(len(coeffs.shape)>1):
+            self.ncoeff = coeffs.shape[1]
+        else:
+            self.ncoeff = 1
+            
         super().__init__(**kwargs)
 
         
@@ -60,13 +66,24 @@ class myCoeff(UserExpression):
     
 
 compCode = compile_cpp_code(code)
-def getMyCoeff(materials, param, op = 'cpp'): 
+myCoeffCpp = lambda x,y : CompiledExpression(compCode.myCoeff(x.flatten().astype('float64'),y, x.shape[1]),degree = 0)
+
+def getMyCoeff(materials, param, op = 'cpp', mesh = None): 
     if(op == 'cpp'):
-        myCoeffCpp = lambda x,y : CompiledExpression(compCode.myCoeff(x.flatten().astype('float64'),y, param.shape[1]),degree = 0)
         return myCoeffCpp(param,materials)
         
     elif(op == 'python'):
         return myCoeff(materials, param, degree = 2) # it was 0 before
 
+    elif(op == 'function'):
+        coeff_exp = myCoeffCpp(param,materials)
+        
+        V = df.VectorFunctionSpace(mesh, 'DG', 0, dim = len(param[0]))
+        return local_project(coeff_exp, V)
+        
+        
+        
+        
+        
 
     

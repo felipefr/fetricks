@@ -6,6 +6,7 @@ from fetricks.fenics.mesh.wrapper_gmsh import Gmsh
 from fetricks.fenics.material.multiscale_model import multiscaleModel, multiscaleModelExpression
 from fetricks.fenics.material.hyperelastic_model import hyperelasticModel, hyperelasticModelExpression
 
+
 __all__ = ['fenics', 
 'tensor2mandel', 'tr_mandel', 'Id_mandel_np', 'Id_mandel_df', 'symgrad_mandel',
 'symgrad', 'Integral',

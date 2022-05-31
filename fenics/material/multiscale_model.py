@@ -72,10 +72,10 @@ class multiscaleModel(materialModel):
         self.projector_eps(epsnew ,  self.eps) 
             
         for e in df.cells(self.mesh):
-            print("hello, I'm cell ", e.index(), e.global_index(), comm.Get_rank() )
+            # print("hello, I'm cell ", e.index(), e.global_index(), comm.Get_rank() )
             dofs = self.Wdofmap.cell_dofs(e.index())
             dofs_tan = self.Wtandofmap.cell_dofs(e.index())
-            print(dofs, dofs_tan )
+            # print(dofs, dofs_tan )
             m = self.micromodels[e.index()]
             m.setUpdateFlag(False)
             self.stress.vector().vec()[dofs] = m.getStress(self.eps.vector().get_local()[dofs])
