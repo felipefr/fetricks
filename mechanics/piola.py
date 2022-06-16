@@ -1,6 +1,6 @@
 import dolfin as df
 import numpy as np
-
+import fetricks.fenics.misc as misc
 
 # PIOLA TRANSFORMATIONS 
 def PiolaTransform_rotation(theta, Vref): #only detB = pm 1 in our context

@@ -81,6 +81,9 @@ class multiscaleModel(materialModel):
             self.stress.vector().vec()[dofs] = m.getStress(self.eps.vector().get_local()[dofs])
             self.tangent.vector().vec()[dofs_tan] = m.getTangent(self.eps.vector().get_local()[dofs]).flatten()[ind_sym_tensor]
             
+            
+            
+            
 class multiscaleModelExpression(materialModelExpression):
     
     def __init__(self, W, Wtan, dxm, micromodels):
