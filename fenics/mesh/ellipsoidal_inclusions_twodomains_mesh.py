@@ -15,8 +15,8 @@ class ellipsoidalInclusionsTwoDomainsMesh(ellipsoidalInclusionsMesh):
         super().__init__(ellipseData, x0, y0, Lx, Ly , lcar)    
                 
     def createSurfaces(self):        
-        self.recL = self.add_rectangle(self.x0L, self.x0L + self.LxL, self.y0L , self.y0L + self.LyL, 0.0, lcar=self.lcar[0], holes = self.eList[:self.NL])                 
-        self.rec = self.add_rectangle(self.x0,self.x0 + self.Lx, self.y0, self.y0 + self.Ly, 0.0, lcar=self.lcar[-1], holes = self.eList[self.NL:] + [self.recL])
+        self.recL = self.add_rectangle(self.x0L, self.x0L + self.LxL, self.y0L , self.y0L + self.LyL, 0.0, lcar=self.lcar, holes = self.eList[:self.NL])                 
+        self.rec = self.add_rectangle(self.x0,self.x0 + self.Lx, self.y0, self.y0 + self.Ly, 0.0, lcar=self.lcar, holes = self.eList[self.NL:] + [self.recL])
     
     def physicalNaming(self):
         # self.add_physical(self.recL.surface, 'volL''
