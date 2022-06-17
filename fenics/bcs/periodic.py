@@ -4,11 +4,16 @@
 Created on Mon May 24 20:57:46 2021
 
 @author: felipefr
+
+
+Example of usage:
+Given the rectangle limits: x0, x1, y0, y1 and the mesh
+ 
+periodicity = PeriodicBoundary(x0, x1, y0, y1])
+V = df.VectorFunctionSpace(mesh, "CG", polyorder, constrained_domain=periodicity)
 """
 
 import dolfin as df
-from micmacsfenics.formulations.multiscale_formulation import MultiscaleFormulation
-
 
 class PeriodicBoundary(df.SubDomain):
     # Left boundary is "target domain" G
@@ -40,13 +45,3 @@ class PeriodicBoundary(df.SubDomain):
         y[0] = x[0] + self.x0 - (self.x1 if right else self.x0)
         y[1] = x[1] + self.y0 - (self.y1 if top else self.y0)
 
-
-class FormulationPeriodic(MultiscaleFormulation):
-
-    def flutuationSpace(self):
-        polyorder = self.others['polyorder']
-        periodicity = PeriodicBoundary(self.others['x0'], self.others['x1'],
-                                       self.others['y0'], self.others['y1'])
-
-        return df.VectorFunctionSpace(self.mesh, "CG", polyorder,
-                                      constrained_domain=periodicity)
