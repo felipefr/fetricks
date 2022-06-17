@@ -2,9 +2,7 @@ import os, sys
 os.environ['KMP_DUPLICATE_LIB_OK']='True'
 import matplotlib.pyplot as plt
 import numpy as np
-import deepBND.core.data_manipulation.utils as dman
-
-import deepBND.core.data_manipulation.wrapper_h5py as myhd
+import fetricks.data_manipulation.wrapper_h5py as myhd
 
 def constructor_scaler(scalerType):    
     return {'MinMax': myMinMaxScaler() , 
@@ -13,7 +11,8 @@ def constructor_scaler(scalerType):
 
 
 class myScaler:
-    def __init__(self):
+    
+    ef __init__(self):
         self.n = 0
         
     def set_n(self,n):

@@ -1,4 +1,4 @@
-from deepBND.core.mesh.wrapper_gmsh import myGmsh
+from fetricks.fenics.mesh.wrapper_gmsh import myGmsh
 
 class degeneratedBoundaryRectangleMesh(myGmsh): # Used for implementation of L2bnd
     def __init__(self, x0, y0, Lx, Ly, Nb): 

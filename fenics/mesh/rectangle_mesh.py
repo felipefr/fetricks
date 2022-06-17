@@ -1,6 +1,6 @@
-from deepBND.core.mesh.wrapper_gmsh import myGmsh
+from fetricks.fenics.mesh.wrapper_gmsh import myGmsh
 
-class rectangleMesh(myGmsh):
+class rectangleMesh(Gmsh):
     def __init__(self, x0, y0, Lx, Ly , lcar):
         super().__init__()
         
