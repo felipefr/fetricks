@@ -1,5 +1,5 @@
-from deepBND.core.mesh.wrapper_gmsh import myGmsh
-from deepBND.core.mesh.ellipsoidal_inclusions_mesh import ellipsoidalInclusionsMesh
+from fetricks.fenics.mesh.wrapper_gmsh import Gmsh
+from fetricks.fenics.mesh.ellipsoidal_inclusions_mesh import ellipsoidalInclusionsMesh
 import numpy as np
 
 class ellipsoidalInclusionsTwoDomainsMesh(ellipsoidalInclusionsMesh):

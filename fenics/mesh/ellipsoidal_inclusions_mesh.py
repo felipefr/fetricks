@@ -1,8 +1,8 @@
-from deepBND.core.mesh.wrapper_gmsh import myGmsh
+from fetricks.fenics.mesh.wrapper_gmsh import Gmsh
 import numpy as np
 
 
-class ellipsoidalInclusionsMesh(myGmsh):
+class ellipsoidalInclusionsMesh(Gmsh):
     # def __init__(self, Lx = 1.0,Ly= 1.0, ellipseData = [], lcar = 0.05, ifPeriodic = False):
     def __init__(self, ellipseData, x0, y0, Lx, Ly , lcar):
         super().__init__()    
