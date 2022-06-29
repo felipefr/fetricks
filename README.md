@@ -9,7 +9,7 @@ This little projecy is born with the aim of assembling some tricks and extension
 
 One of the projects that use fetricks is micmacsfenics (https://github.com/felipefr/micmacsFenics), the only one which is public so far.
 
-In some of them I took inspiration with the excellent tutorial of Jéremy Bleyer below.
+In some of them I took inspiration with the excellent tutorial of Jeremy Bleyer below:
 https://comet-fenics.readthedocs.io/en/latest/
 
 
