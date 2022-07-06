@@ -1,6 +1,6 @@
-from fetricks.fenics.mesh.wrapper_gmsh import myGmsh
+from fetricks.fenics.mesh.wrapper_gmsh import Gmsh
 
-class degeneratedBoundaryRectangleMesh(myGmsh): # Used for implementation of L2bnd
+class degeneratedBoundaryRectangleMesh(Gmsh): # Used for implementation of L2bnd
     def __init__(self, x0, y0, Lx, Ly, Nb): 
         super().__init__()
         
@@ -8,7 +8,7 @@ class degeneratedBoundaryRectangleMesh(myGmsh): # Used for implementation of L2b
         self.y0 = y0
         self.Lx = Lx
         self.Ly = Ly
-        self.lcar = 2*self.Lx    ## just a huge value
+        self.lcar = 4*self.Lx    ## just a huge value
         self.createSurfaces()
         self.physicalNaming()
         self.set_transfinite_lines(self.extLines, Nb)

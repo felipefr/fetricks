@@ -47,6 +47,8 @@ class Gmsh(pygmsh.built_in.Geometry):
         self.mesh = meshio.read(meshMshFile)
         
     def write(self, opt = 'meshio'):
+        if(type(self.mesh) == type(None)):
+            self.generate()
         if(opt == 'meshio'):
             savefile = self.radFileMesh.format('msh')
             meshio.write(savefile, self.mesh)
