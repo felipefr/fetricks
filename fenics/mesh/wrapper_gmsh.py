@@ -57,7 +57,7 @@ class Gmsh(pygmsh.built_in.Geometry):
             exportMeshHDF5_fromGMSH(self.mesh, savefile)
             
     def generate(self):
-        self.mesh = pygmsh.generate_mesh(self, extra_gmsh_arguments = self.gmsh_opt.split(), dim = 2, mesh_file_type = 'msh2') # it should be msh2 cause of tags    
+        self.mesh = pygmsh.generate_mesh(self, verbose = False, extra_gmsh_arguments = self.gmsh_opt.split(), dim = 2, mesh_file_type = 'msh2') # it should be msh2 cause of tags    
                                           
 
     # def getEnrichedMesh(self, savefile = ''):
