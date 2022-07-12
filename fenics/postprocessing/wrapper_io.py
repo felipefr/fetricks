@@ -34,47 +34,21 @@ def readXDMF_with_markers(meshFile, mesh, comm = MPI.comm_world):
     # return mt, mf
     return mt, mf
 
-def exportMeshHDF5_fromGMSH(gmshMesh = 'mesh.msh', meshFile = 'mesh.xdmf', labels = {'line' : 'faces', 'triangle' : 'regions'}): #'meshTemp2.msh'
-    # Todo: Export just mesh with meshio then update .h5 file with domains and boundary physical markers. Need of just one xdmf file, and also h5 ==> look below
-    # import dolfin as df
+# Todo: Export just mesh with meshio then update .h5 file with domains and boundary physical markers. Need of just one xdmf file, and also h5 ==> look below
 
-    # mesh = df.Mesh(xml_mesh_name)
-    # mesh_file = df.HDF5File(df.mpi_comm_world(), h5_file_name, 'w')
-    # mesh_file.write(mesh, '/mesh')
-    
-    # # maybe you have defined a mesh-function (boundaries, domains ec.)
-    # # in the xml_mesh aswell, in this case use the following two lines
-    
-    # domains = df.MeshFunction("size_t", mesh, 3, mesh.domains())
-    # mesh_file.write(domains, "/domains")
-    # read in parallel:
-    
-    # mesh = df.Mesh()
-    # hdf5 = df.HDF5File(df.mpi_comm_world(), h5_file_name, 'r')
-    # hdf5.read(mesh, '/mesh', False)
-    
-    # # in case mesh-functions are available ...
-    
-    # domains = df.CellFunction("size_t", mesh)
-    # hdf5.read(domains, "/domains")
-    
+def exportMeshHDF5_fromGMSH(gmshMesh = 'mesh.msh', meshFile = 'mesh.xdmf', labels = {'line' : 'faces', 'triangle' : 'regions'}): #'meshTemp2.msh'    
     geometry = meshio.read(gmshMesh) if type(gmshMesh) == type('s') else gmshMesh
     
     meshFileRad = meshFile[:-5]
     
-    meshio.write(meshFile, meshio.Mesh(points=geometry.points[:,:2], cells={"triangle": geometry.cells["triangle"]})) # working on mac, error with cell dictionary
-    # meshio.write(meshFile, meshio.Mesh(points=geometry.points[:,:2], cells={"triangle": geometry.cells}))
-        
+    # working on mac, error with cell dictionary
+    meshio.write(meshFile, meshio.Mesh(points=geometry.points[:,:2], cells={"triangle": geometry.cells["triangle"]})) 
+
     mesh = meshio.Mesh(points=np.zeros((1,2)), cells={'line': geometry.cells['line']},
                                                                               cell_data={'line': {'faces': geometry.cell_data['line']["gmsh:physical"]}})
     
     meshio.write("{0}_{1}.xdmf".format(meshFileRad,'faces'), mesh)
-    
-    # f = h5py.File("{0}_{1}.h5".format(meshFileRad,'faces'),'r+')
-    # del f['data0']
-    # f['data0'] = h5py.ExternalLink(meshFileRad + ".h5", "data0")
-    # f.close()
-    
+        
     mesh = meshio.Mesh(points=np.zeros((1,2)), cells={"triangle": np.array([[1,2,3]])}, cell_data={'triangle': {'regions': geometry.cell_data['triangle']["gmsh:physical"]}})
     
     meshio.write("{0}_{1}.xdmf".format(meshFileRad,'regions'), mesh)
