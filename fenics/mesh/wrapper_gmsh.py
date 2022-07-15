@@ -4,18 +4,13 @@
 # 
 # =============================================================================
 
-import numpy as np
 import meshio
 import pygmsh
 import os
-import dolfin as df
-from functools import reduce
 
 from fetricks.fenics.postprocessing.wrapper_io import exportMeshHDF5_fromGMSH
-from fetricks.fenics.mesh.mesh import Mesh
 
-
-class Gmsh(pygmsh.built_in.Geometry):
+class Gmsh(pygmsh.geo.Geometry):
     def __init__(self, meshname = "default.xdmf"):
         super().__init__()   
         self.mesh = None
@@ -47,19 +42,16 @@ class Gmsh(pygmsh.built_in.Geometry):
         self.mesh = meshio.read(meshMshFile)
         
     def write(self, opt = 'meshio'):
-        if(type(self.mesh) == type(None)):
-            self.generate()
         if(opt == 'meshio'):
             savefile = self.radFileMesh.format('msh')
-            meshio.write(savefile, self.mesh)
+            meshio.write(savefile, self)
         elif(opt == 'fenics'):
             savefile = self.radFileMesh.format('xdmf')
-            exportMeshHDF5_fromGMSH(self.mesh, savefile)
+            exportMeshHDF5_fromGMSH(self, savefile)
             
     def generate(self):
-        self.mesh = pygmsh.generate_mesh(self, verbose = False, extra_gmsh_arguments = self.gmsh_opt.split(), dim = 2, mesh_file_type = 'msh2') # it should be msh2 cause of tags    
-                                          
-
+        self.generate_mesh(verbose = False, dim = 2, order = 1)     
+                  
     # def getEnrichedMesh(self, savefile = ''):
         
     #     if(len(savefile) == 0):
