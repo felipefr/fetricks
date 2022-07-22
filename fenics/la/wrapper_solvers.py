@@ -2,6 +2,32 @@ import dolfin as df
 import numpy as np
 from timeit import default_timer as timer
 
+# Block Solver [K 0; 0 K] u = [F_1 ... F_N]
+class BlockSolver:
+
+    def __init__(self, subproblems):
+        self.subproblems = subproblems
+        self.n_subproblems = len(self.subproblems)
+        
+        self.F = [ df.PETScVector() for i in range(self.n_subproblems) ] 
+        self.A = df.PETScMatrix()
+        
+        # supposing lhs and bcs are equal for all problems
+        df.assemble(self.subproblems[0].a_ufl , tensor = self.A)
+        [bc.apply(self.A) for bc in self.subproblems[0].bcs()] 
+        
+        self.solver = df.PETScLUSolver(self.A, 'superlu')
+
+    def assembly_rhs(self):
+        for i in range(self.n_subproblems): 
+            df.assemble(self.subproblems[i].L_ufl, tensor = self.F[i])    
+            [bc.apply(self.F[i]) for bc in self.subproblems[i].bcs()]
+            
+    def solve(self):   
+        self.assembly_rhs()
+        for i in range(self.n_subproblems): 
+            self.solver.solve(self.subproblems[i].u_ufl.vector(), self.F[i])
+            
 
 # Hand-coded implementation of Newton Raphson (Necessary in some cases)
 def Newton(Jac, Res, bc, du, u, callbacks = None, Nitermax = 10, tol = 1e-8): 
