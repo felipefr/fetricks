@@ -30,8 +30,8 @@ class BlockSolver:
             
 
 # Hand-coded implementation of Newton Raphson (Necessary in some cases)
-def Newton(Jac, Res, bc, du, u, callbacks = None, Nitermax = 10, tol = 1e-8): 
-    A, b = df.assemble_system(Jac, Res, bc)
+def Newton(Jac, Res, bc, du, u, callbacks = [], Nitermax = 10, tol = 1e-8): 
+    A, b = df.assemble_system(Jac, -Res, bc)
     nRes0 = b.norm("l2")
     nRes0 = nRes0 if nRes0>0.0 else 1.0
     nRes = nRes0
@@ -49,9 +49,9 @@ def Newton(Jac, Res, bc, du, u, callbacks = None, Nitermax = 10, tol = 1e-8):
         df.solve(A, du.vector(), b, "mumps")
         u.assign(u + du)
         for callback in callbacks:
-            callback(u)
+            callback(u, du)
             
-        A, b = df.assemble_system(Jac, Res, bc)
+        A, b = df.assemble_system(Jac, -Res, bc)
         nRes = b.norm("l2")
         print(" Residual:", nRes)
         niter += 1
