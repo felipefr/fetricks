@@ -16,12 +16,12 @@ def symgrad_voigt(v):
     return df.as_vector([v[0].dx(0), v[1].dx(1), v[0].dx(1) + v[1].dx(0)])
 
 
-def stress2Voigt(s):
-    return df.as_vector([s[0, 0], s[1, 1], s[0, 1]])
+def stress2voigt(s):
+    return df.as_vector([s[0, 0], s[1, 1], 0.5*(s[0, 1] + s[1, 0]) ])
 
 
-def strain2Voigt(e):
-    return df.as_vector([e[0, 0], e[1, 1], 2*e[0, 1]])
+def strain2voigt(e):
+    return df.as_vector([e[0, 0], e[1, 1], e[0, 1] + e[1, 0]])
 
 def voigt2strain(e):
     return df.as_tensor([[e[0], 0.5*e[2]], [0.5*e[2], e[1]]])
@@ -38,17 +38,17 @@ def macro_strain(i):
                     
                     
 # VOIGT NOTATION: Generic backend
-def stress2Voigt_gen(s, backend = df.as_vector):
-    return backend([s[0, 0], s[1, 1], s[0, 1]])
+def stress2voigt_gen(s, backend = df.as_vector):
+    return backend([s[0, 0], s[1, 1], 0.5*(s[0, 1] + s[1, 0])])
 
 
-def strain2Voigt_gen(e, backend = df.as_vector):
-    return backend([e[0, 0], e[1, 1], 2*e[0, 1]])
+def strain2voigt_gen(e, backend = df.as_vector):
+    return backend([e[0, 0], e[1, 1], e[0, 1] + e[1, 0]])
 
-def voigt2Strain_gen(e, backend = df.as_vector):
+def voigt2strain_gen(e, backend = df.as_vector):
     return backend([[e[0], 0.5*e[2]], [0.5*e[2], e[1]]])
 
-def voigt2Stress_gen(s, backend = df.as_vector):
+def voigt2stress_gen(s, backend = df.as_vector):
     return backend([[s[0], s[2]], [s[2], s[1]]])
 
     
@@ -107,5 +107,9 @@ def vonMises(sig):
     return df.sqrt((3./2)*df.inner(s, s)) 
 
 
-
-
+# mandel to voigt conversions
+def mandel2voigtStrain(v, backend = df.as_vector):
+    return backend([v[0], v[1], sqrt2*v[2]]) 
+                    
+def mandel2voigtStress(v, backend = df.as_vector):
+    return backend([v[0], v[1], halfsqrt2*v[2]]) 
