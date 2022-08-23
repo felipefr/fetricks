@@ -23,6 +23,7 @@ class Gmsh(pygmsh.built_in.Geometry):
         self.setNameMesh(meshname)
         self.gmsh_opt = '-format msh2 -{0} -smooth 2 -anisoMax 1000.0'.format(self.dim)
         
+        
     # write .geo file necessary to produce msh files using gmsh
     def writeGeo(self):
         savefile = self.radFileMesh.format('geo')
