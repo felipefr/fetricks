@@ -37,8 +37,8 @@ def Newton(Jac, Res, bc, du, u, callbacks = [], Nitermax = 10, tol = 1e-8):
     nRes = nRes0
     
     V = u.function_space()
-    du.vector().set_local(np.zeros(len(du.vector().get_local())))
-    u.vector().set_local(np.zeros(len(du.vector().get_local())))
+    du.vector().set_local(np.zeros(V.dim()))
+    u.vector().set_local(np.zeros(V.dim()))
       
     niter = 0
     
@@ -46,7 +46,7 @@ def Newton(Jac, Res, bc, du, u, callbacks = [], Nitermax = 10, tol = 1e-8):
         bc_i.homogenize()
     
     while nRes/nRes0 > tol and niter < Nitermax:
-        df.solve(A, du.vector(), b, "mumps")
+        df.solve(A, du.vector(), b)
         u.assign(u + du)
         for callback in callbacks:
             callback(u, du)

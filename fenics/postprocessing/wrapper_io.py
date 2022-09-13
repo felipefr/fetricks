@@ -77,9 +77,12 @@ def exportXDMF_gen(filename, fields, k = -1):
             for field in fields['vertex']:
                 ofile.write(field, k) 
         
-
         if('cell' in fields.keys()):
             for field in fields['cell']:
+                ofile.write(field, k) 
+
+        if('cell_vector' in fields.keys()):
+            for field in fields['cell_vector']:
                 for field_i in field.split():
                     ofile.write(field_i, k) 
 
@@ -112,10 +115,15 @@ def exportXDMF_checkpoint_gen(filename, fields):
             for field in fields['vertex']:
                 ofile.write_checkpoint(field, field.name(), count, append = True)
                 # count = count + 1
+                
         
-
         if('cell' in fields.keys()):
             for field in fields['cell']:
+                ofile.write_checkpoint(field, field.name(), count, append = True) 
+                # count = count + 1
+
+        if('cell_vector' in fields.keys()):
+            for field in fields['cell_vector']:
                 for field_i in field.split():
                     ofile.write_checkpoint(field_i, field_i.name(), count, append = True) 
                     # count = count + 1
