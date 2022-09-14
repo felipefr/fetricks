@@ -90,6 +90,17 @@ def tr_mandel(X):
 def symgrad_mandel(v): # it was shown somehow to have better performance than doing it explicity
     return tensor2mandel(symgrad(v))
     
+
+# Used to convert dPsi/deps_m in mandel notation to the correct stress in mandel notation  
+def grad2mandel_vec(X):
+    return df.as_tensor([X[0] , X[1], 2*X[2]])
+
+# Used to convert dsigma_m/deps_m in mandel notation to the correct tangent tensor in mandel notation  
+def grad2mandel_ten(X):
+    return df.as_tensor([ [X[0,0] , X[0,1], 2*X[0,2]],
+                          [X[1,0] , X[1,1], 2*X[1,2]],
+                          [X[2,0] , X[2,1], 2*X[2,2]] ])
+    
 # this is in mandel
 def macro_strain_mandel(i): 
     Eps_Mandel = np.zeros((3,))
