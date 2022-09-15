@@ -1,3 +1,5 @@
+# Still some bugs in this code
+
 import dolfin as df
 import matplotlib.pyplot as plt
 import numpy as np
@@ -34,6 +36,9 @@ W = df.FunctionSpace(mesh, We)
 W0e = df.FiniteElement("Quadrature", mesh.ufl_cell(), degree=deg_stress, quad_scheme='default')
 W0 = df.FunctionSpace(mesh, W0e)
 
+Wtan_e = df.TensorElement("Quadrature", mesh.ufl_cell(), degree=deg_stress, shape=(3,3), quad_scheme='default')
+Wtan = df.FunctionSpace(mesh, Wtan_e)
+
 bcL = df.DirichletBC(V, df.Constant((0.0,0.0)), mesh.boundaries, clampedBndFlag)
 bc = [bcL]
 
@@ -44,22 +49,24 @@ def F_ext(v):
 metadata = {"quadrature_degree": deg_stress, "quadrature_scheme": "default"}
 dxm = df.dx(metadata=metadata)
 
-model = ft.hyperelasticModelExpression(W, dxm, {'E': E, 'nu': nu, 'alpha': alpha})
+model = ft.hyperelasticModelExpression(W, Wtan, dxm, {'E': E, 'nu': nu, 'alpha': alpha})
 
 u = df.Function(V, name="Total displacement")
 du = df.Function(V, name="Iteration correction")
 v = df.TestFunction(V)
 u_ = df.TrialFunction(V)
 
-a_Newton = df.inner(ft.tensor2mandel(ft.symgrad(u_)), df.dot(model.tangent, ft.tensor2mandel(ft.symgrad(v))) )*dxm
-res = -df.inner(ft.tensor2mandel(ft.symgrad(v)), model.stress )*dxm + F_ext(v)
+
+# RHS and LHS: Note that Jac = derivative of Res
+a_Newton = df.inner(ft.symgrad_mandel(u_), df.dot(model.tangent, ft.symgrad_mandel(v)))*dxm
+res = df.inner(ft.tensor2mandel(ft.symgrad(v)), model.stress )*dxm - F_ext(v)
 
 file_results = df.XDMFFile("cook.xdmf")
 file_results.parameters["flush_output"] = True
 file_results.parameters["functions_share_mesh"] = True
 
 
-callbacks = [lambda w: model.updateStrain(ft.tensor2mandel(ft.symgrad(w))) ]
+callbacks = [lambda w, dw: model.updateStrain(ft.tensor2mandel(ft.symgrad(w))) ]
 
 ft.Newton(a_Newton, res, bc, du, u, callbacks , Nitermax = 10, tol = 1e-8)
 

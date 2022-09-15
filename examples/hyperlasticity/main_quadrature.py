@@ -54,15 +54,16 @@ du = df.Function(V, name="Iteration correction")
 v = df.TestFunction(V)
 u_ = df.TrialFunction(V)
 
+# RHS and LHS: Note that Jac = derivative of Res
 a_Newton = df.inner(ft.tensor2mandel(ft.symgrad(u_)), model.tangent(ft.tensor2mandel(ft.symgrad(v))) )*dxm
-res = -df.inner(ft.tensor2mandel(ft.symgrad(v)), model.sig )*dxm + F_ext(v)
+res = df.inner(ft.tensor2mandel(ft.symgrad(v)), model.sig )*dxm - F_ext(v)
 
 file_results = df.XDMFFile("cook.xdmf")
 file_results.parameters["flush_output"] = True
 file_results.parameters["functions_share_mesh"] = True
 
 
-callbacks = [lambda w: model.update_alpha(ft.tensor2mandel(ft.symgrad(w))) ]
+callbacks = [lambda w, dw: model.update_alpha(ft.tensor2mandel(ft.symgrad(w))) ]
 
 ft.Newton(a_Newton, res, bc, du, u, callbacks , Nitermax = 10, tol = 1e-8)
 
