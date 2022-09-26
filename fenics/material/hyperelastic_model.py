@@ -74,34 +74,34 @@ class hyperelasticModel(materialModel):
         self.project_var(alpha_new)
         
         
-    def stress_np(self, e): # elastic (I dont know why for the moment) # in mandel format
+    # def stress_np(self, e): # elastic (I dont know why for the moment) # in mandel format
     
-        ee = np.dot(e,e)
-        tre2 = (e[0] + e[1])**2.0
+    #     ee = np.dot(e,e)
+    #     tre2 = (e[0] + e[1])**2.0
         
-        lamb_star = self.lamb_*( 1 + self.alpha_*tre2)
-        mu_star = self.mu_*( 1 + self.alpha_*ee ) 
+    #     lamb_star = self.lamb_*( 1 + self.alpha_*tre2)
+    #     mu_star = self.mu_*( 1 + self.alpha_*ee ) 
         
-        return lamb_star*(e[0] + e[1])*ft.Id_mandel_np + 2*mu_star*e
+    #     return lamb_star*(e[0] + e[1])*ft.Id_mandel_np + 2*mu_star*e
     
     
-    def tangent_np(self, e): # elastic (I dont know why for the moment) # in mandel format
+    # def tangent_np(self, e): # elastic (I dont know why for the moment) # in mandel format
         
-        ee = np.dot(e,e)
-        tre2 = (e[0] + e[1])**2.0
+    #     ee = np.dot(e,e)
+    #     tre2 = (e[0] + e[1])**2.0
         
-        lamb_star = self.lamb_*( 1 + 3*self.alpha_*tre2)
-        mu_star = self.mu*( 1 + self.alpha_*ee ) 
+    #     lamb_star = self.lamb_*( 1 + 3*self.alpha_*tre2)
+    #     mu_star = self.mu*( 1 + self.alpha_*ee ) 
         
-        D = 4*self.mu_*self.alpha_*np.outer(e,e)
+    #     D = 4*self.mu_*self.alpha_*np.outer(e,e)
     
-        D[0,0] += lamb_star + 2*mu_star
-        D[1,1] += lamb_star + 2*mu_star
-        D[0,1] += lamb_star
-        D[1,0] += lamb_star
-        D[2,2] += 2*mu_star
+    #     D[0,0] += lamb_star + 2*mu_star
+    #     D[1,1] += lamb_star + 2*mu_star
+    #     D[0,1] += lamb_star
+    #     D[1,0] += lamb_star
+    #     D[2,2] += 2*mu_star
         
-        return D
+    #     return D
 
 
 

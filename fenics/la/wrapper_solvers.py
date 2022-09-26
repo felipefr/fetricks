@@ -35,7 +35,6 @@ def Newton(Jac, Res, bc, du, u, callbacks = [], Nitermax = 10, tol = 1e-8):
     nRes = []
     nRes.append(b.norm("l2"))
     nRes[0] = nRes[0] if nRes[0]>0.0 else 1.0
-    nRes.append(nRes[0]) # just to initialize
     
     V = u.function_space()
     du.vector().set_local(np.zeros(V.dim()))
@@ -46,7 +45,7 @@ def Newton(Jac, Res, bc, du, u, callbacks = [], Nitermax = 10, tol = 1e-8):
     for bc_i in bc: # non-homogeneous dirichlet applied only in the first itereation
         bc_i.homogenize()
     
-    while nRes[niter+1]/nRes[niter] > tol and niter < Nitermax:
+    while nRes[niter]/nRes[0] > tol and niter < Nitermax:
         df.solve(A, du.vector(), b)
         u.assign(u + du)
         for callback in callbacks:
@@ -54,16 +53,24 @@ def Newton(Jac, Res, bc, du, u, callbacks = [], Nitermax = 10, tol = 1e-8):
             
         A, b = df.assemble_system(Jac, -Res, bc)
         nRes.append(b.norm("l2"))
-        print(" Residual:", nRes)
+        print(" Residual:", nRes[niter+1])
         niter += 1
     
     return u, nRes
 
 
-# Hand-coded implementation of Newton Raphson (Necessary in some cases)
+# Automatic implementation of Newton Raphson (Necessary in some cases)
 def Newton_automatic(Jac, Res, bc, du, u, callbacks = [], Nitermax = 10, tol = 1e-8):     
-    problem = df.NonlinearVariationalProblem(Res, u, bc)
+    problem = df.NonlinearVariationalProblem(Res, u, bc, Jac)
     microsolver = df.NonlinearVariationalSolver(problem)
+    
+    solver_parameters = {"nonlinear_solver": "newton",
+                         "newton_solver": {"maximum_iterations": 20,
+                                           "report": True,
+                                           "error_on_nonconvergence": True}}
+
+    microsolver.parameters.update(solver_parameters)
+
     microsolver.solve()
     return u
 

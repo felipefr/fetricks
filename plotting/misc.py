@@ -6,10 +6,17 @@ plt.rc("text", usetex = True)
 plt.rc("font", family = 'serif')
 plt.rc("font", size = 12)
 plt.rc('text.latex', preamble=r'\usepackage{amsmath,amsfonts}')
+plt.rcParams["mathtext.fontset"] = "cm"
 # matplotlib.rcParams['text.latex.preamble']=[r"\usepackage{amsmath}"]
 
 palletteCounter = 0
 pallette = ['blue','red','green']
+
+def loadLatexOptions():
+    plt.rc("text", usetex = True)
+    plt.rc("font", family = 'serif')
+    plt.rc("font", size = 12)
+    plt.rc('text.latex', preamble=r'\usepackage{amsmath,amsfonts}')
 
 def plotMeanAndStd(x, y, l='', linetypes = ['-o','--','--'], axis = 0):
     plt.plot(x, np.mean(y, axis = axis), linetypes[0], label = l)
