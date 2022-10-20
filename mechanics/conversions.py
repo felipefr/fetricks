@@ -99,7 +99,15 @@ def grad2mandel_vec(X):
 def grad2mandel_ten(X):
     return df.as_tensor([ [X[0,0] , X[0,1], 2*X[0,2]],
                           [X[1,0] , X[1,1], 2*X[1,2]],
-                          [X[2,0] , X[2,1], 2*X[2,2]] ])
+                          [X[2,0] , X[2,1], 4*X[2,2]] ])
+    
+# derive in tensor format and convert to mandel format (scalar)
+def mandelgrad(f, x):
+    return tensor2mandel(df.diff(f,x))
+
+# derive in tensor format and convert to mandel format (2-tensor)
+def mandelgrad_ten(f, x):
+    return tensor4th2mandel(df.diff(f,x))
     
 # this is in mandel
 def macro_strain_mandel(i): 
