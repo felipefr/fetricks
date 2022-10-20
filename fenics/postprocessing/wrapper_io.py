@@ -119,11 +119,11 @@ def exportXDMF_checkpoint_gen(filename, fields):
         
         if('cell' in fields.keys()):
             for field in fields['cell']:
-                ofile.write_checkpoint(field, field.name(), count, append = True) 
+                ofile.write_checkpoint(field, field.name(), count, XDMFFile.Encoding.HDF5, append = True) 
                 # count = count + 1
 
         if('cell_vector' in fields.keys()):
             for field in fields['cell_vector']:
                 for field_i in field.split():
-                    ofile.write_checkpoint(field_i, field_i.name(), count, append = True) 
+                    ofile.write_checkpoint(field_i, field_i.name(), count, XDMFFile.Encoding.HDF5, append = True) 
                     # count = count + 1
