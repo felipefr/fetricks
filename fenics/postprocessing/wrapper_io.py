@@ -1,18 +1,5 @@
 from __future__ import print_function
-import numpy as np
-from fenics import *
 from dolfin import *
-from ufl import nabla_div
-import matplotlib.pyplot as plt
-import sys, os
-import copy
-
-from functools import reduce
-
-from timeit import default_timer as timer
-import meshio
-import h5py
-import xml.etree.ElementTree as ET
 
 def readXDMF_with_markers(meshFile, mesh, comm = MPI.comm_world):
 
@@ -31,72 +18,8 @@ def readXDMF_with_markers(meshFile, mesh, comm = MPI.comm_world):
     
     mt  = MeshFunction("size_t", mesh, mvc)
     
-    # return mt, mf
     return mt, mf
-
-# Todo: Export just mesh with meshio then update .h5 file with domains and boundary physical markers. Need of just one xdmf file, and also h5 ==> look below
-
-def exportMeshHDF5_fromGMSH(gmshMesh = 'mesh.msh', meshFile = 'mesh.xdmf'):
-    geometry = meshio.read(gmshMesh) if type(gmshMesh) == type('s') else gmshMesh
     
-    meshFileRad = meshFile[:-5]
-    
-    # working on mac, error with cell dictionary
-    meshio.write(meshFile, meshio.Mesh(points=geometry.points[:,:2], cells={"triangle": geometry.cells["triangle"]})) 
-
-    mesh = meshio.Mesh(points=np.zeros((1,2)), cells={'line': geometry.cells['line']},
-                                                                              cell_data={'line': {'faces': geometry.cell_data['line']["gmsh:physical"]}})
-    
-    meshio.write("{0}_{1}.xdmf".format(meshFileRad,'faces'), mesh)
-        
-    mesh = meshio.Mesh(points=np.zeros((1,2)), cells={"triangle": np.array([[1,2,3]])}, cell_data={'triangle': {'regions': geometry.cell_data['triangle']["gmsh:physical"]}})
-    
-    meshio.write("{0}_{1}.xdmf".format(meshFileRad,'regions'), mesh)
-    
-    # hack to not repeat mesh information
-    f = h5py.File("{0}_{1}.h5".format(meshFileRad,'regions'),'r+')
-    del f['data1']
-    f['data1'] = h5py.ExternalLink(meshFileRad + ".h5", "data1")
-    f.close()
-    
-    g = ET.parse("{0}_{1}.xdmf".format(meshFileRad,'regions'))
-    root = g.getroot()
-    root[0][0][2].attrib['NumberOfElements'] = root[0][0][3][0].attrib['Dimensions'] # left is topological in level, and right in attributes level
-    root[0][0][2][0].attrib['Dimensions'] = root[0][0][3][0].attrib['Dimensions'] + ' 3'
-  
-    g.write("{0}_{1}.xdmf".format(meshFileRad,'regions'))
-    
-def exportMeshHDF5_fromGMSH_volume(gmshMesh = 'mesh.msh', meshFile = 'mesh.xdmf'):    
-    geometry = meshio.read(gmshMesh) if type(gmshMesh) == type('s') else gmshMesh
-    
-    meshFileRad = meshFile[:-5]
-    
-    # working on mac, error with cell dictionary
-    meshio.write(meshFile, meshio.Mesh(points=geometry.points[:,:2], cells={"tetra": geometry.cells["tetra"]})) 
-
-    mesh = meshio.Mesh(points=np.zeros((1,2)), cells={'triangle': geometry.cells['triangle']},
-                                                                              cell_data={'triangle': {'faces': geometry.cell_data['triangle']["gmsh:physical"]}})
-    
-    meshio.write("{0}_{1}.xdmf".format(meshFileRad,'faces'), mesh)
-        
-    mesh = meshio.Mesh(points=np.zeros((1,2)), cells={"tetra": np.array([[1,2,3,4]])}, cell_data={'tetra': {'regions': geometry.cell_data['tetra']["gmsh:physical"]}})
-    
-    meshio.write("{0}_{1}.xdmf".format(meshFileRad,'regions'), mesh)
-    
-    # hack to not repeat mesh information
-    f = h5py.File("{0}_{1}.h5".format(meshFileRad,'regions'),'r+')
-    del f['data1']
-    f['data1'] = h5py.ExternalLink(meshFileRad + ".h5", "data1")
-    f.close()
-    
-    g = ET.parse("{0}_{1}.xdmf".format(meshFileRad,'regions'))
-    root = g.getroot()
-    root[0][0][2].attrib['NumberOfElements'] = root[0][0][3][0].attrib['Dimensions'] # left is topological in level, and right in attributes level
-    root[0][0][2][0].attrib['Dimensions'] = root[0][0][3][0].attrib['Dimensions'] + ' 3'
-  
-    g.write("{0}_{1}.xdmf".format(meshFileRad,'regions'))
-    
-
 def exportXDMF_gen(filename, fields, k = -1):
     with XDMFFile(filename) as ofile: 
         ofile.parameters["flush_output"] = True
