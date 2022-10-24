@@ -11,7 +11,7 @@ import os
 import dolfin as df
 from functools import reduce
 
-from fetricks.fenics.postprocessing.wrapper_io import exportMeshHDF5_fromGMSH
+from fetricks.fenics.postprocessing.wrapper_io import exportMeshHDF5_fromGMSH, exportMeshHDF5_fromGMSH_volume
 from fetricks.fenics.mesh.mesh import Mesh
 
 
@@ -57,6 +57,7 @@ class Gmsh(pygmsh.built_in.Geometry):
         elif(opt == 'fenics'):
             savefile = self.radFileMesh.format('xdmf')
             exportMeshHDF5_fromGMSH(self.mesh, savefile)
+            # exportMeshHDF5_fromGMSH_volume(self.mesh, savefile)
             
     def generate(self):
         self.mesh = pygmsh.generate_mesh(self, verbose = False,
@@ -67,22 +68,3 @@ class Gmsh(pygmsh.built_in.Geometry):
     def setNameMesh(self, meshname):
         self.radFileMesh,  self.format = meshname.split('.')
         self.radFileMesh += '.{0}'
-        
-        
-    # def getEnrichedMesh(self, savefile = ''):
-        
-    #     if(len(savefile) == 0):
-    #         savefile = self.radFileMesh.format(self.format)
-        
-    #     if(savefile[-3:] == 'xml'):
-    #         self.writeXML(savefile)
-            
-    #     elif(savefile[-4:] == 'xdmf'):
-    #         print("exporting to fenics")
-    #         self.write(savefile, 'fenics')
-        
-    #     return Mesh(savefile)
-    
-        
-# self.mesh = pygmsh.generate_mesh(self, verbose=False, dim=2, prune_vertices=True, prune_z_0=True,
-# remove_faces=False, extra_gmsh_arguments=gmsh_opt,  mesh_file_type='msh4') # it should be msh2 cause of tags

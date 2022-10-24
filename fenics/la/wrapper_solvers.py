@@ -16,7 +16,7 @@ class BlockSolver:
         df.assemble(self.subproblems[0].a_ufl , tensor = self.A)
         [bc.apply(self.A) for bc in self.subproblems[0].bcs()] 
         
-        self.solver = df.PETScLUSolver(self.A, 'superlu')
+        self.solver = df.PETScLUSolver(self.A)
 
     def assembly_rhs(self):
         for i in range(self.n_subproblems): 
