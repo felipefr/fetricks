@@ -40,3 +40,4 @@ lame2young = lambda lamb, mu: mu*(3.*lamb + 2.*mu)/(lamb + mu)
 lame2lambPlaneStress = lambda lamb, mu: (2.0*mu*lamb)/(lamb + 2.0*mu)
 lamePlaneStress2lamb = lambda lambStar, mu: (2.0*mu*lambStar)/(-lambStar + 2.0*mu)
 eng2lambPlaneStress = gof(lame2lambPlaneStress,lambda x,y: (eng2lamb(x,y), eng2mu(x,y)))
+

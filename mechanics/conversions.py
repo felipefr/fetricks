@@ -132,3 +132,37 @@ def mandel2voigtStrain(v, backend = df.as_vector):
                     
 def mandel2voigtStress(v, backend = df.as_vector):
     return backend([v[0], v[1], halfsqrt2*v[2]]) 
+
+
+# Check it again 
+# def rotationInMandelNotation(theta):
+
+#     Q = np.array([[np.cos(theta), np.sin(theta)],
+#                   [-np.sin(theta), np.cos(theta)]])
+    
+#     # Rotation tranformation in mandel-kelvin convention
+#     sq2 = np.sqrt(2.0)
+#     Tm = np.array([ [Q[0,0]**2 , Q[0,1]**2, sq2*Q[0,0]*Q[0,1]], 
+#                     [Q[1,0]**2 , Q[1,1]**2, sq2*Q[1,1]*Q[1,0]],
+#                     [sq2*Q[1,0]*Q[0,0] , sq2*Q[0,1]*Q[1,1], Q[1,1]*Q[0,0] + Q[0,1]*Q[1,0] ] ])
+    
+    
+#     return Tm
+
+def rotationInMandelNotation(theta):
+
+    c = np.cos(theta)
+    s = np.sin(theta)
+    c2 = c*c
+    s2 = s*s
+    cs = c*s
+    sq2 = np.sqrt(2.0)
+    
+    # Rotation tranformation in mandel-kelvin convention
+    
+    Tm = np.array([ [c2 , s2, -sq2*cs], 
+                    [s2 , c2,  sq2*cs],
+                    [cs , -cs, 0.5*sq2*(c2 - s2)] ])
+    
+    
+    return Tm

@@ -12,8 +12,6 @@ import pygmsh
 import os
 import dolfin as df
 from functools import reduce
-
-from fetricks.fenics.postprocessing.wrapper_io import exportMeshHDF5_fromGMSH
 from fetricks.fenics.mesh.mesh import Mesh
 
 
