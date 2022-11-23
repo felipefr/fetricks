@@ -134,7 +134,7 @@ def mandel2voigtStress(v, backend = df.as_vector):
     return backend([v[0], v[1], halfsqrt2*v[2]]) 
 
 
-# Check it again 
+#  Check it again 
 # def rotationInMandelNotation(theta):
 
 #     Q = np.array([[np.cos(theta), np.sin(theta)],
@@ -162,7 +162,7 @@ def rotationInMandelNotation(theta):
     
     Tm = np.array([ [c2 , s2, -sq2*cs], 
                     [s2 , c2,  sq2*cs],
-                    [cs , -cs, 0.5*sq2*(c2 - s2)] ])
+                    [sq2*cs , -sq2*cs, c2 - s2] ])
     
     
     return Tm

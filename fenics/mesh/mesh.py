@@ -1,5 +1,6 @@
 import dolfin as df
 from functools import reduce
+import numpy as np
 
 import fetricks.fenics.postprocessing.wrapper_io as iofe
 
@@ -15,14 +16,18 @@ class Mesh(df.Mesh):
         elif(meshFile[-4:] == 'xdmf'):
             self.subdomains, self.boundaries = iofe.readXDMF_with_markers(meshFile, self, comm)
                 
-        self.ds = df.Measure('ds', domain=self, subdomain_data=self.boundaries)
-        self.dx = df.Measure('dx', domain=self, subdomain_data=self.subdomains)
-            
+        self.createMeasures()
+        self.vols = np.array([df.Cell(self, i).volume() for i in range(self.num_cells())])
         self.V = {}
         self.bcs = {}
         self.dsN = {}
         self.dxR = {}
         
+    
+    def createMeasures(self):
+        self.ds = df.Measure('ds', domain=self, subdomain_data=self.boundaries)
+        self.dx = df.Measure('dx', domain=self, subdomain_data=self.subdomains)
+    
     def createFiniteSpace(self,  spaceType = 'S', name = 'u', spaceFamily = 'CG', degree = 1):
         
         myFunctionSpace = df.TensorFunctionSpace if spaceType =='T' else (df.VectorFunctionSpace if spaceType == 'V' else df.FunctionSpace)

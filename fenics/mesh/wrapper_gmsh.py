@@ -15,6 +15,10 @@ from functools import reduce
 from fetricks.fenics.mesh.mesh import Mesh
 
 
+# Instructions : generation from gmsh
+# gmsh -format 'msh22' -3 quarterCilinder.geo -o quarterCilinder.msh
+# dolfin-convert quarterCilinder.msh quarterCilinder.xml
+
 class Gmsh(pygmsh.built_in.Geometry):
     def __init__(self, meshname = "default.xdmf", dim = 2):
         super().__init__()   

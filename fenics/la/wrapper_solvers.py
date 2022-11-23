@@ -30,15 +30,22 @@ class BlockSolver:
             
 
 # Hand-coded implementation of Newton Raphson (Necessary in some cases)
-def Newton(Jac, Res, bc, du, u, callbacks = [], Nitermax = 10, tol = 1e-8): 
+def Newton(Jac, Res, bc, du, u, callbacks = [], Nitermax = 10, tol = 1e-8, u0_satisfybc = False):
+    if(u0_satisfybc):
+        for bc_i in bc: # non-homogeneous dirichlet applied only in the first itereation
+            bc_i.homogenize()
+        
     A, b = df.assemble_system(Jac, -Res, bc)
+    
+    # print("cond number", np.linalg.cond(A.array()))
+    
     nRes = []
     nRes.append(b.norm("l2"))
     nRes[0] = nRes[0] if nRes[0]>0.0 else 1.0
     
     V = u.function_space()
     du.vector().set_local(np.zeros(V.dim()))
-    u.vector().set_local(np.zeros(V.dim()))
+    # u.vector().set_local(np.zeros(V.dim()))
       
     niter = 0
     
@@ -58,6 +65,12 @@ def Newton(Jac, Res, bc, du, u, callbacks = [], Nitermax = 10, tol = 1e-8):
     
     return u, nRes
 
+def NonlinearSolver(problem, bc, du, callbacks = [], Nitermax = 10, tol = 1e-8): 
+    Jac = problem.J_ufl
+    Res = problem.F_ufl
+    u = problem.u_ufl
+    
+    return Newton(Jac, Res, bc, du, u, callbacks, Nitermax, tol)
 
 # Automatic implementation of Newton Raphson (Necessary in some cases)
 def Newton_automatic(Jac, Res, bc, du, u, callbacks = [], Nitermax = 10, tol = 1e-8):     
