@@ -30,7 +30,7 @@ if __name__ == '__main__':
     assert np.allclose(df.assemble( df.Constant(1.0)*mesh.dx(0)), l*h)
 
     # generation from .geo: geo -> msh -> xdmf or xml
-    model = ft.Gmsh('bar.geo', 2)
+    model = ft.GmshIO('bar.geo', 2)
     model.write(option = 'xdmf')
 
     # test    
