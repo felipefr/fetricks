@@ -20,7 +20,7 @@ class GmshIO:
         meshGeoFile = self.radFileMesh.format('geo')
         meshMshFile = self.radFileMesh.format('msh')
     
-        os.system('gmsh -2 -format msh2 {0} {1} -o {2}'.format(self.gmsh_opt, meshGeoFile, meshMshFile))  # with del2d, noticed less distortions
+        os.system('gmsh {0} {1} -o {2}'.format(self.gmsh_opt, meshGeoFile, meshMshFile))  # with del2d, noticed less distortions
         
         self.mesh = meshio.read(meshMshFile)
     
