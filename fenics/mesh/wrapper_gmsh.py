@@ -4,67 +4,41 @@
 # 
 # =============================================================================
 
-import numpy as np
 import meshio
-import pygmsh
 import os
-import dolfin as df
-from functools import reduce
+import numpy as np
 
-
-# Instructions : generation from gmsh
-# gmsh -format 'msh22' -3 quarterCilinder.geo -o quarterCilinder.msh
-# dolfin-convert quarterCilinder.msh quarterCilinder.xml
-
-class Gmsh(pygmsh.built_in.Geometry):
+class GmshIO:
     def __init__(self, meshname = "default.xdmf", dim = 2):
-        super().__init__()   
         self.mesh = None
         self.dim = dim
         self.setNameMesh(meshname)
+        
         self.gmsh_opt = '-format msh2 -{0} -smooth 2 -anisoMax 1000.0'.format(self.dim)
-        
-        
-    # write .geo file necessary to produce msh files using gmsh
-    def writeGeo(self):
-        savefile = self.radFileMesh.format('geo')
-        f = open(savefile,'w')
-        f.write(self.get_code())
-        f.close()
-
-    # write .xml files (standard for fenics): 
-    def writeXML(self):
-        meshXMLFile = self.radFileMesh.format('xml')
-        meshMshFile = self.radFileMesh.format('msh')
-        self.writeMSH()
-        
-        os.system('dolfin-convert {0} {1}'.format(meshMshFile, meshXMLFile))    
     
     def writeMSH(self, gmsh_opt = ''):
-        self.writeGeo()
         meshGeoFile = self.radFileMesh.format('geo')
         meshMshFile = self.radFileMesh.format('msh')
     
-        os.system('gmsh {0} {1} -o {2}'.format(self.gmsh_opt, meshGeoFile, meshMshFile))  # with del2d, noticed less distortions
+        os.system('gmsh -2 -format msh2 {0} {1} -o {2}'.format(self.gmsh_opt, meshGeoFile, meshMshFile))  # with del2d, noticed less distortions
         
         self.mesh = meshio.read(meshMshFile)
+    
+    # msh should be provided
+    def write(self, option = 'xdmf'):
         
-    def write(self, option = 'meshio', optimize_storage = True):
-        if(type(self.mesh) == type(None)):
-            self.generate()
-        if(option == 'meshio'):
-            savefile = self.radFileMesh.format('msh')
-            meshio.write(savefile, self.mesh)
-        elif(option == 'fenics'):
-            savefile = self.radFileMesh.format('xdmf')
-            self.exportMeshHDF5(savefile, optimize_storage)
+        if(self.format == 'geo'):
+            self.writeMSH()
             
-    def generate(self):
-        self.mesh = pygmsh.generate_mesh(self, verbose = False,
-                    extra_gmsh_arguments = self.gmsh_opt.split(), dim = self.dim, 
-                    mesh_file_type = 'msh2') # it should be msh2 cause of tags    
-                                          
-
+        if(option == 'xdmf'):
+            savefile = self.radFileMesh.format('xdmf')
+            self.exportMeshHDF5(savefile)
+        else:
+            meshXMLFile = self.radFileMesh.format('xml')
+            meshMshFile = self.radFileMesh.format('msh')
+            
+            os.system('dolfin-convert {0} {1}'.format(meshMshFile, meshXMLFile))   
+    
     def setNameMesh(self, meshname):
         self.radFileMesh,  self.format = meshname.split('.')
         self.radFileMesh += '.{0}'
@@ -85,48 +59,30 @@ class Gmsh(pygmsh.built_in.Geometry):
 
         self.__determine_geometry_types()
 
-        geometry = meshio.read(self.mesh) if type(self.mesh) == type('s') else self.mesh
+        geometry = meshio.read(self.radFileMesh.format('msh')) 
         
         meshFileRad = meshFile[:-5]
         
         # working on mac, error with cell dictionary
-        meshio.write(meshFile, meshio.Mesh(points=geometry.points[:,:self.dim], cells={self.cell_type: geometry.cells[self.cell_type]})) 
-    
+        meshio.write(meshFile, meshio.Mesh(points=geometry.points[:,:self.dim], cells={self.cell_type: geometry.cells_dict[self.cell_type]})) 
+        
         self.__exportHDF5_faces(geometry, meshFileRad, optimize = optimize_storage)
         self.__exportHDF5_regions(geometry, meshFileRad, optimize = optimize_storage)
 
-        if(optimize_storage):
-            self.__hack_exportHDF5_regions(meshFileRad)
-
     def __exportHDF5_faces(self, geometry, meshFileRad, optimize = False):
-        mesh = meshio.Mesh(points= self.dummy_point if optimize else geometry.points[:,:self.dim], 
-                           cells={self.facet_type: geometry.cells[self.facet_type]},
-                           cell_data={self.facet_type: {'faces': geometry.cell_data[self.facet_type]["gmsh:physical"]}})
-        
+        mesh = self.__create_aux_mesh(geometry, self.facet_type, 'faces', prune_z = (self.dim == 2) )   
         meshio.write("{0}_{1}.xdmf".format(meshFileRad,'faces'), mesh)
 
     def __exportHDF5_regions(self, geometry, meshFileRad, optimize = False):        
-        mesh = meshio.Mesh(points= self.dummy_point if optimize else geometry.points[:,:self.dim], 
-                           cells={self.cell_type: self.dummy_cell if optimize else geometry.cells[self.cell_type] }, 
-                           cell_data={self.cell_type: {'regions': geometry.cell_data[self.cell_type]["gmsh:physical"]}})
-        
+        mesh = self.__create_aux_mesh(geometry, self.cell_type, 'regions', prune_z = (self.dim == 2) )   
         meshio.write("{0}_{1}.xdmf".format(meshFileRad,'regions'), mesh)
-
-    def __hack_exportHDF5_regions(self, meshFileRad):  
-        import h5py
-        import xml.etree.ElementTree as ET
-    
-        # hack to not repeat mesh information
-        f = h5py.File("{0}_{1}.h5".format(meshFileRad,'regions'),'r+')
-        del f['data1']
-        f['data1'] = h5py.ExternalLink(meshFileRad + ".h5", "data1")
-        f.close()
         
-        g = ET.parse("{0}_{1}.xdmf".format(meshFileRad,'regions'))
-        root = g.getroot()
-        root[0][0][2].attrib['NumberOfElements'] = root[0][0][3][0].attrib['Dimensions'] # left is topological in level, and right in attributes level
-        root[0][0][2][0].attrib['Dimensions'] = root[0][0][3][0].attrib['Dimensions'] + ' ' + str(len(self.dummy_cell[0]))
-      
-        g.write("{0}_{1}.xdmf".format(meshFileRad,'regions'))
+    def __create_aux_mesh(self, mesh, cell_type, name_to_read, prune_z=False):
+        cells = mesh.get_cells_type(cell_type)
+        cell_data = mesh.get_cell_data("gmsh:physical", cell_type)
+        points = mesh.points[:,:2] if prune_z else mesh.points
+        out_mesh = meshio.Mesh(points=points, cells={cell_type: cells}, cell_data={name_to_read:[cell_data]})
+        return out_mesh
         
-        
+# self.mesh = pygmsh.generate_mesh(self, verbose=False, dim=2, prune_vertices=True, prune_z_0=True,
+# remove_faces=False, extra_gmsh_arguments=gmsh_opt,  mesh_file_type='msh4') # it should be msh2 cause of tags

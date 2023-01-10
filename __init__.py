@@ -8,10 +8,10 @@ from fetricks.fenics.la.wrapper_solvers import Newton, Newton_automatic, local_p
 from fetricks.fenics.mesh.mesh import Mesh
 
 import pygmsh
-if('built_in' in pygmsh.__all__): #  available in the version 6.0.2
-    from fetricks.fenics.mesh.wrapper_gmsh import Gmsh
+if('built_in' in pygmsh.__all__):
+    from fetricks.fenics.mesh.wrapper_gmsh_legacy_pygmsh import GmshIO # uses pygmsh 6.0.2 and meshio 3.3.1
 else: 
-    from fetricks.fenics.mesh.wrapper_gmsh_new import Gmsh # new version pygmsh (limited functionality)
+    from fetricks.fenics.mesh.wrapper_gmsh import GmshIO # uses new meshio
     
     
 from fetricks.fenics.material.multiscale_model import multiscaleModel, multiscaleModelExpression
