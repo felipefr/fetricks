@@ -58,7 +58,7 @@ class Gmsh(pygmsh.built_in.Geometry):
             meshio.write(savefile, self.mesh)
         elif(option == 'fenics'):
             savefile = self.radFileMesh.format('xdmf')
-            self.exportMeshHDF5_old(savefile, optimize_storage)
+            self.exportMeshHDF5(savefile, optimize_storage)
             
     def generate(self):
         self.mesh = pygmsh.generate_mesh(self, verbose = False,
@@ -131,49 +131,3 @@ class Gmsh(pygmsh.built_in.Geometry):
         g.write("{0}_{1}.xdmf".format(meshFileRad,'regions'))
         
         
-    def exportMeshHDF5_old(self, meshFile = 'mesh.xdmf', optimize_storage = False):
-        
-        import h5py
-        import xml.etree.ElementTree as ET
-    
-        if(self.dim == 2):
-            facet_type = "line"
-            cell_type = "triangle"
-            dummy_cell = np.array([[1,2,3]])
-            dummy_point = np.zeros((1,2))
-        elif(self.dim == 3):
-            facet_type = "triangle"
-            cell_type = "tetra"
-            dummy_cell = np.array([[1,2,3,4]])
-            dummy_point = np.zeros((1,3))
-            
-        
-        geometry = meshio.read(self.mesh) if type(self.mesh) == type('s') else self.mesh
-        
-        meshFileRad = meshFile[:-5]
-        
-        # working on mac, error with cell dictionary
-        meshio.write(meshFile, meshio.Mesh(points=geometry.points[:,:self.dim], cells={cell_type: geometry.cells[cell_type]})) 
-    
-        mesh = meshio.Mesh(points=dummy_point, cells={facet_type: geometry.cells[facet_type]},
-                                                   cell_data={facet_type: {'faces': geometry.cell_data[facet_type]["gmsh:physical"]}})
-        
-        meshio.write("{0}_{1}.xdmf".format(meshFileRad,'faces'), mesh)
-            
-        mesh = meshio.Mesh(points=dummy_point, cells={cell_type: dummy_cell}, 
-                                                   cell_data={cell_type: {'regions': geometry.cell_data[cell_type]["gmsh:physical"]}})
-        
-        meshio.write("{0}_{1}.xdmf".format(meshFileRad,'regions'), mesh)
-        
-        # hack to not repeat mesh information
-        f = h5py.File("{0}_{1}.h5".format(meshFileRad,'regions'),'r+')
-        del f['data1']
-        f['data1'] = h5py.ExternalLink(meshFileRad + ".h5", "data1")
-        f.close()
-        
-        g = ET.parse("{0}_{1}.xdmf".format(meshFileRad,'regions'))
-        root = g.getroot()
-        root[0][0][2].attrib['NumberOfElements'] = root[0][0][3][0].attrib['Dimensions'] # left is topological in level, and right in attributes level
-        root[0][0][2][0].attrib['Dimensions'] = root[0][0][3][0].attrib['Dimensions'] + ' ' + str(len(dummy_cell[0]))
-      
-        g.write("{0}_{1}.xdmf".format(meshFileRad,'regions'))
