@@ -5,74 +5,80 @@
 # =============================================================================
 
 import meshio
-import pygmsh
 import os
+import numpy as np
 
-from fetricks.fenics.postprocessing.wrapper_io import exportMeshHDF5_fromGMSH
-
-class Gmsh(pygmsh.built_in.Geometry):
-    def __init__(self, meshname = "default.xdmf"):
-        super().__init__()   
+class Gmsh:
+    def __init__(self, meshname = "default.xdmf", dim = 2):
         self.mesh = None
+        self.dim = dim
         self.setNameMesh(meshname)
-        self.gmsh_opt = '-algo front2d -smooth 2 -anisoMax 1000.0'
         
-    # write .geo file necessary to produce msh files using gmsh
-    def writeGeo(self):
-        savefile = self.radFileMesh.format('geo')
-        f = open(savefile,'w')
-        f.write(self.get_code())
-        f.close()
-
-    # write .xml files (standard for fenics): 
-    def writeXML(self):
-        meshXMLFile = self.radFileMesh.format('xml')
-        meshMshFile = self.radFileMesh.format('msh')
-        self.writeMSH()
-        
-        os.system('dolfin-convert {0} {1}'.format(meshMshFile, meshXMLFile))    
+        self.gmsh_opt = '-format msh2 -{0} -smooth 2 -anisoMax 1000.0'.format(self.dim)
     
     def writeMSH(self, gmsh_opt = ''):
-        self.writeGeo()
         meshGeoFile = self.radFileMesh.format('geo')
         meshMshFile = self.radFileMesh.format('msh')
     
         os.system('gmsh -2 -format msh2 {0} {1} -o {2}'.format(self.gmsh_opt, meshGeoFile, meshMshFile))  # with del2d, noticed less distortions
         
         self.mesh = meshio.read(meshMshFile)
-        
-    def write(self, opt = 'meshio'):
-        if(type(self.mesh) == type(None)):
-            self.generate()
-        if(opt == 'meshio'):
-            savefile = self.radFileMesh.format('msh')
-            meshio.write(savefile, self.mesh)
-        elif(opt == 'fenics'):
+    
+    # msh should be provided
+    def write(self, option = 'xdmf'):
+        if(option == 'xdmf'):
             savefile = self.radFileMesh.format('xdmf')
-            exportMeshHDF5_fromGMSH(self.mesh, savefile)
+            self.exportMeshHDF5(savefile)
+        else:
+            meshXMLFile = self.radFileMesh.format('xml')
+            meshMshFile = self.radFileMesh.format('msh')
             
-    def generate(self):
-        self.mesh = pygmsh.generate_mesh(self, verbose = False, extra_gmsh_arguments = self.gmsh_opt.split(), dim = 2, mesh_file_type = 'msh2') # it should be msh2 cause of tags    
-                                          
-
-    # def getEnrichedMesh(self, savefile = ''):
-        
-    #     if(len(savefile) == 0):
-    #         savefile = self.radFileMesh.format(self.format)
-        
-    #     if(savefile[-3:] == 'xml'):
-    #         self.writeXML(savefile)
-            
-    #     elif(savefile[-4:] == 'xdmf'):
-    #         print("exporting to fenics")
-    #         self.write(savefile, 'fenics')
-        
-    #     return Mesh(savefile)
+            os.system('dolfin-convert {0} {1}'.format(meshMshFile, meshXMLFile))   
     
     def setNameMesh(self, meshname):
         self.radFileMesh,  self.format = meshname.split('.')
         self.radFileMesh += '.{0}'
         
+    def __determine_geometry_types(self):
+        if(self.dim == 2):
+            self.facet_type = "line"
+            self.cell_type = "triangle"
+            self.dummy_cell = np.array([[1,2,3]])
+            self.dummy_point = np.zeros((1,2))
+        elif(self.dim == 3):
+            self.facet_type = "triangle"
+            self.cell_type = "tetra"
+            self.dummy_cell = np.array([[1,2,3,4]])
+            self.dummy_point = np.zeros((1,3))
+            
+    def exportMeshHDF5(self, meshFile = 'mesh.xdmf', optimize_storage = False):
+
+        self.__determine_geometry_types()
+
+        geometry = meshio.read(self.radFileMesh.format('msh')) 
+        
+        meshFileRad = meshFile[:-5]
+        
+        # working on mac, error with cell dictionary
+        meshio.write(meshFile, meshio.Mesh(points=geometry.points[:,:self.dim], cells={self.cell_type: geometry.cells_dict[self.cell_type]})) 
+        
+        self.__exportHDF5_faces(geometry, meshFileRad, optimize = optimize_storage)
+        self.__exportHDF5_regions(geometry, meshFileRad, optimize = optimize_storage)
+
+    def __exportHDF5_faces(self, geometry, meshFileRad, optimize = False):
+        mesh = self.__create_aux_mesh(geometry, self.facet_type, 'faces', prune_z = (self.dim == 2) )   
+        meshio.write("{0}_{1}.xdmf".format(meshFileRad,'faces'), mesh)
+
+    def __exportHDF5_regions(self, geometry, meshFileRad, optimize = False):        
+        mesh = self.__create_aux_mesh(geometry, self.cell_type, 'regions', prune_z = (self.dim == 2) )   
+        meshio.write("{0}_{1}.xdmf".format(meshFileRad,'regions'), mesh)
+        
+    def __create_aux_mesh(self, mesh, cell_type, name_to_read, prune_z=False):
+        cells = mesh.get_cells_type(cell_type)
+        cell_data = mesh.get_cell_data("gmsh:physical", cell_type)
+        points = mesh.points[:,:2] if prune_z else mesh.points
+        out_mesh = meshio.Mesh(points=points, cells={cell_type: cells}, cell_data={name_to_read:[cell_data]})
+        return out_mesh
         
 # self.mesh = pygmsh.generate_mesh(self, verbose=False, dim=2, prune_vertices=True, prune_z_0=True,
 # remove_faces=False, extra_gmsh_arguments=gmsh_opt,  mesh_file_type='msh4') # it should be msh2 cause of tags

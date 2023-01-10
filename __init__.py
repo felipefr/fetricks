@@ -6,7 +6,14 @@ from fetricks.mechanics.conversions import grad2mandel_vec, grad2mandel_ten, man
 from fetricks.fenics.misc import symgrad, Integral
 from fetricks.fenics.la.wrapper_solvers import Newton, Newton_automatic, local_project, local_project_given_sol, LocalProjector
 from fetricks.fenics.mesh.mesh import Mesh
-from fetricks.fenics.mesh.wrapper_gmsh import Gmsh 
+
+import pygmsh
+if('built_in' in pygmsh.__all__): #  available in the version 6.0.2
+    from fetricks.fenics.mesh.wrapper_gmsh import Gmsh
+else: 
+    from fetricks.fenics.mesh.wrapper_gmsh_new import Gmsh # new version pygmsh (limited functionality)
+    
+    
 from fetricks.fenics.material.multiscale_model import multiscaleModel, multiscaleModelExpression
 from fetricks.fenics.material.hyperelastic_model import hyperelasticModel, hyperelasticModelExpression
 

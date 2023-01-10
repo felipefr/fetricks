@@ -10,7 +10,6 @@ import pygmsh
 import os
 import dolfin as df
 from functools import reduce
-from fetricks.fenics.mesh.mesh import Mesh
 
 
 # Instructions : generation from gmsh
