@@ -28,6 +28,34 @@ class BlockSolver:
         for i in range(self.n_subproblems): 
             self.solver.solve(self.subproblems[i].u_ufl.vector(), self.F[i])
             
+class BlockSolverIndependent:
+
+    def __init__(self, subproblems):
+        self.subproblems = subproblems
+        self.n_subproblems = len(self.subproblems)
+        
+        self.F = [ df.PETScVector() for i in range(self.n_subproblems) ] 
+        
+        # supposing lhs and bcs are equal for all problems
+        self.solver = []
+        self.A = []
+        
+        for i in range(self.n_subproblems):
+            self.A.append(df.PETScMatrix())
+            df.assemble(self.subproblems[i].a_ufl , tensor = self.A[-1])
+            [bc.apply(self.A[-1]) for bc in self.subproblems[i].bcs()] 
+            self.solver.append(df.PETScLUSolver(self.A[-1]))
+            
+
+    def assembly_rhs(self):
+        for i in range(self.n_subproblems): 
+            df.assemble(self.subproblems[i].L_ufl, tensor = self.F[i])    
+            [bc.apply(self.F[i]) for bc in self.subproblems[i].bcs()]
+            
+    def solve(self):   
+        self.assembly_rhs()
+        for i in range(self.n_subproblems): 
+            self.solver[i].solve(self.subproblems[i].u_ufl.vector(), self.F[i])
 
 # Hand-coded implementation of Newton Raphson (Necessary in some cases)
 def Newton(Jac, Res, bc, du, u, callbacks = [], Nitermax = 10, tol = 1e-8, u0_satisfybc = False):
@@ -220,26 +248,23 @@ def solver_direct(a,b, bcs, Uh, method = "superlu" ):
     return uh
     
 class LocalProjector:
-    def __init__(self, V, dx):    
-        self.dofmap = V.dofmap()
+    def __init__(self, V, dx, sol = None):    
+        self.V = V
+        self.sol = sol if sol else df.Function(V)
         
-        dv = df.TrialFunction(V)
-        v_ = df.TestFunction(V)
+        u = df.TrialFunction(V)
+        v = df.TestFunction(V)
         
-        a_proj = df.inner(dv, v_)*dx
-        self.b_proj = lambda u: df.inner(u, v_)*dx
+        a_proj = df.inner(u, v)*dx
+        self.b_proj = lambda w: df.inner(w, v)*dx
+        
+        self.rhs = df.PETScVector()
         
         self.solver = df.LocalSolver(a_proj)
         self.solver.factorize()
-        
-        self.sol = df.Function(V)
     
-    def __call__(self, u, sol = None):
-        b = df.assemble(self.b_proj(u))
+    
+    def __call__(self, u):
+        df.assemble(self.b_proj(u), tensor = self.rhs)
+        self.solver.solve_local(self.sol.vector(), self.rhs,  self.V.dofmap())
         
-        if sol is None:
-            self.solver.solve_local(self.sol.vector(), b,  self.dofmap)
-            return self.sol
-        else:
-            self.solver.solve_local(sol.vector(), b,  self.dofmap)
-            return

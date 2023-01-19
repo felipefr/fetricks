@@ -22,26 +22,21 @@ class GmshIO(pygmsh.built_in.Geometry):
         self.mesh = None
         self.dim = dim
         self.setNameMesh(meshname)
-        self.gmsh_opt = '-format msh2 -{0} -smooth 2 -anisoMax 1000.0'.format(self.dim)
+        self.gmsh_opt = '-format msh2 -{0}'.format(self.dim)
         
+        if(self.format == "geo"):
+            f = open(meshname)
+            self.add_raw_code(f.read())
+            f.close()
         
     # write .geo file necessary to produce msh files using gmsh
     def writeGeo(self):
         savefile = self.radFileMesh.format('geo')
         f = open(savefile,'w')
         f.write(self.get_code())
-        f.close()
-
-    # write .xml files (standard for fenics): 
-    def writeXML(self):
-        meshXMLFile = self.radFileMesh.format('xml')
-        meshMshFile = self.radFileMesh.format('msh')
-        self.writeMSH()
-        
-        os.system('dolfin-convert {0} {1}'.format(meshMshFile, meshXMLFile))    
+        f.close()   
     
     def writeMSH(self, gmsh_opt = ''):
-        self.writeGeo()
         meshGeoFile = self.radFileMesh.format('geo')
         meshMshFile = self.radFileMesh.format('msh')
     
@@ -49,16 +44,24 @@ class GmshIO(pygmsh.built_in.Geometry):
         
         self.mesh = meshio.read(meshMshFile)
         
-    def write(self, option = 'meshio', optimize_storage = True):
-        if(type(self.mesh) == type(None)):
+        
+    def write(self, option = 'xdmf', optimize_storage = True):
+        
+        if(self.format == 'geo'):
+            self.writeMSH()
+            
+        elif(type(self.mesh) == type(None)):
             self.generate()
-        if(option == 'meshio'):
-            savefile = self.radFileMesh.format('msh')
-            meshio.write(savefile, self.mesh)
-        elif(option == 'fenics'):
+            
+        if(option == 'xdmf'):
             savefile = self.radFileMesh.format('xdmf')
             self.exportMeshHDF5(savefile, optimize_storage)
+        else:
+            meshXMLFile = self.radFileMesh.format('xml')
+            meshMshFile = self.radFileMesh.format('msh')
             
+            os.system('dolfin-convert {0} {1}'.format(meshMshFile, meshXMLFile))   
+  
     def generate(self):
         self.mesh = pygmsh.generate_mesh(self, verbose = False,
                     extra_gmsh_arguments = self.gmsh_opt.split(), dim = self.dim, 

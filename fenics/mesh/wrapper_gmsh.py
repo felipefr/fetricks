@@ -1,6 +1,6 @@
 # ============================================================================= 
-# The class Gmsh is wrapper for pygmsh Geometry. It provides basic functionalities
-# to interect with meshio and fenics. 
+# The class GmshIO provides basic IO basic functionalities for Gmsh
+# using meshio and fenics. 
 # 
 # =============================================================================
 
@@ -14,7 +14,7 @@ class GmshIO:
         self.dim = dim
         self.setNameMesh(meshname)
         
-        self.gmsh_opt = '-format msh2 -{0} -smooth 2 -anisoMax 1000.0'.format(self.dim)
+        self.gmsh_opt = '-format msh2 -{0}'.format(self.dim)
     
     def writeMSH(self, gmsh_opt = ''):
         meshGeoFile = self.radFileMesh.format('geo')
@@ -24,7 +24,6 @@ class GmshIO:
         
         self.mesh = meshio.read(meshMshFile)
     
-    # msh should be provided
     def write(self, option = 'xdmf'):
         
         if(self.format == 'geo'):
