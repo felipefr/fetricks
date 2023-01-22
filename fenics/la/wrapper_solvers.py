@@ -251,12 +251,13 @@ class LocalProjector:
     def __init__(self, V, dx, sol = None):    
         self.V = V
         self.sol = sol if sol else df.Function(V)
+        self.dx = dx
         
         u = df.TrialFunction(V)
         v = df.TestFunction(V)
         
-        a_proj = df.inner(u, v)*dx
-        self.b_proj = lambda w: df.inner(w, v)*dx
+        a_proj = df.inner(u, v)*self.dx
+        self.b_proj = lambda w: df.inner(w, v)*self.dx
         
         self.rhs = df.PETScVector()
         
