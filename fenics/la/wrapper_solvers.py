@@ -2,6 +2,41 @@ import dolfin as df
 import numpy as np
 from timeit import default_timer as timer
 
+
+class CustomNonlinearProblem(df.NonlinearProblem):
+    def __init__(self, a, L, bcs):
+        df.NonlinearProblem.__init__(self)
+        self.L = L
+        self.a = a
+        self.bcs = bcs
+    def F(self, b, x):
+        df.assemble(self.L, tensor=b)
+        [bc.apply(b) for bc in self.bcs] 
+        
+    def J(self, A, x):
+        df.assemble(self.a, tensor=A)
+        [bc.apply(A) for bc in self.bcs]
+
+
+# problem should be a NonlinearVariationalProblem
+def CustomNonlinearSolver(problem, u = None, du = None, bcs = None, callbacks = [], Nitermax = 10, tol = 1e-8): 
+    # u should be provided
+    if(isinstance(problem, CustomNonlinearProblem) and u):
+        Jac = problem.a
+        Res = problem.L
+        bcs = problem.bcs
+        u = u
+
+    # bcs should be provided
+    elif(isinstance(problem, df.NonlinearVariationalProblem) and bcs):
+        Jac = problem.J_ufl
+        Res = problem.F_ufl
+        u = problem.u_ufl
+        bcs = bcs
+        
+    return Newton(Jac, Res, bcs, du, u, callbacks, Nitermax, tol)
+
+
 # Block Solver [K 0; 0 K] u = [F_1 ... F_N]
 class BlockSolver:
 
@@ -27,7 +62,13 @@ class BlockSolver:
         self.assembly_rhs()
         for i in range(self.n_subproblems): 
             self.solver.solve(self.subproblems[i].u_ufl.vector(), self.F[i])
-            
+
+    def solve_subproblem(self, i):   
+        df.assemble(self.subproblems[i].L_ufl, tensor = self.F[i])    
+        [bc.apply(self.F[i]) for bc in self.subproblems[i].bcs()]
+        self.solver.solve(self.subproblems[i].u_ufl.vector(), self.F[i])
+                                                                         
+                                                                         
 class BlockSolverIndependent:
 
     def __init__(self, subproblems):
@@ -93,12 +134,7 @@ def Newton(Jac, Res, bc, du, u, callbacks = [], Nitermax = 10, tol = 1e-8, u0_sa
     
     return u, nRes
 
-def NonlinearSolver(problem, bc, du, callbacks = [], Nitermax = 10, tol = 1e-8): 
-    Jac = problem.J_ufl
-    Res = problem.F_ufl
-    u = problem.u_ufl
-    
-    return Newton(Jac, Res, bc, du, u, callbacks, Nitermax, tol)
+
 
 # Automatic implementation of Newton Raphson (Necessary in some cases)
 def Newton_automatic(Jac, Res, bc, du, u, callbacks = [], Nitermax = 10, tol = 1e-8):     
@@ -269,3 +305,13 @@ class LocalProjector:
         df.assemble(self.b_proj(u), tensor = self.rhs)
         self.solver.solve_local(self.sol.vector(), self.rhs,  self.V.dofmap())
         
+# Class for interfacing with the Newton solver
+class myNonlinearProblem(df.NonlinearProblem):
+    def __init__(self, a, L):
+        NonlinearProblem.__init__(self)
+        self.L = L
+        self.a = a
+    def F(self, b, x):
+        assemble(self.L, tensor=b)
+    def J(self, A, x):
+        assemble(self.a, tensor=A)

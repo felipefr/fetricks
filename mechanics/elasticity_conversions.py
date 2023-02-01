@@ -19,9 +19,17 @@ def youngPoisson2lame_planeStress(nu,E):
     
     return lamb, mu
 
+# 2d isotropic elastitic tangent tensor versions
 def Celas_voigt(lamb,mu):
     return np.array( [[lamb + 2*mu, lamb, 0], [lamb, lamb + 2*mu, 0], [0, 0, mu]] )
+
+def Celas_mandel(lamb,mu):
+    return np.array( [[lamb + 2*mu, lamb, 0], [lamb, lamb + 2*mu, 0], [0, 0, 2*mu]] )
     
+# Does not enforce symmetry
+def Celas_flat(lamb,mu):
+    return np.array( [[lamb + 2*mu, 0, 0, lamb], [0, 2*mu, 0, 0], [0, 0, 2*mu, 0], [lamb, 0, 0, lamb + 2*mu]] )
+
 youngPoisson2lame = lambda nu,E : [ nu * E/((1. - 2.*nu)*(1.+nu)) , E/(2.*(1. + nu)) ] # lamb, mu
 
 gof = lambda g,f: lambda x,y : g(*f(x,y)) # composition, g : R2 -> R* , f : R2 -> R2

@@ -19,6 +19,12 @@ solver_parameters = {"nonlinear_solver": "newton",
                      "newton_solver": {"maximum_iterations": 20,
                                        "report": True,
                                        "error_on_nonconvergence": True}}
+                                       
+df.parameters["form_compiler"]["cpp_optimize"] = True
+ffc_options = {"optimize": True, \
+                "eliminate_zeros": True, \
+                "precompute_basis_const": True, \
+                "precompute_ip_const": True}
 
 folder = './meshes/'
 meshfile = folder + 'mesh_40.xdmf'

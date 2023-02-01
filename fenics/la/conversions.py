@@ -30,7 +30,11 @@ def as_cross_2x2(A):
                          [A[1,1]],
                          [-A[0,0]],
                          [-A[0,1]]])
-                        
+
+# a*(A[0,1] - A[1,0])  = inner(as_skew(a) , A) 
+def as_skew_2x2(a):
+    return df.as_tensor([[0, a], [-a, 0]])
+                                               
 def as_flatten_3x3(A):
     return df.as_vector([A[0,0], A[0,1], A[0,2], A[1,0], A[1,1], A[1,2], A[2,0], A[2,1], A[2,2]])
 
