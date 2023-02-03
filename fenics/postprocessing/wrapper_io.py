@@ -6,13 +6,13 @@ def readXDMF_with_markers(meshFile, mesh, comm = MPI.comm_world):
     with XDMFFile(comm,meshFile) as infile:
         infile.read(mesh)
     
-    mvc = MeshValueCollection("size_t", mesh, 1)
+    mvc = MeshValueCollection("size_t", mesh, 1) # maybe is not generalised for 3d
     with XDMFFile(comm, "{0}_faces.xdmf".format(meshFile[:-5])) as infile:
         infile.read(mvc, "faces")
                 
     mf  = MeshFunction("size_t", mesh, mvc)
   
-    mvc = MeshValueCollection("size_t", mesh, 2)
+    mvc = MeshValueCollection("size_t", mesh, 2) # maybe is not generalised for 3d
     with XDMFFile(comm, "{0}_regions.xdmf".format(meshFile[:-5])) as infile:
         infile.read(mvc, "regions")
     

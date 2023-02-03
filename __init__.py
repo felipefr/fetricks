@@ -37,3 +37,5 @@ from .fenics.la.conversions import (as_flatten_2x2, as_flatten_3x3,
 
 from .fenics.la.wrapper_solvers import (CustomNonlinearSolver, CustomNonlinearProblem)
 from .mechanics.material_models import (psi_ciarlet, get_stress_tang_from_psi)
+
+from .fenics.bcs.neumann import NeumannTensorSource, NeumannVectorSource, NeumannBC, NeumannVectorBC, NeumannBC_orth

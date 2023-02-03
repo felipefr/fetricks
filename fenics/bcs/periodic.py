@@ -45,3 +45,4 @@ class PeriodicBoundary(df.SubDomain):
         y[0] = x[0] + self.x0 - (self.x1 if right else self.x0)
         y[1] = x[1] + self.y0 - (self.y1 if top else self.y0)
 
+
