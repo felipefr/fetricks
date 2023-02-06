@@ -16,8 +16,9 @@ from fetricks.fenics.mesh.mesh import Mesh
 # force to use new version
 from fetricks.fenics.mesh.wrapper_gmsh import GmshIO # uses new meshio
     
-from fetricks.fenics.material.multiscale_model import multiscaleModel, multiscaleModelExpression
-from fetricks.fenics.material.hyperelastic_model import hyperelasticModel, hyperelasticModelExpression
+from .mechanics.multiscale_model import multiscaleModel
+from .mechanics.multiscale_model_expression import multiscaleModelExpression
+from .mechanics.hyperelastic_model import hyperelasticModel, hyperelasticModelExpression
 
 
 __all__ = ['stress2voigt', 'strain2voigt', 'voigt2strain', 'voigt2stress', 'mandel2voigtStrain', 'mandel2voigtStress',
@@ -32,10 +33,10 @@ __all__ = ['stress2voigt', 'strain2voigt', 'voigt2strain', 'voigt2stress', 'mand
 
 
 from .fenics.la.conversions import (as_flatten_2x2, as_flatten_3x3, 
-                                    as_unflatten_2x2, as_cross_2x2, as_skew_2x2)
-
+                                    as_unflatten_2x2, as_cross_2x2, as_skew_2x2, flatgrad_2x2, flatsymgrad_2x2,
+                                    sym_flatten_3x3_np, ind_sym_tensor_3x3, as_sym_tensor_3x3)
 
 from .fenics.la.wrapper_solvers import (CustomNonlinearSolver, CustomNonlinearProblem)
-from .mechanics.material_models import (psi_ciarlet, get_stress_tang_from_psi)
+from .mechanics.material_models import (psi_ciarlet, psi_hookean_nonlinear_lame, get_stress_tang_from_psi)
 
-from .fenics.bcs.neumann import NeumannTensorSource, NeumannVectorSource, NeumannBC, NeumannVectorBC, NeumannBC_orth
+from .fenics.bcs.neumann import NeumannTensorSource, NeumannVectorSource, NeumannBC, NeumannVectorBC, NeumannVectorBC_given_normal

@@ -48,9 +48,7 @@ def NeumannBC(W, t, mesh, flag):
     return [df.DirichletBC(W, NeumannVectorSource(mesh, t.values()) , mesh.boundaries, flag)]
 
 # This is Neumann but when normal are aligned with the cartesian axes
-def NeumannBC_orth(W, t, mesh, flag, axial):
-    normal = np.zeros(2)
-    normal[axial] = 1.0
-    sig_ = np.outer(t.values(), normal)
+def NeumannVectorBC_given_normal(W, t, normal, mesh, flag):
+    sig_ = np.outer(t.values(), normal.values())
         
     return [df.DirichletBC(W, df.Constant(sig_), mesh.boundaries, flag)]

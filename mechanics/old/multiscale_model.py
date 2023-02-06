@@ -52,7 +52,7 @@ class multiscaleModel(materialModel):
     
         self.ngauss = int(W.dim()/self.size_strain)
         
-        self.projector_eps = ft.LocalProjector(W, dxm)
+        self.projector_eps = ft.LocalProjector(W, dxm, sol = self.eps)
         
         self.Wdofmap = W.dofmap()
         self.Wtandofmap = Wtan.dofmap()
@@ -102,7 +102,7 @@ class multiscaleModel(materialModel):
         # self.tangent.vector().set_local(stress_tangent[:,self.size_strain:].flatten())
             
     def update(self, epsnew):
-        self.projector_eps(epsnew ,  self.eps) 
+        self.projector_eps(epsnew) 
         self.update_stress_tangent()    
     
     # def update(self, epsnew):

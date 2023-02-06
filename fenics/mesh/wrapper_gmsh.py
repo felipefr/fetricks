@@ -24,14 +24,14 @@ class GmshIO:
         
         self.mesh = meshio.read(meshMshFile)
     
-    def write(self, option = 'xdmf'):
+    def write(self, option = 'xdmf', optimize_storage = True):
         
         if(self.format == 'geo'):
             self.writeMSH()
             
         if(option == 'xdmf'):
             savefile = self.radFileMesh.format('xdmf')
-            self.exportMeshHDF5(savefile)
+            self.exportMeshHDF5(savefile, optimize_storage)
         else:
             meshXMLFile = self.radFileMesh.format('xml')
             meshMshFile = self.radFileMesh.format('msh')

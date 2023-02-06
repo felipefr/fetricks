@@ -4,22 +4,75 @@ from timeit import default_timer as timer
 
 
 class CustomNonlinearProblem(df.NonlinearProblem):
-    def __init__(self, a, L, bcs):
+    def __init__(self, L, u, bcs, a, callbacks = []):
         df.NonlinearProblem.__init__(self)
         self.L = L
         self.a = a
         self.bcs = bcs
-    def F(self, b, x):
+        self.u = u
+        
+    def F(self, b, x = None): 
         df.assemble(self.L, tensor=b)
         [bc.apply(b) for bc in self.bcs] 
         
-    def J(self, A, x):
+    def J(self, A, x = None): 
         df.assemble(self.a, tensor=A)
         [bc.apply(A) for bc in self.bcs]
 
 
 # problem should be a NonlinearVariationalProblem
-def CustomNonlinearSolver(problem, u = None, du = None, bcs = None, callbacks = [], Nitermax = 10, tol = 1e-8): 
+class CustomNonlinearSolver:
+
+    def __init__(self, problem, callbacks = [], u0_satisfybc = False): 
+        
+        self.problem = problem
+        self.callbacks = callbacks
+        
+        self.du = df.Function(self.problem.u.function_space())
+        self.du.vector().set_local(np.zeros(self.du.vector().size()))
+        
+        self.rhs = df.PETScVector() 
+        self.lhs = df.PETScMatrix()
+        
+    def solve(self, Nitermax = 10, tol = 1e-8, report = True):
+        
+        self.call_callbacks()
+        nRes = []
+        nRes.append(self.assemble())
+        
+        nRes[0] = nRes[0] if nRes[0]>0.0 else 1.0
+        niter = 0
+        
+        while nRes[niter]/nRes[0] > tol and niter < Nitermax:
+            nRes.append(self.newton_raphson_iteration())
+            niter+=1
+            
+            if(report):
+                print(" Residual:", nRes[-1]/nRes[0])
+            
+            
+        return nRes
+
+    def newton_raphson_iteration(self):
+        df.solve(self.lhs, self.du.vector(), self.rhs)
+        self.problem.u.assign(self.problem.u + self.du)    
+        self.call_callbacks()
+        return self.assemble()
+        
+    def call_callbacks(self):
+        [foo(self.problem.u, self.du) for foo in self.callbacks]
+    
+    def assemble(self):
+        self.problem.F(self.rhs)
+        self.problem.J(self.lhs)
+        
+        return self.rhs.norm("l2")
+        
+
+
+
+# problem should be a NonlinearVariationalProblem
+def CustomNonlinearSolver_old(problem, u = None, du = None, bcs = None, callbacks = [], Nitermax = 10, tol = 1e-8): 
     # u should be provided
     if(isinstance(problem, CustomNonlinearProblem) and u):
         Jac = problem.a
@@ -100,32 +153,29 @@ class BlockSolverIndependent:
 
 # Hand-coded implementation of Newton Raphson (Necessary in some cases)
 def Newton(Jac, Res, bc, du, u, callbacks = [], Nitermax = 10, tol = 1e-8, u0_satisfybc = False):
+    
+    V = u.function_space()
+    du.vector().set_local(np.zeros(V.dim()))
+    [foo(u,du) for foo in callbacks]
+    
     if(u0_satisfybc):
         for bc_i in bc: # non-homogeneous dirichlet applied only in the first itereation
             bc_i.homogenize()
         
     A, b = df.assemble_system(Jac, -Res, bc)
     
-    # print("cond number", np.linalg.cond(A.array()))
-    
     nRes = []
     nRes.append(b.norm("l2"))
     nRes[0] = nRes[0] if nRes[0]>0.0 else 1.0
     
-    V = u.function_space()
-    du.vector().set_local(np.zeros(V.dim()))
-    # u.vector().set_local(np.zeros(V.dim()))
-      
     niter = 0
-    
     for bc_i in bc: # non-homogeneous dirichlet applied only in the first itereation
         bc_i.homogenize()
     
     while nRes[niter]/nRes[0] > tol and niter < Nitermax:
         df.solve(A, du.vector(), b)
-        u.assign(u + du)
-        for callback in callbacks:
-            callback(u, du)
+        u.assign(u + du)    
+        [foo(u,du) for foo in callbacks]
             
         A, b = df.assemble_system(Jac, -Res, bc)
         nRes.append(b.norm("l2"))

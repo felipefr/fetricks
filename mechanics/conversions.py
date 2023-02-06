@@ -119,7 +119,7 @@ def macro_strain_mandel(i):
 
 # STRESS RELATED FUNCTIONS
 def sigmaLame(u, lame):
-    return lame[0]*nabla_div(u)*df.Identity(2) + 2*lame[1]*symgrad(u)
+    return lame[0]*df.div(u)*df.Identity(2) + 2*lame[1]*symgrad(u)
 
 def vonMises(sig):
     s = sig - (1./3)*df.tr(sig)*df.Identity(2)
