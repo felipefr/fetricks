@@ -28,33 +28,28 @@ class multiscaleModel(materialModel):
 
     def __createInternalVariables(self, W, Wtan, dxm):
         self.stress = df.Function(W)
-        self.eps = df.Function(W)
+        self.strain = df.Function(W)
         self.tangent = df.Function(Wtan)
         
         self.size_tan = Wtan.num_sub_spaces()
         self.size_strain = W.num_sub_spaces()
-    
         self.ngauss = int(W.dim()/self.size_strain)
         
-        self.projector_eps = ft.LocalProjector(W, dxm, sol = self.eps)
-        
-        self.Wdofmap = W.dofmap()
-        self.Wtandofmap = Wtan.dofmap()
-        
-        
+        self.projector_strain = ft.LocalProjector(W, dxm, sol = self.strain)
+                
+        self.strain_array = self.strain.vector().vec().array.reshape( (self.ngauss, self.size_strain) )
+        self.stress_array = self.stress.vector().vec().array.reshape( (self.ngauss, self.size_strain))
+        self.tangent_array = self.tangent.vector().vec().array.reshape( (self.ngauss, self.size_tan))
+                
     def tangent_op(self, de):
         return df.dot(ft.as_sym_tensor_3x3(self.tangent), de) 
 
     def update_stress_tangent(self):
-        e = self.eps.vector().vec().array.reshape( (-1, self.size_strain) )
-        s = self.stress.vector().vec().array.reshape( (-1, self.size_strain))
-        t = self.tangent.vector().vec().array.reshape( (-1, self.size_tan))
-        
-        for i, m in enumerate(self.micromodels):
-            s[i,:] , t[i,:] = m.getStressTangent_force(e[i,:])  
+        for s, t, e, m in zip(self.stress_array, self.tangent_array, self.strain_array, self.micromodels):
+            s[:], t[:] = m.getStressTangent_force(e)  
             
-    def update(self, epsnew):
-        self.projector_eps(epsnew) 
+    def update(self, strain_new):
+        self.projector_strain(strain_new) 
         self.update_stress_tangent()    
 
     
