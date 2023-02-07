@@ -8,6 +8,7 @@ Created on Tue Feb  7 16:53:48 2023
 
 import os
 import dolfin as df
+import h5py # unexpected behaviour without including it, although not explicitly used
 
 def readXDMF_with_markers(meshFile, mesh, comm = df.MPI.comm_world):
 
@@ -28,8 +29,8 @@ def readXDMF_with_markers(meshFile, mesh, comm = df.MPI.comm_world):
     
     return mt, mf
     
-def exportXDMF_gen(filename, fields, k = 0, delete_old_file = True, encoding = df.XDMFFile.Encoding.ASCII):
-    if(delete_old_file and os.path.exists(filename)):
+def exportXDMF_gen(filename, fields, k = 0, delete_old_file = True):
+    if(delete_old_file):
         os.remove(filename)
         
     with df.XDMFFile(filename) as ofile: 
@@ -39,21 +40,21 @@ def exportXDMF_gen(filename, fields, k = 0, delete_old_file = True, encoding = d
         
         if('vertex' in fields.keys()):
             for field in fields['vertex']:
-                ofile.write(field, k, encoding = encoding) 
+                ofile.write(field, k) 
         
         if('cell' in fields.keys()):
             for field in fields['cell']:
-                ofile.write(field, k, encoding = encoding) 
+                ofile.write(field, k) 
 
         if('cell_vector' in fields.keys()):
             for field in fields['cell_vector']:
                 for field_i in field.split():
-                    ofile.write(field_i, k, encoding = encoding) 
+                    ofile.write(field_i, k) 
             
                
-def exportXDMF_checkpoint_gen(filename, fields, k= 0, delete_old_file = True, encoding = df.XDMFFile.Encoding.ASCII):
+def exportXDMF_checkpoint_gen(filename, fields, k= 0, delete_old_file = True):
     
-    if(delete_old_file and os.path.exists(filename)):
+    if(delete_old_file):
         os.remove(filename)
         
     with df.XDMFFile(filename) as ofile: 
@@ -62,10 +63,10 @@ def exportXDMF_checkpoint_gen(filename, fields, k= 0, delete_old_file = True, en
             
         if('vertex' in fields.keys()):
             for field in fields['vertex']:
-                ofile.write_checkpoint(field, field.name(), k, encoding, append = True)                
+                ofile.write_checkpoint(field, field.name(), k, df.XDMFFile.Encoding.HDF5, append = True)                
         
         if('cell' in fields.keys()):
             for field in fields['cell']:
-                ofile.write_checkpoint(field, field.name(), k, encoding, append = True) 
+                ofile.write_checkpoint(field, field.name(), k, df.XDMFFile.Encoding.HDF5, append = True) 
 
 
