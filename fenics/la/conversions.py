@@ -5,6 +5,15 @@ Created on Jan 21 08:31:08 2023
 
 @author: ffiguere 
 
+
+This file is part of fetricks:  useful tricks and some extensions for FEniCs and other FEM-related utilities
+Obs: (fe + tricks: where "fe" stands for FEM, FEniCs and me :) ).
+
+Copyright (c) 2022-2023, Felipe Rocha.
+See file LICENSE.txt for license information.
+Please report all bugs and problems to <felipe.figueredo-rocha@ec-nantes.fr>, or
+<f.rocha.felipe@gmail.com>
+
 """
 
 import dolfin as df
@@ -23,6 +32,9 @@ ind_sym_tensor_3x3 = np.array([0, 4, 8, 5, 2, 1])
 
 def as_sym_tensor_3x3(a):
     return df.as_tensor( [[ a[0], a[5], a[4]] , [a[5] , a[1], a[3]] , [a[4] , a[3], a[2]]])
+
+def as_sym_tensor_3x3_np(a):
+    return np.array( [[ a[0], a[5], a[4]] , [a[5] , a[1], a[3]] , [a[4] , a[3], a[2]]])
 
 def sym_flatten_3x3_np(A):
     return 0.5*(A + A.T).flatten()[ind_sym_tensor_3x3]

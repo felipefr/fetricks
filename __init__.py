@@ -1,3 +1,13 @@
+"""
+This file is part of fetricks:  useful tricks and some extensions for FEniCs and other FEM-related utilities
+Obs: (fe + tricks: where "fe" stands for FEM, FEniCs and me :) ).
+
+Copyright (c) 2022-2023, Felipe Rocha.
+See file LICENSE.txt for license information.
+Please report all bugs and problems to <felipe.figueredo-rocha@ec-nantes.fr>, or
+<f.rocha.felipe@gmail.com>
+"""
+
 from fetricks.mechanics.conversions import stress2voigt, strain2voigt, voigt2strain, voigt2stress, mandel2voigtStrain, mandel2voigtStress
 from fetricks.mechanics.conversions import tensor2mandel, mandel2tensor, tensor4th2mandel, tr_mandel, Id_mandel_np, Id_mandel_df, symgrad_mandel, symgrad_voigt
 from fetricks.mechanics.conversions import tensor2mandel_np, mandel2tensor_np
@@ -34,7 +44,7 @@ __all__ = ['stress2voigt', 'strain2voigt', 'voigt2strain', 'voigt2stress', 'mand
 
 from .fenics.la.conversions import (as_flatten_2x2, as_flatten_3x3, 
                                     as_unflatten_2x2, as_cross_2x2, as_skew_2x2, flatgrad_2x2, flatsymgrad_2x2,
-                                    sym_flatten_3x3_np, ind_sym_tensor_3x3, as_sym_tensor_3x3)
+                                    sym_flatten_3x3_np, as_sym_tensor_3x3_np, ind_sym_tensor_3x3, as_sym_tensor_3x3)
 
 from .fenics.la.wrapper_solvers import (CustomNonlinearSolver, CustomNonlinearProblem)
 from .mechanics.material_models import (psi_ciarlet, psi_hookean_nonlinear_lame, get_stress_tang_from_psi)

@@ -6,6 +6,15 @@ Created on Mon May 24 20:57:46 2021
 @author: felipefr
 
 
+This file is part of fetricks:  useful tricks and some extensions for FEniCs and other FEM-related utilities
+Obs: (fe + tricks: where "fe" stands for FEM, FEniCs and me :) ).
+
+Copyright (c) 2022-2023, Felipe Rocha.
+See file LICENSE.txt for license information.
+Please report all bugs and problems to <felipe.figueredo-rocha@ec-nantes.fr>, or
+<f.rocha.felipe@gmail.com>
+
+
 Example of usage:
 Given the rectangle limits: x0, x1, y0, y1 and the mesh
  

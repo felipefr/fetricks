@@ -1,6 +1,15 @@
 """
 @author: felipe
 
+
+This file is part of fetricks:  useful tricks and some extensions for FEniCs and other FEM-related utilities
+Obs: (fe + tricks: where "fe" stands for FEM, FEniCs and me :) ).
+
+Copyright (c) 2022-2023, Felipe Rocha.
+See file LICENSE.txt for license information.
+Please report all bugs and problems to <felipe.figueredo-rocha@ec-nantes.fr>, or
+<f.rocha.felipe@gmail.com>
+
 This is a wrapper for the h5py library. 
 The main idea is to create a numpy-like access to hdf5 files.
 
