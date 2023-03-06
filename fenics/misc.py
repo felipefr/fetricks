@@ -90,5 +90,30 @@ class myfog_expression(df.UserExpression): # fog f,g : R2 -> R2, generalise
         
     def value_shape(self):
         return (2,)
+    
+    
+
+# create quadrature spaces: scalar, vectorial  (strain/stresses), and tensorial (tangents)
+def create_quadrature_spaces_mechanics(mesh, deg_q, qdim):
+    cell = mesh.ufl_cell()
+    q = "Quadrature"
+    QF = df.FiniteElement(q, cell, deg_q, quad_scheme="default")
+    QV = df.VectorElement(q, cell, deg_q, quad_scheme="default", dim=qdim)
+    QT = df.TensorElement(q, cell, deg_q, quad_scheme="default", shape=(qdim, qdim))
+    return [df.FunctionSpace(mesh, Q) for Q in [QF, QV, QT]]
+
+
+# apparently add_local is faster than set_local
+def setter(q, values):
+    """
+    q:
+        quadrature function space
+    values:
+        entries for `q`
+    """
+    v = q.vector()
+    v.zero()
+    v.add_local(values.flatten())
+    v.apply("insert")
 
 
