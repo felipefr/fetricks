@@ -13,8 +13,6 @@ Please report all bugs and problems to <felipe.figueredo-rocha@ec-nantes.fr>, or
 import dolfin as df
 import matplotlib.pyplot as plt
 import numpy as np
-from fetricks.fenics.mesh.mesh import Mesh 
-
 import fetricks as ft 
 
 from timeit import default_timer as timer
@@ -30,7 +28,7 @@ nu = 0.3
 alpha = 200.0
 ty = 5.0
 
-mesh = Mesh("./meshes/mesh_40.xdmf")
+mesh = ft.Mesh("./meshes/mesh_40.xdmf")
 
 start = timer()
 
@@ -40,26 +38,17 @@ traction = df.Constant((0.0,ty ))
     
 deg_u = 1
 deg_stress = 0
+dim_strain = 3
+
 V = df.VectorFunctionSpace(mesh, "CG", deg_u)
-We = df.VectorElement("Quadrature", mesh.ufl_cell(), degree=deg_stress, dim=3, quad_scheme='default')
-W = df.FunctionSpace(mesh, We)
-W0e = df.FiniteElement("Quadrature", mesh.ufl_cell(), degree=deg_stress, quad_scheme='default')
-W0 = df.FunctionSpace(mesh, W0e)
-
-Wtan_e = df.TensorElement("Quadrature", mesh.ufl_cell(), degree=deg_stress, shape=(3,3), quad_scheme='default')
-Wtan = df.FunctionSpace(mesh, Wtan_e)
-
 bcL = df.DirichletBC(V, df.Constant((0.0,0.0)), mesh.boundaries, clampedBndFlag)
 bc = [bcL]
 
 def F_ext(v):
     return df.inner(traction, v)*mesh.ds(LoadBndFlag)
 
-
-metadata = {"quadrature_degree": deg_stress, "quadrature_scheme": "default"}
-dxm = df.dx(metadata=metadata)
-
-model = ft.hyperelasticModelExpression(W, Wtan, dxm, {'E': E, 'nu': nu, 'alpha': alpha})
+model = ft.hyperelasticModelExpression(mesh, {'E': E, 'nu': nu, 'alpha': alpha}, deg_stress, dim_strain)
+dxm = model.dxm
 
 u = df.Function(V, name="Total displacement")
 du = df.Function(V, name="Iteration correction")
@@ -76,9 +65,9 @@ file_results.parameters["flush_output"] = True
 file_results.parameters["functions_share_mesh"] = True
 
 
-callbacks = [lambda w, dw: model.updateStrain(ft.tensor2mandel(ft.symgrad(w))) ]
+callbacks = [lambda w, dw: model.update(ft.tensor2mandel(ft.symgrad(w))) ]
 
-ft.Newton(a_Newton, res, bc, du, u, callbacks , Nitermax = 10, tol = 1e-8)
+r = ft.Newton(a_Newton, res, bc, du, u, callbacks , Nitermax = 10, tol = 1e-8)[1]
 
 ## Solve here Newton Raphson
 
@@ -86,3 +75,6 @@ file_results.write(u, 0.0)
 
 end = timer()
 print(end - start)
+
+rates = [ np.log(r[i+2]/r[i+1])/np.log(r[i+1]/r[i])  for i in range(len(r) - 2) ] 
+print('rates' , rates )

@@ -17,40 +17,71 @@ Please report all bugs and problems to <felipe.figueredo-rocha@ec-nantes.fr>, or
 
 # TO DO: Compatibilise intervaces
 
+import abc
 import dolfin as df
+import numpy as np
 from .generic_gausspoint_expression import genericGaussPointExpression
 import fetricks as ft
 
 
-class materialModel:
+class materialModel(metaclass=abc.ABCMeta):
     
-    def sigma_op(self, e):
+    def __init__(self, mesh, param, deg_stress = 0, dim_strain = 3):
+        
+        self.param_parser(param)
+        self.W0, self.W, self.Wtan = ft.create_quadrature_spaces_mechanics(mesh, deg_stress, dim_strain)
+        
+        metadata = {"quadrature_degree": deg_stress, "quadrature_scheme": "default"}
+        self.dxm = df.dx(metadata=metadata)
+    
+        self.create_internal_variables()
+    
+    @abc.abstractmethod 
+    def stress(self, e):
         pass
     
-    def tangent_op(self, e):
+    @abc.abstractmethod 
+    def tangent(self, e):
         pass
     
-    def __createInternalVariables(self, W, Wtan, dxm):
+    @abc.abstractmethod  
+    def create_internal_variables(self):
         pass
     
+    @abc.abstractmethod    
+    def param_parser(self, param):
+        pass
+    
+    @abc.abstractmethod 
     def update(self, e):
         pass
     
     def project_var(self, AA):
         for label in AA.keys(): 
-            self.projector_list[label](AA[label], self.varInt[label])
+            self.projector_list[label](AA[label])
 
 
-class materialModelExpression(materialModel):
-    def __init__(self, W, Wtan, dxm):
-        self.strain = df.Function(W) 
-        self.projector = ft.LocalProjector(W, dxm)
+class materialModelExpression:
+    def __init__(self, mesh, param, deg_stress = 0, dim_strain = 3):
+        
+        self.param_parser(param)
+        self.W0, self.W, self.Wtan = ft.create_quadrature_spaces_mechanics(mesh, deg_stress, dim_strain)
+        
+        metadata = {"quadrature_degree": deg_stress, "quadrature_scheme": "default"}
+        self.dxm = df.dx(metadata=metadata)
     
-        self.size_tan = Wtan.num_sub_spaces()
-        self.size_strain = W.num_sub_spaces()
+        self.strain = df.Function(self.W) 
+        self.projector = ft.LocalProjector(self.W, self.dxm, self.strain)
+        
+        self.size_strain = self.W.num_sub_spaces()
+        self.size_tan = self.Wtan.num_sub_spaces()
+        self.size_tan_sqrt = int(np.sqrt(self.size_tan))
         
         self.stress = genericGaussPointExpression(self.strain, self.pointwise_stress , (self.size_strain,))
-        self.tangent = genericGaussPointExpression(self.strain, self.pointwise_tangent , (self.size_tan,))
+        self.tangent = genericGaussPointExpression(self.strain, self.pointwise_tangent , (self.size_tan_sqrt, self.size_tan_sqrt))
+    
+    def param_parser(self, param):
+        pass
     
     def pointwise_stress(self, e, cell = None): # elastic (I dont know why for the moment) # in mandel format
         pass
@@ -59,4 +90,4 @@ class materialModelExpression(materialModel):
         pass
     
     def update(self, e):
-        self.projector(e, self.strain)
+        self.projector(e)

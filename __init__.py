@@ -37,12 +37,12 @@ from .fenics.bcs.neumann import NeumannTensorSource, NeumannVectorSource, Neuman
 
 from .mechanics.conversions import stress2voigt, strain2voigt, voigt2strain, voigt2stress, mandel2voigtStrain, mandel2voigtStress
 from .mechanics.conversions import tensor2mandel, mandel2tensor, tensor4th2mandel, tr_mandel, Id_mandel_np, Id_mandel_df, symgrad_mandel, symgrad_voigt
-from .mechanics.conversions import tensor2mandel_np, mandel2tensor_np
+from .mechanics.conversions import tensor2mandel_np, mandel2tensor_np, tensor4th2mandel_np
 from .mechanics.conversions import grad2mandel_vec, grad2mandel_ten, mandelgrad, mandelgrad_ten
 
 # from .mechanics.conversions3d import stress2voigt, strain2voigt, voigt2strain, voigt2stress, mandel2voigtStrain, mandel2voigtStress
 # from .mechanics.conversions3d import tensor2mandel, mandel2tensor, tensor4th2mandel, tr_mandel, Id_mandel_np, Id_mandel_df, symgrad_mandel, symgrad_voigt
-# from .mechanics.conversions3d import tensor2mandel_np, mandel2tensor_np
+# from .mechanics.conversions3d import tensor2mandel_np, mandel2tensor_np, tensor4th2mandel_np
 # from .mechanics.conversions3d import grad2mandel_vec, grad2mandel_ten, mandelgrad, mandelgrad_ten
 
 

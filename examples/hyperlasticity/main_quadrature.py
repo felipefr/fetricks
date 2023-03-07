@@ -12,8 +12,6 @@ Please report all bugs and problems to <felipe.figueredo-rocha@ec-nantes.fr>, or
 import dolfin as df
 import matplotlib.pyplot as plt
 import numpy as np
-from fetricks.fenics.mesh.mesh import Mesh 
-
 import fetricks as ft 
 
 from timeit import default_timer as timer
@@ -31,9 +29,8 @@ nu = 0.3
 alpha = 200.0
 ty = 5.0
 
-model = ft.hyperelasticModel({'E': E, 'nu': nu, 'alpha': alpha})
 
-mesh = Mesh("./meshes/mesh_40.xdmf")
+mesh = ft.Mesh("./meshes/mesh_40.xdmf")
 
 start = timer()
 
@@ -43,11 +40,8 @@ traction = df.Constant((0.0,ty ))
     
 deg_u = 1
 deg_stress = 0
+dim_strain = 3
 V = df.VectorFunctionSpace(mesh, "CG", deg_u)
-We = df.VectorElement("Quadrature", mesh.ufl_cell(), degree=deg_stress, dim=3, quad_scheme='default')
-W = df.FunctionSpace(mesh, We)
-W0e = df.FiniteElement("Quadrature", mesh.ufl_cell(), degree=deg_stress, quad_scheme='default')
-W0 = df.FunctionSpace(mesh, W0e)
 
 bcL = df.DirichletBC(V, df.Constant((0.0,0.0)), mesh.boundaries, clampedBndFlag)
 bc = [bcL]
@@ -56,10 +50,9 @@ def F_ext(v):
     return df.inner(traction, v)*mesh.ds(LoadBndFlag)
 
 
-metadata = {"quadrature_degree": deg_stress, "quadrature_scheme": "default"}
-dxm = df.dx(metadata=metadata)
+model = ft.hyperelasticModel(mesh, {'E': E, 'nu': nu, 'alpha': alpha}, deg_stress, dim_strain)
+dxm = model.dxm
 
-model.createInternalVariables(W, W0, dxm)
 u = df.Function(V, name="Total displacement")
 du = df.Function(V, name="Iteration correction")
 v = df.TestFunction(V)
@@ -74,7 +67,7 @@ file_results.parameters["flush_output"] = True
 file_results.parameters["functions_share_mesh"] = True
 
 
-callbacks = [lambda w, dw: model.update_alpha(ft.tensor2mandel(ft.symgrad(w))) ]
+callbacks = [lambda w, dw: model.update(ft.tensor2mandel(ft.symgrad(w))) ]
 
 r = ft.Newton(a_Newton, res, bc, du, u, callbacks , Nitermax = 10, tol = 1e-6)[1]
 

@@ -93,6 +93,12 @@ def tensor4th2mandel(X):
                           [X[1,1,0,0], X[1,1,1,1], sqrt2*X[1,1,0,1]],
                           [sqrt2*X[0,1,0,0], sqrt2*X[0,1,1,1], 2*X[0,1,0,1]] ] )
                       
+
+def tensor4th2mandel_np(X):
+    return np.array([ [X[0,0,0,0], X[0,0,1,1], sqrt2*X[0,0,0,1]],
+                          [X[1,1,0,0], X[1,1,1,1], sqrt2*X[1,1,0,1]],
+                          [sqrt2*X[0,1,0,0], sqrt2*X[0,1,1,1], 2*X[0,1,0,1]] ] )
+
 def tr_mandel(X):
     return X[0] + X[1]
 
