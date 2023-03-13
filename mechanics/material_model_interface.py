@@ -20,7 +20,6 @@ Please report all bugs and problems to <felipe.figueredo-rocha@ec-nantes.fr>, or
 import abc
 import dolfin as df
 import numpy as np
-from .generic_gausspoint_expression import genericGaussPointExpression
 import fetricks as ft
 
 
@@ -28,8 +27,11 @@ class materialModel(metaclass=abc.ABCMeta):
     
     def __init__(self, mesh, param, deg_stress = 0, dim_strain = 3):
         
+        self.dim_strain = dim_strain
         self.param_parser(param)
-        self.W0, self.W, self.Wtan = ft.create_quadrature_spaces_mechanics(mesh, deg_stress, dim_strain)
+        self.W0, self.W, self.Wtan = ft.create_quadrature_spaces_mechanics(mesh, deg_stress, self.dim_strain)
+        
+        self.n_gauss_points = self.W.dim()//self.dim_strain
         
         metadata = {"quadrature_degree": deg_stress, "quadrature_scheme": "default"}
         self.dxm = df.dx(metadata=metadata)
@@ -37,11 +39,11 @@ class materialModel(metaclass=abc.ABCMeta):
         self.create_internal_variables()
     
     @abc.abstractmethod 
-    def stress(self, e):
+    def stress_op(self, e):
         pass
     
     @abc.abstractmethod 
-    def tangent(self, e):
+    def tangent_op(self, e):
         pass
     
     @abc.abstractmethod  

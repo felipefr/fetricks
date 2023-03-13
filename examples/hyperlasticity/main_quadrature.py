@@ -59,8 +59,8 @@ v = df.TestFunction(V)
 u_ = df.TrialFunction(V)
 
 # RHS and LHS: Note that Jac = derivative of Res
-a_Newton = df.inner(ft.tensor2mandel(ft.symgrad(u_)), model.tangent(ft.tensor2mandel(ft.symgrad(v))) )*dxm
-res = df.inner(ft.tensor2mandel(ft.symgrad(v)), model.sig )*dxm - F_ext(v)
+a_Newton = df.inner(ft.tensor2mandel(ft.symgrad(u_)), model.tangent_op(ft.tensor2mandel(ft.symgrad(v))) )*dxm
+res = df.inner(ft.tensor2mandel(ft.symgrad(v)), model.stress )*dxm - F_ext(v)
 
 file_results = df.XDMFFile("cook.xdmf")
 file_results.parameters["flush_output"] = True

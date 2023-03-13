@@ -15,18 +15,11 @@ Please report all bugs and problems to <felipe.figueredo-rocha@ec-nantes.fr>, or
 <f.rocha.felipe@gmail.com>
 """
 
-
-import sys
 import dolfin as df
 import numpy as np
-from .material_model import materialModel , materialModelExpression
-
 import fetricks as ft
 
-# mandel2tensor
-# LocalProjector
-
-class hyperelasticModel(materialModel):
+class hyperelasticModel(ft.materialModel):
         
     def param_parser(self, param):
         
@@ -44,28 +37,25 @@ class hyperelasticModel(materialModel):
         
 
     def create_internal_variables(self):
-        self.sig = df.Function(self.W)
-        self.eps = df.Function(self.W)
+        self.stress = df.Function(self.W)
+        self.strain = df.Function(self.W)
         
-        projector_eps = ft.LocalProjector(self.W, self.dxm, self.eps)
-        projector_sig = ft.LocalProjector(self.W, self.dxm, self.sig)
+        projector_strain = ft.LocalProjector(self.W, self.dxm, self.strain)
+        projector_stress = ft.LocalProjector(self.W, self.dxm, self.stress)
         
-        self.projector_list = {'eps' : projector_eps,  'sig' : projector_sig}
+        self.projector_list = {'eps' : projector_strain,  'sig' : projector_stress}
 
-    def stress(self, lamb_, mu_, eps): # elastic (I dont know why for the moment) # in mandel format
+    def stress_op(self, lamb_, mu_, eps): # elastic (I dont know why for the moment) # in mandel format
         return lamb_*ft.tr_mandel(eps)*ft.Id_mandel_df + 2*mu_*eps
-    
-    def epseps_de(self, de):
-        return df.inner(self.eps, de)*self.eps
-    
-    def tangent(self, de): # de have to be in mandel notation
-        ee = df.inner(self.eps, self.eps)
-        tre2 = ft.tr_mandel(self.eps)**2.0
+        
+    def tangent_op(self, de): # de have to be in mandel notation
+        ee = df.inner(self.strain, self.strain)
+        tre2 = ft.tr_mandel(self.strain)**2.0
         
         lamb_ = self.lamb*( 1 + 3*self.alpha*tre2)
         mu_ = self.mu*( 1 + self.alpha*ee ) 
         
-        return self.stress(lamb_, mu_, de)  + 4*self.mu*self.alpha*self.epseps_de(de)
+        return self.stress_op(lamb_, mu_, de)  + 4*self.mu*self.alpha*df.inner(self.strain, de)*self.strain
 
     def update(self, epsnew):
         
@@ -75,12 +65,12 @@ class hyperelasticModel(materialModel):
         lamb_ = self.lamb*( 1 + self.alpha*tre2)
         mu_ = self.mu*( 1 + self.alpha*ee ) 
         
-        alpha_new = {'eps' : epsnew, 'sig': self.stress(lamb_, mu_, epsnew)}
+        alpha_new = {'eps' : epsnew, 'sig': self.stress_op(lamb_, mu_, epsnew)}
         self.project_var(alpha_new)
         
         
 # Constant materials params
-class hyperelasticModelExpression(materialModelExpression):
+class hyperelasticModelExpression(ft.materialModelExpression):
     
     def __init__(self, mesh, param, deg_stress = 0, dim_strain = 3):
         super().__init__(mesh, param, deg_stress, dim_strain)

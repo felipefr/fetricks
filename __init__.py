@@ -19,7 +19,10 @@ from .fenics.mesh.mesh import Mesh
     
 # force to use new version
 from .fenics.mesh.wrapper_gmsh import GmshIO # uses new meshio
-    
+
+from .mechanics.material_model_interface import materialModel , materialModelExpression
+from .mechanics.material_models import (psi_ciarlet, psi_hookean_nonlinear_lame, get_stress_tang_from_psi)
+from .mechanics.generic_gausspoint_expression import genericGaussPointExpression
 from .mechanics.multiscale_model import multiscaleModel
 from .mechanics.multiscale_model_expression import multiscaleModelExpression
 from .mechanics.hyperelastic_model import hyperelasticModel, hyperelasticModelExpression
@@ -30,7 +33,8 @@ from .fenics.la.conversions import (as_flatten_2x2, as_flatten_3x3,
                                     sym_flatten_3x3_np, as_sym_tensor_3x3_np, ind_sym_tensor_3x3, as_sym_tensor_3x3)
 
 from .fenics.la.wrapper_solvers import (CustomNonlinearSolver, CustomNonlinearProblem)
-from .mechanics.material_models import (psi_ciarlet, psi_hookean_nonlinear_lame, get_stress_tang_from_psi)
+
+
 
 from .fenics.bcs.neumann import NeumannTensorSource, NeumannVectorSource, NeumannBC, NeumannVectorBC, NeumannVectorBC_given_normal
 

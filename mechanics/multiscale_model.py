@@ -18,8 +18,6 @@ Please report all bugs and problems to <felipe.figueredo-rocha@ec-nantes.fr>, or
 import sys
 import dolfin as df
 import numpy as np
-from .material_model import materialModel
-
 import fetricks as ft
 
 from mpi4py import MPI
@@ -27,7 +25,7 @@ from mpi4py import MPI
 comm = MPI.COMM_WORLD
 comm_self = MPI.COMM_SELF
 
-class multiscaleModel(materialModel):
+class multiscaleModel(ft.materialModel):
     
     def __init__(self, W, Wtan, dxm, micromodels):
         

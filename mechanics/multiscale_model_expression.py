@@ -17,13 +17,11 @@ Please report all bugs and problems to <felipe.figueredo-rocha@ec-nantes.fr>, or
 
 # NOT TESTED
 
-
-from .material_model import materialModel, materialModelExpression 
 import numpy as np
 import dolfin as df
 import fetricks as ft
 
-class multiscaleModelExpression(materialModelExpression):
+class multiscaleModelExpression(ft.materialModelExpression):
     
     def __init__(self, W, Wtan, dxm, micromodels):
         self.micromodels = micromodels

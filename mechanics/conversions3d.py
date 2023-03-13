@@ -37,9 +37,9 @@ def tensor2mandel_np(X):
                      halfsqrt2*(X[0,1] + X[1,0])])
 
 def mandel2tensor(X):
-    return df.as_tensor( [X[0], halfsqrt2*X[5], halfsqrt2*X[4]],
-                         [halfsqrt2*X[5], X[1], halfsqrt2*X[3]],
-                         [halfsqrt2*X[4], halfsqrt2*X[3], X[2]])
+    return df.as_tensor( [[X[0], halfsqrt2*X[5], halfsqrt2*X[4]],
+                          [halfsqrt2*X[5], X[1], halfsqrt2*X[3]],
+                          [halfsqrt2*X[4], halfsqrt2*X[3], X[2]]])
 
 def tensor2mandel(X):
     return df.as_vector([X[0,0], X[1,1], X[2,2], 
