@@ -27,13 +27,16 @@ class materialModel(metaclass=abc.ABCMeta):
     
     def __init__(self, mesh, param, deg_stress = 0, dim_strain = 3):
         
+        self.deg_stress = deg_stress
+        self.mesh = mesh
         self.dim_strain = dim_strain
         self.param_parser(param)
         self.W0, self.W, self.Wtan = ft.create_quadrature_spaces_mechanics(mesh, deg_stress, self.dim_strain)
+        # self.W0, self.W, self.Wtan = ft.create_DG_spaces_mechanics(mesh, deg_stress, self.dim_strain)
         
         self.n_gauss_points = self.W.dim()//self.dim_strain
         
-        metadata = {"quadrature_degree": deg_stress, "quadrature_scheme": "default"}
+        metadata = {"quadrature_degree": deg_stress}
         self.dxm = df.dx(metadata=metadata)
     
         self.create_internal_variables()

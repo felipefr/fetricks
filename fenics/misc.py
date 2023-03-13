@@ -103,6 +103,15 @@ def create_quadrature_spaces_mechanics(mesh, deg_q, qdim):
     return [df.FunctionSpace(mesh, Q) for Q in [QF, QV, QT]]
 
 
+def create_DG_spaces_mechanics(mesh, deg_q, qdim):
+    cell = mesh.ufl_cell()
+    q = "DG"
+    QF = df.FiniteElement(q, cell, deg_q)
+    QV = df.VectorElement(q, cell, deg_q, dim=qdim)
+    QT = df.TensorElement(q, cell, deg_q, shape=(qdim, qdim))
+    return [df.FunctionSpace(mesh, Q) for Q in [QF, QV, QT]]
+
+
 # apparently add_local is faster than set_local
 def setter(q, values):
     """
