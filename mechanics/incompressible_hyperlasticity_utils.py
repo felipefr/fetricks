@@ -55,3 +55,22 @@ def getDiso(Dbar_, Sbar, C, Cinv, J):
     Cinv_circ_dot_Cinv = ft.outer_dot_mandel_ufl(Cinv, Cinv)
     
     return Dbar - 2*df.sym(df.outer(B, c)) + gamma*df.outer(B,B) +  TrCoeff*(Cinv_circ_dot_Cinv)
+
+# More intuitive, but there's probably a bug
+# get Diso given Sbar, Dbar (page 255 Holzapfel). Mandel notation convention
+# def getDiso4Dbar(Dbar_, Sbar, C, Cinv, J):
+    
+#     Dbar = J**(-4/3)*Dbar_
+    
+#     i, j, k, l = ufl.indices(4)
+    
+#     Siso = getSiso4Sbar(Sbar, C, Cinv, J)
+#     TrCoeff = (2/3)*J**(-2/3)*df.inner(Sbar,C)
+#     DbarC = df.dot(Dbar, C)
+#     CDbarC = df.inner(C, DbarC)
+    
+#     Cinv_ = conv.mandel2tensor(Cinv)
+#     Cinv_circ_dot_Cinv = 0.5*tensor4th2mandel(ufl.as_tensor(Cinv_[i,k]*Cinv_[j,l] + Cinv_[i,l]*Cinv_[j,k] , (i,j,k,l) ))
+    
+#     return ( Dbar - (2./3.)*df.sym(df.outer(DbarC, Cinv)) + ((1./9.)*CDbarC - (1/3)*TrCoeff)*df.outer(Cinv,Cinv) + 
+#               TrCoeff*(Cinv_circ_dot_Cinv) - (2./3.)*df.sym(df.outer(Siso, Cinv)) )

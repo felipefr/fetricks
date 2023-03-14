@@ -28,6 +28,7 @@ from .mechanics.multiscale_model import multiscaleModel
 from .mechanics.multiscale_model_expression import multiscaleModelExpression
 from .mechanics.hyperelastic_model import hyperelasticModel, hyperelasticModelExpression
 from .mechanics.incompressible_hyperlasticity_utils import Dev, getSiso, getSvol, getDiso, getDvol
+from .mechanics.hyperlasticity_utils import GL2CG_np, get_invariants_iso_np, get_invariants_iso_np 
 
 from .fenics.la.conversions import (as_flatten_2x2, as_flatten_3x3, 
                                     as_unflatten_2x2, as_cross_2x2, as_skew_2x2, flatgrad_2x2, flatsymgrad_2x2,
@@ -49,8 +50,11 @@ from .mechanics.conversions2d import *
 from .mechanics import conversions2d as conv2d
 from .mechanics import conversions3d as conv3d
 
-def get_mechanical_notation_conversor(dim_strain = None):
-    return {3: conv2d, 6: conv3d}[dim_strain]
+def get_mechanical_notation_conversor(dim_strain = None, gdim = None):
+    if(gdim):
+        return {2: conv2d, 3: conv3d}[gdim]
+    elif(dim_strain):
+        return {3: conv2d, 6: conv3d}[dim_strain]
 
 # Explicit import conversions
 # from .mechanics.conversions2d import stress2voigt, strain2voigt, voigt2strain, voigt2stress, mandel2voigtStrain, mandel2voigtStress

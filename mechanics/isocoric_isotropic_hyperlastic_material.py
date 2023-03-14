@@ -20,7 +20,7 @@ class IsochoricIsotropicHyperelasticMaterial(ft.materialModel):
     def param_parser(self, param):
         
         self.gdim = param['gdim']
-        self.conv = {2: ft.conv2d, 3: ft.conv3d}[self.gdim]
+        self.conv = ft.get_mechanical_notation_conversor(gdim = self.gdim)
             
     def create_internal_variables(self):
         self.stress = df.Function(self.W)
@@ -48,37 +48,14 @@ class IsochoricIsotropicHyperelasticMaterial(ft.materialModel):
         ft.setter(self.stress, np.array([self.get_stress(strain_table[i,:]) for i in range(self.n_gauss_points)]))
         ft.setter(self.tangent, np.array([self.get_tangent(strain_table[i,:]) for i in range(self.n_gauss_points)]))
 
-
-    def E2CG(self, E):
-        return 2*self.conv.mandel2tensor_np(E) + np.eye(self.gdim)
-    
-    def get_invariants(self, C_):
-        
-        if(C_.shape[0] == 2):
-            C = np.array([[C_[0,0], C_[0,1], 0], [C_[1,0], C_[1,1], 0], [0, 0, 1]])
-        else:
-            C = C_
-        
-        I3 = np.linalg.det(C)
-        J = np.sqrt(I3)
-        I1 = np.trace(C)
-        I2 = 0.5*(np.trace(C)**2 - np.trace(C@C))
-        
-        return I1, I2, I3, J
-    
-    def get_invariants_iso(self, C_):
-        I1, I2, I3, J = self.get_invariants(C_)
-        
-        return J**(-2/3)*I1, J**(-4/3)*I2, I3, J
-
         
     def get_stress(self, E):
         
-        C = self.E2CG(E)
-        I1, I2, I3, J = self.get_invariants_iso(C)
+        C = ft.GL2CG_np(self.conv.mandel2tensor_np(E))
+        I1, I2, I3, J = ft.get_invariants_iso_np(C)
         Cbar = self.conv.tensor2mandel_np(J**(-2/3)*C)
         
-        dpsidi1, dpsidi2 = self.get_dpsi(E) 
+        dpsidi1, dpsidi2 = self.get_dpsi(C) 
         
         a1 = 2*(dpsidi1 + I1*dpsidi2)
         a2 = -2*dpsidi2
@@ -88,8 +65,8 @@ class IsochoricIsotropicHyperelasticMaterial(ft.materialModel):
     
     def get_tangent(self, E):
         
-        C = self.E2CG(E)
-        I1, I2, I3, J = self.get_invariants_iso(C)
+        C = ft.GL2CG_np(self.conv.mandel2tensor_np(E))
+        I1, I2, I3, J = ft.get_invariants_iso_np(C)
         Cbar = self.conv.tensor2mandel_np(J**(-2/3)*C)
         
         dpsidi1, dpsidi2 = self.get_dpsi(C) 
