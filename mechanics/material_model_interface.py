@@ -36,7 +36,7 @@ class materialModel(metaclass=abc.ABCMeta):
         
         self.n_gauss_points = self.W.dim()//self.dim_strain
         
-        metadata = {"quadrature_degree": deg_stress}
+        metadata = {"quadrature_degree": deg_stress, 'quadrature_scheme': 'default' }
         self.dxm = df.dx(metadata=metadata)
     
         self.create_internal_variables()

@@ -36,22 +36,19 @@ from .fenics.la.wrapper_solvers import (CustomNonlinearSolver, CustomNonlinearPr
 
 
 from .fenics.bcs.neumann import NeumannTensorSource, NeumannVectorSource, NeumannBC, NeumannVectorBC, NeumannVectorBC_given_normal
-
-
-from .mechanics.conversions import stress2voigt, strain2voigt, voigt2strain, voigt2stress, mandel2voigtStrain, mandel2voigtStress
-from .mechanics.conversions import tensor2mandel, mandel2tensor, tensor4th2mandel, tr_mandel, Id_mandel_np, Id_mandel_df, symgrad_mandel, symgrad_voigt
-from .mechanics.conversions import tensor2mandel_np, mandel2tensor_np, tensor4th2mandel_np
-from .mechanics.conversions import grad2mandel_vec, grad2mandel_ten, mandelgrad, mandelgrad_ten
-
-
-
 from .fenics.misc import create_quadrature_spaces_mechanics, create_DG_spaces_mechanics, symgrad, Integral, setter
 
-# from .mechanics.conversions3d import stress2voigt, strain2voigt, voigt2strain, voigt2stress, mandel2voigtStrain, mandel2voigtStress
-# from .mechanics.conversions3d import tensor2mandel, mandel2tensor, tensor4th2mandel, tr_mandel, Id_mandel_np, Id_mandel_df, symgrad_mandel, symgrad_voigt
-# from .mechanics.conversions3d import tensor2mandel_np, mandel2tensor_np, tensor4th2mandel_np
-# from .mechanics.conversions3d import grad2mandel_vec, grad2mandel_ten, mandelgrad, mandelgrad_ten
+# Conversions
+# the default is 2d, if you want use explictly ft.conv2d or ft.conv3d, or even rename it with conv = ft.convXd
+from .mechanics.conversions2d import *
+from .mechanics import conversions2d as conv2d
+from .mechanics import conversions3d as conv3d
 
+# Explicit import conversions
+# from .mechanics.conversions2d import stress2voigt, strain2voigt, voigt2strain, voigt2stress, mandel2voigtStrain, mandel2voigtStress
+# from .mechanics.conversions2d import tensor2mandel, mandel2tensor, tensor4th2mandel, tr_mandel, Id_mandel_np, Id_mandel_df, symgrad_mandel, symgrad_voigt
+# from .mechanics.conversions2d import tensor2mandel_np, mandel2tensor_np, tensor4th2mandel_np
+# from .mechanics.conversions2d import grad2mandel_vec, grad2mandel_ten, mandelgrad, mandelgrad_ten
 
 
 # __all__ = ['stress2voigt', 'strain2voigt', 'voigt2strain', 'voigt2stress', 'mandel2voigtStrain', 'mandel2voigtStress',

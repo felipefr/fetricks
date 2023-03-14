@@ -346,6 +346,8 @@ def solver_direct(a,b, bcs, Uh, method = "superlu" ):
     
 class LocalProjector:
     def __init__(self, V, dx, sol = None):    
+        
+        df.parameters["form_compiler"]["representation"] = 'quadrature'
         self.V = V
         self.sol = sol if sol else df.Function(V)
         self.dx = dx
@@ -360,11 +362,15 @@ class LocalProjector:
         
         self.solver = df.LocalSolver(a_proj)
         self.solver.factorize()
-    
+        
+        df.parameters["form_compiler"]["representation"] = 'uflacs'
+
     
     def __call__(self, u):
+        df.parameters["form_compiler"]["representation"] = 'quadrature'
         df.assemble(self.b_proj(u), tensor = self.rhs)
         self.solver.solve_local(self.sol.vector(), self.rhs,  self.V.dofmap())
+        df.parameters["form_compiler"]["representation"] = 'uflacs'
         
 # Class for interfacing with the Newton solver
 class myNonlinearProblem(df.NonlinearProblem):
