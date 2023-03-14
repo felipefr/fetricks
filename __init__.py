@@ -21,15 +21,20 @@ from .fenics.mesh.mesh import Mesh
 from .fenics.mesh.wrapper_gmsh import GmshIO # uses new meshio
 
 from .mechanics.material_model_interface import materialModel , materialModelExpression
+from .mechanics.isocoric_isotropic_hyperlastic_material import IsochoricIsotropicHyperelasticMaterial
 from .mechanics.material_models import (psi_ciarlet, psi_hookean_nonlinear_lame, get_stress_tang_from_psi)
 from .mechanics.generic_gausspoint_expression import genericGaussPointExpression
 from .mechanics.multiscale_model import multiscaleModel
 from .mechanics.multiscale_model_expression import multiscaleModelExpression
 from .mechanics.hyperelastic_model import hyperelasticModel, hyperelasticModelExpression
+from .mechanics.incompressible_hyperlasticity_utils import Dev, getSiso, getSvol, getDiso, getDvol
 
 from .fenics.la.conversions import (as_flatten_2x2, as_flatten_3x3, 
                                     as_unflatten_2x2, as_cross_2x2, as_skew_2x2, flatgrad_2x2, flatsymgrad_2x2,
                                     sym_flatten_3x3_np, as_sym_tensor_3x3_np, ind_sym_tensor_3x3, as_sym_tensor_3x3)
+
+
+from .fenics.la.operations import outer_overline_ufl, outer_underline_ufl, outer_dot_ufl, outer_dot_mandel_ufl
 
 from .fenics.la.wrapper_solvers import (CustomNonlinearSolver, CustomNonlinearProblem)
 
@@ -43,6 +48,9 @@ from .fenics.misc import create_quadrature_spaces_mechanics, create_DG_spaces_me
 from .mechanics.conversions2d import *
 from .mechanics import conversions2d as conv2d
 from .mechanics import conversions3d as conv3d
+
+def get_mechanical_notation_conversor(dim_strain = None):
+    return {3: conv2d, 6: conv3d}[dim_strain]
 
 # Explicit import conversions
 # from .mechanics.conversions2d import stress2voigt, strain2voigt, voigt2strain, voigt2stress, mandel2voigtStrain, mandel2voigtStress

@@ -40,6 +40,14 @@ class materialModel(metaclass=abc.ABCMeta):
         self.dxm = df.dx(metadata=metadata)
     
         self.create_internal_variables()
+
+
+    # optional
+    def get_dpsi(self, E):
+        pass
+    
+    def get_d2psi(self,E):
+        pass
     
     @abc.abstractmethod 
     def stress_op(self, e):
@@ -64,6 +72,7 @@ class materialModel(metaclass=abc.ABCMeta):
     def project_var(self, AA):
         for label in AA.keys(): 
             self.projector_list[label](AA[label])
+
 
 
 class materialModelExpression:
