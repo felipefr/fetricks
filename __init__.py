@@ -28,7 +28,7 @@ from .mechanics.multiscale_model import multiscaleModel
 from .mechanics.multiscale_model_expression import multiscaleModelExpression
 from .mechanics.hyperelastic_model import hyperelasticModel, hyperelasticModelExpression
 from .mechanics.incompressible_hyperlasticity_utils import Dev, getSiso, getSvol, getDiso, getDvol
-from .mechanics.hyperlasticity_utils import GL2CG_np, get_invariants_iso_np, get_invariants_iso_np 
+from .mechanics.hyperlasticity_utils import GL2CG_np, get_invariants_iso_np, get_invariants_iso_np, get_GL_mandel, get_deltaGL_mandel
 
 from .fenics.la.conversions import (as_flatten_2x2, as_flatten_3x3, 
                                     as_unflatten_2x2, as_cross_2x2, as_skew_2x2, flatgrad_2x2, flatsymgrad_2x2,

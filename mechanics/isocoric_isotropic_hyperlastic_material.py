@@ -30,9 +30,6 @@ class IsochoricIsotropicHyperelasticMaterial(ft.materialModel):
         projector_strain = ft.LocalProjector(self.W, self.dxm, self.strain)
         self.projector_list = {'strain' : projector_strain}
 
-    def getE(self, u):
-        return self.conv.symgrad_mandel(u) + 0.5*self.conv.tensor2mandel(df.grad(u).T*df.grad(u))
-
     def stress_op(self, E):
         return self.stress
         
@@ -40,7 +37,7 @@ class IsochoricIsotropicHyperelasticMaterial(ft.materialModel):
         return df.dot(self.tangent, de)
     
     def update(self, u):
-        alpha_new = {'strain' : self.getE(u)}
+        alpha_new = {'strain' : ft.get_GL_mandel(u)}
         self.project_var(alpha_new)
         
         strain_table = self.strain.vector().get_local().reshape((-1, self.dim_strain))    
@@ -55,7 +52,7 @@ class IsochoricIsotropicHyperelasticMaterial(ft.materialModel):
         I1, I2, I3, J = ft.get_invariants_iso_np(C)
         Cbar = self.conv.tensor2mandel_np(J**(-2/3)*C)
         
-        dpsidi1, dpsidi2 = self.get_dpsi(C) 
+        dpsidi1, dpsidi2 = self.get_dpsi(C)
         
         a1 = 2*(dpsidi1 + I1*dpsidi2)
         a2 = -2*dpsidi2
