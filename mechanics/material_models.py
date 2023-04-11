@@ -23,8 +23,37 @@ Convention:
 
 
 import dolfin as df
+import ufl
 import fetricks as ft
 import numpy as np
+
+def psi_hartmannneff_C(C_, param): # paper german benchmarks Archives, 2021
+    
+    if(C_.ufl_shape[0] == 2):    
+        C = df.as_tensor([[C_[0,0], C_[0,1], 0], [C_[1,0], C_[1,1], 0], [0, 0, 1]])
+    else:
+        C = C_
+
+    alpha, c10, c01, kappa = param["alpha"], param["c10"], param["c01"], param["kappa"]
+
+    J = df.sqrt(df.det(C))
+    Cbar = J**(-1/3)*C
+    I1 = df.tr(Cbar)
+    # I2 = df.tr(ufl.cofac(Cbar))
+    I2 = 0.5*(df.tr(C)**2 - df.tr(C*C))
+    
+    print(alpha)
+    # U = (kappa/50)*(J**5 + J**(-5) - 2)
+    U = 0.5*kappa*(J - 1)**2
+    W = alpha*(I1*I1*I1 - 27) + c10*(I1 - 3.) + c01*(I2**1.5 - 3.*np.sqrt(3.))
+    
+    return U + W
+
+
+def psi_hartmannneff(F, param): # paper german benchmarks Archives, 2021
+    return psi_hartmannneff_C(F.T*F, param)
+
+
 def psi_ciarlet_C(C_, param): # paper german benchmarks Archives, 2021
     if(C_.ufl_shape[0] == 2):    
         C = df.as_tensor([[C_[0,0], C_[0,1], 0], [C_[1,0], C_[1,1], 0], [0, 0, 1]])

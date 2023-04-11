@@ -23,7 +23,7 @@ from .fenics.mesh.wrapper_gmsh import GmshIO # uses new meshio
 from .mechanics.material_model_interface import materialModel , materialModelExpression
 from .mechanics.isocoric_isotropic_hyperlastic_material import IsochoricIsotropicHyperelasticMaterial
 from .mechanics.material_models import (psi_ciarlet, psi_ciarlet_C, psi_hookean_nonlinear_lame, get_stress_tang_from_psi, 
-                                        PK2_ciarlet_C_np)
+                                        PK2_ciarlet_C_np, psi_hartmannneff, psi_hartmannneff_C)
 from .mechanics.generic_gausspoint_expression import genericGaussPointExpression
 from .mechanics.multiscale_model import multiscaleModel
 from .mechanics.multiscale_model_expression import multiscaleModelExpression
