@@ -15,6 +15,9 @@ import fetricks as ft
 def GL2CG_np(E):
     return 2*E + np.eye(E.shape[0])
 
+def plane_strain_CG_np(C):
+    return np.array([[C[0,0], C[0,1], 0], [C[1,0], C[1,1], 0], [0, 0, 1]])
+
 # C is full
 def get_invariants_np(C, constraint = 'PLANE_STRAIN'):
     

@@ -150,22 +150,13 @@ def mandel2voigtStress(v, backend = df.as_vector):
     return backend([v[0], v[1], halfsqrt2*v[2]]) 
 
 
-#  Check it again 
-# def rotationInMandelNotation(theta):
-
-#     Q = np.array([[np.cos(theta), np.sin(theta)],
-#                   [-np.sin(theta), np.cos(theta)]])
-    
-#     # Rotation tranformation in mandel-kelvin convention
-#     sq2 = np.sqrt(2.0)
-#     Tm = np.array([ [Q[0,0]**2 , Q[0,1]**2, sq2*Q[0,0]*Q[0,1]], 
-#                     [Q[1,0]**2 , Q[1,1]**2, sq2*Q[1,1]*Q[1,0]],
-#                     [sq2*Q[1,0]*Q[0,0] , sq2*Q[0,1]*Q[1,1], Q[1,1]*Q[0,0] + Q[0,1]*Q[1,0] ] ])
-    
-    
-#     return Tm
-
-def rotationInMandelNotation(theta):
+# Q = [[np.cos(theta), np.sin(theta)],
+#      [-np.sin(theta), np.cos(theta)],
+# Tm = [ [Q[0,0]**2 , Q[0,1]**2, sq2*Q[0,0]*Q[0,1]], 
+#      [Q[1,0]**2 , Q[1,1]**2, sq2*Q[1,1]*Q[1,0]],
+#      [sq2*Q[1,0]*Q[0,0] , sq2*Q[0,1]*Q[1,1], Q[1,1]*Q[0,0] + Q[0,1]*Q[1,0] ]]
+# (Q.T @ A @ Q)_m = Tm @ Am
+def rotation_mandel(theta):
 
     c = np.cos(theta)
     s = np.sin(theta)

@@ -22,13 +22,14 @@ from .fenics.mesh.wrapper_gmsh import GmshIO # uses new meshio
 
 from .mechanics.material_model_interface import materialModel , materialModelExpression
 from .mechanics.isocoric_isotropic_hyperlastic_material import IsochoricIsotropicHyperelasticMaterial
-from .mechanics.material_models import (psi_ciarlet, psi_hookean_nonlinear_lame, get_stress_tang_from_psi)
+from .mechanics.material_models import (psi_ciarlet, psi_ciarlet_C, psi_hookean_nonlinear_lame, get_stress_tang_from_psi, 
+                                        PK2_ciarlet_C_np)
 from .mechanics.generic_gausspoint_expression import genericGaussPointExpression
 from .mechanics.multiscale_model import multiscaleModel
 from .mechanics.multiscale_model_expression import multiscaleModelExpression
 from .mechanics.hyperelastic_model import hyperelasticModel, hyperelasticModelExpression
 from .mechanics.incompressible_hyperlasticity_utils import Dev, getSiso, getSvol, getDiso, getDvol
-from .mechanics.hyperlasticity_utils import GL2CG_np, get_invariants_iso_np, get_invariants_iso_np, get_GL_mandel, get_deltaGL_mandel
+from .mechanics.hyperlasticity_utils import GL2CG_np, plane_strain_CG_np, get_invariants_iso_np, get_invariants_iso_np, get_GL_mandel, get_deltaGL_mandel
 
 from .fenics.la.conversions import (as_flatten_2x2, as_flatten_3x3, 
                                     as_unflatten_2x2, as_cross_2x2, as_skew_2x2, flatgrad_2x2, flatsymgrad_2x2,
