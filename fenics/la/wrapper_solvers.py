@@ -345,12 +345,15 @@ def solver_direct(a,b, bcs, Uh, method = "superlu" ):
     return uh
     
 class LocalProjector:
-    def __init__(self, V, dx, sol = None):    
+    def __init__(self, V, dx, sol = None, inner_representation = 'quadrature', outer_representation = 'uflacs'):    
         
-        df.parameters["form_compiler"]["representation"] = 'quadrature'
         self.V = V
         self.sol = sol if sol else df.Function(V)
         self.dx = dx
+        self.inner_representation = inner_representation
+        self.outer_representation = outer_representation
+        
+        df.parameters["form_compiler"]["representation"] = self.inner_representation
         
         u = df.TrialFunction(V)
         v = df.TestFunction(V)
@@ -363,14 +366,14 @@ class LocalProjector:
         self.solver = df.LocalSolver(a_proj)
         self.solver.factorize()
         
-        df.parameters["form_compiler"]["representation"] = 'uflacs'
+        df.parameters["form_compiler"]["representation"] = self.outer_representation
 
     
     def __call__(self, u):
-        df.parameters["form_compiler"]["representation"] = 'quadrature'
+        df.parameters["form_compiler"]["representation"] = self.inner_representation
         df.assemble(self.b_proj(u), tensor = self.rhs)
         self.solver.solve_local(self.sol.vector(), self.rhs,  self.V.dofmap())
-        df.parameters["form_compiler"]["representation"] = 'uflacs'
+        df.parameters["form_compiler"]["representation"] = self.outer_representation
         
 # Class for interfacing with the Newton solver
 class myNonlinearProblem(df.NonlinearProblem):

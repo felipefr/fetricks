@@ -37,21 +37,52 @@ def psi_hartmannneff_C(C_, param): # paper german benchmarks Archives, 2021
     alpha, c10, c01, kappa = param["alpha"], param["c10"], param["c01"], param["kappa"]
 
     J = df.sqrt(df.det(C))
-    Cbar = J**(-1/3)*C
+    Cbar = J**(-2/3)*C
     I1 = df.tr(Cbar)
-    # I2 = df.tr(ufl.cofac(Cbar))
-    I2 = 0.5*(df.tr(C)**2 - df.tr(C*C))
+    I2 = df.tr(ufl.cofac(Cbar))
+    # I2 = 0.5*(df.tr(Cbar)**2 - df.tr(Cbar*Cbar))
     
-    print(alpha)
-    # U = (kappa/50)*(J**5 + J**(-5) - 2)
-    U = 0.5*kappa*(J - 1)**2
-    W = alpha*(I1*I1*I1 - 27) + c10*(I1 - 3.) + c01*(I2**1.5 - 3.*np.sqrt(3.))
+    # print(alpha)
+    U = (kappa/50)*(J**5 + J**(-5) - 2)
+    # U = 0.5*kappa*(J - 1)**2
+    W = alpha*(I1**3 - 27) + c10*(I1 - 3.) + c01*(I2**1.5 - 3.*np.sqrt(3.))
     
     return U + W
 
 
 def psi_hartmannneff(F, param): # paper german benchmarks Archives, 2021
     return psi_hartmannneff_C(F.T*F, param)
+
+
+def PK2_hartmannneff_C_np(C_, param):
+    if(C_.shape[0] == 2):    
+        C = np.array([[C_[0,0], C_[0,1], 0], [C_[1,0], C_[1,1], 0], [0, 0, 1]])
+    else:
+        C = C_
+        
+    alpha, c10, c01, kappa = param["alpha"], param["c10"], param["c01"], param["kappa"]
+
+    I3 = np.linalg.det(C)
+    I1 = np.trace(C)
+    I2 = 0.5*(np.trace(C)**2 - np.trace(C@C))
+    
+    dpsi1 = 3*I1**2*alpha/I3 + c10/I3**(1/3)
+    dpsi2 = 3*c01*(I2/I3**(2/3))**(3/2)/(2*I2)
+    dpsi3 = -I1**3*alpha/I3**2 - I1*c10/(3*I3**(4/3)) + kappa*(5*I3**(3/2)/2 - 5/(2*I3**(7/2)))/50 - c01*(I2/I3**(2/3))**(3/2)/I3
+    # d2psi11 = 6*I1*alpha/I3
+    # d2psi12 = 0
+    # d2psi13 = -3*I1**2*alpha/I3**2 - c10/(3*I3**(4/3))
+    # d2psi22 = 3*c01*(I2/I3**(2/3))**(3/2)/(4*I2**2)
+    # d2psi23 = -3*c01*(I2/I3**(2/3))**(3/2)/(2*I2*I3)
+    # d2psi33 = 2*I1**3*alpha/I3**3 + 4*I1*c10/(9*I3**(7/3)) + kappa*(15*sqrt(I3)/4 + 35/(4*I3**(9/2)))/50 + 2*c01*(I2/I3**(2/3))**(3/2)/I3**2
+    
+    
+    a1 = 2*(dpsi1 + I1*dpsi2)
+    a2 = -2*dpsi2
+    a3 = 2*I3*dpsi3
+    
+    S = a1*np.eye(C_.shape[0]) + a2*C_ + a3*np.linalg.inv(C_)
+    return S
 
 
 def psi_ciarlet_C(C_, param): # paper german benchmarks Archives, 2021
