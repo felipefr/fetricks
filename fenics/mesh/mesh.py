@@ -18,14 +18,12 @@ import fetricks.fenics.postprocessing.wrapper_io as iofe
 
 class Mesh(df.Mesh):
     def __init__(self, mesh, comm = df.MPI.comm_world):
-        super().__init__(comm)
-    
         if(isinstance(mesh,str)):
+            super().__init__(comm)
             self.read_from_file(mesh, comm)
         else: # this should be only used for very simple meshes (rectangular ones)
             super().__init__(mesh) # call copy constructor, does not with comm
             self.boundaries, self.subdomains = self.label_boundaries() 
-            
             
         self.createMeasures()
         self.vols = np.array([df.Cell(self, i).volume() for i in range(self.num_cells())])
