@@ -42,7 +42,8 @@ from .fenics.la.wrapper_solvers import (CustomNonlinearSolver, CustomNonlinearPr
 
 
 
-from .fenics.bcs.neumann import NeumannTensorSource, NeumannVectorSource, NeumannBC, NeumannVectorBC, NeumannVectorBC_given_normal
+from .fenics.bcs.neumann import (NeumannTensorSource, NeumannVectorSource, NeumannBC, NeumannVectorBC, NeumannVectorBC_given_normal,
+                                NeumannTensorSourceCpp, NeumannVectorSourceCpp)
 from .fenics.misc import create_quadrature_spaces_mechanics, create_DG_spaces_mechanics, symgrad, Integral, setter
 
 # Conversions
