@@ -10,6 +10,27 @@ Please report all bugs and problems to <felipe.figueredo-rocha@ec-nantes.fr>, or
 """
 import matplotlib.pyplot as plt
 import numpy as np
+import dolfin as df
+
+
+# (key, space, label) (label stands for the name of the function in the file)
+def load_sol(filename, keys, spaces, labels = None ):
+    
+    if(not labels): labels = keys
+    
+    sol = {key: df.Function(Uh) for key, Uh, label in zip(keys, spaces, labels)} 
+
+    with df.XDMFFile(filename) as f:
+        for key, Uh, label in zip(keys, spaces, labels):
+            f.read_checkpoint(sol[key], label)
+            
+    return sol
+
+def get_errors(sol, sol_ref, keys, norm = None, keys_ref = None):
+    if(not keys_ref): keys_ref = keys
+    errors_abs = { key : norm(sol[key] - sol_ref[key_ref]) for key, key_ref in zip(keys, keys_ref)}
+    errors_rel = { key : errors_abs[key]/norm(sol_ref[key_ref]) for key, key_ref in zip(keys, keys_ref)}
+    return errors_abs, errors_rel
 
 def visualiseStresses(test, pred = None, figNum = 1, savefig = None):
     n = test.shape[1]

@@ -40,7 +40,7 @@ from .fenics.la.operations import outer_overline_ufl, outer_underline_ufl, outer
 
 from .fenics.la.wrapper_solvers import (CustomNonlinearSolver, CustomNonlinearProblem)
 
-
+from .fenics.postprocessing.misc import load_sol, get_errors
 
 from .fenics.bcs.neumann import (NeumannTensorSource, NeumannVectorSource, NeumannBC, NeumannVectorBC, NeumannVectorBC_given_normal,
                                 NeumannTensorSourceCpp, NeumannVectorSourceCpp)
