@@ -17,55 +17,6 @@ import dolfin as df
 import numpy as np
 
 
-codeTensorSource = """
-#include <pybind11/pybind11.h>
-#include <pybind11/eigen.h>
-#include <dolfin/function/Expression.h>
-#include <dolfin/mesh/Cell.h>
-#include <dolfin/mesh/Mesh.h>
-#include <dolfin/geometry/Point.h>
-
-typedef Eigen::VectorXd npArray;
-typedef Eigen::VectorXi npArrayInt;
-typedef dolfin::Mesh dfMesh;
-typedef dolfin::Cell dfCell;
-
-class NeumannTensorSourceCpp : public dolfin::Expression {
-  public:
-     
-    dfMesh mesh;
-    npArray gs;
-    int gdim;
-    
-    NeumannTensorSourceCpp(dfMesh m, npArray g, int gdim) : dolfin::Expression(gdim,gdim){
-        mesh = m;
-        gs = g;
-        gdim = gdim;
-        }
-
-    void eval(Eigen::Ref<Eigen::VectorXd> values,
-                      Eigen::Ref<const Eigen::VectorXd> x,
-                      const ufc::cell& cell) const {
-        
-        int i = cell.local_facet;
-        if(i > -1){                  
-            dfCell c(mesh, cell.index);
-            values << gs[0]*c.normal(i, 0), gs[0]*c.normal(i, 1), gs[1]*c.normal(i, 0), gs[1]*c.normal(i, 1) ;
-        }
-    }
-    
-                      
-                    
-};
-
-PYBIND11_MODULE(SIGNATURE, m) {
-    pybind11::class_<NeumannTensorSourceCpp, std::shared_ptr<NeumannTensorSourceCpp>, dolfin::Expression>
-    (m, "NeumannTensorSourceCpp")
-    .def(pybind11::init< dfMesh, npArray, int>())
-    .def("__call__", &NeumannTensorSourceCpp::eval);
-}
-"""
-
 
 codeVectorSource = """
 #include <pybind11/pybind11.h>
@@ -102,7 +53,34 @@ class NeumannVectorSourceCpp : public dolfin::Expression {
             dfCell c(mesh, cell.index);
             values << gs*c.normal(i, 0), gs*c.normal(i, 1) ;
         }
+    }                      
+                    
+};
+                  
+class NeumannTensorSourceCpp : public dolfin::Expression {
+  public:
+     
+    dfMesh mesh;
+    npArray gs;
+    int gdim;
+    
+    NeumannTensorSourceCpp(dfMesh m, npArray g, int gdim) : dolfin::Expression(gdim,gdim){
+        mesh = m;
+        gs = g;
+        gdim = gdim;
+        }
+
+    void eval(Eigen::Ref<Eigen::VectorXd> values,
+                      Eigen::Ref<const Eigen::VectorXd> x,
+                      const ufc::cell& cell) const {
+        
+        int i = cell.local_facet;
+        if(i > -1){                  
+            dfCell c(mesh, cell.index);
+            values << gs[0]*c.normal(i, 0), gs[0]*c.normal(i, 1), gs[1]*c.normal(i, 0), gs[1]*c.normal(i, 1) ;
+        }
     }
+    
                       
                     
 };
@@ -112,13 +90,13 @@ PYBIND11_MODULE(SIGNATURE, m) {
     (m, "NeumannVectorSourceCpp")
     .def(pybind11::init< dfMesh, double, int>())
     .def("__call__", &NeumannVectorSourceCpp::eval);
+
+    pybind11::class_<NeumannTensorSourceCpp, std::shared_ptr<NeumannTensorSourceCpp>, dolfin::Expression>
+    (m, "NeumannTensorSourceCpp")
+    .def(pybind11::init< dfMesh, npArray, int>())
+    .def("__call__", &NeumannTensorSourceCpp::eval);
 }
 """
-
-
-# compCodeTensorSource = df.compile_cpp_code(codeTensorSource)
-# NeumannTensorSourceCpp = lambda mesh, g, gdim: df.CompiledExpression(compCodeTensorSource.NeumannTensorSourceCpp(mesh, g, gdim), degree = 1)
-
 
 def static_vars(**kwargs):
     def decorate(func):
@@ -131,14 +109,14 @@ def static_vars(**kwargs):
 @static_vars(compCode = None)
 def NeumannTensorSourceCpp(mesh, g, degree = 1):
     if(not NeumannTensorSourceCpp.compCode):
-        NeumannTensorSourceCpp.compCode = df.compile_cpp_code(codeTensorSource)
-    return df.CompiledExpression(NeumannTensorSourceCpp.compCode.NeumannTensorSourceCpp(mesh, g, len(g)), degree = degree)
+        NeumannTensorSourceCpp.compCode = df.compile_cpp_code(codeVectorSource)
+    return df.CompiledExpression(NeumannTensorSourceCpp.compCode.NeumannTensorSourceCpp(mesh, g, mesh.geometric_dimension()), degree = degree)
 
 @static_vars(compCode = None)
 def NeumannVectorSourceCpp(mesh, g, degree = 1):
     if(not NeumannVectorSourceCpp.compCode):
         NeumannVectorSourceCpp.compCode = df.compile_cpp_code(codeVectorSource)
-    return df.CompiledExpression(NeumannVectorSourceCpp.compCode.NeumannVectorSourceCpp(mesh, g, len(g)), degree = degree)
+    return df.CompiledExpression(NeumannVectorSourceCpp.compCode.NeumannVectorSourceCpp(mesh, g, mesh.geometric_dimension()), degree = degree)
 
     
 # buggy : sometimes crashes as eval is not available
