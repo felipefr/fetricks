@@ -9,8 +9,10 @@ This little project is born with the aim of assembling some tricks and extension
 
 Some of the public projects that use fetricks are micmacsfenics (https://github.com/felipefr/micmacsFenics) and ddfenics (https://github.com/felipefr/micmacsFenics).
 
-I should acknowledge the excellent tutorial of Jeremy Bleyer (https://comet-fenics.readthedocs.io/en/latest/), from which some functions have adapted.
+I should acknowledge the excellent tutorial of Jeremy Bleyer (https://comet-fenics.readthedocs.io/en/latest/), from which some functions have adapted.se
 
+## Installation
+Install with : pip install . (origin directory where setup.py is located)
 
 ## Citation
 Please cite 
