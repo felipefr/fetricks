@@ -39,7 +39,9 @@ class GmshIO:
             os.system('dolfin-convert {0} {1}'.format(meshMshFile, meshXMLFile))   
     
     def setNameMesh(self, meshname):
-        self.radFileMesh,  self.format = meshname.split('.')
+        # self.radFileMesh,  self.format = meshname.split('.')
+        self.radFileMesh,  self.format = os.path.splitext(meshname)
+        self.format = self.format[1:]
         self.radFileMesh += '.{0}'
         
     def __determine_geometry_types(self, mesh_msh):

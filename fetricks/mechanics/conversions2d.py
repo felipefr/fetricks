@@ -80,6 +80,7 @@ def tensor2mandel_np(X):
     return np.array([X[0,0], X[1,1], halfsqrt2*(X[0,1] + X[1,0])])
 
 
+
 def tensor2mandel(X):
     return df.as_vector([X[0,0], X[1,1], halfsqrt2*(X[0,1] + X[1,0])])
 
