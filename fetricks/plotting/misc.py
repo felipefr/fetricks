@@ -9,38 +9,32 @@ Please report all bugs and problems to <felipe.figueredo-rocha@ec-nantes.fr>, or
 <f.rocha.felipe@gmail.com>
 """
 import matplotlib.pyplot as plt
-import matplotlib
 import numpy as np
 
-plt.rc("text", usetex = True)
-plt.rc("font", family = 'serif')
-plt.rc("font", size = 12)
-plt.rc('text.latex', preamble=r'\usepackage{amsmath,amsfonts}')
-plt.rcParams["mathtext.fontset"] = "cm"
-# matplotlib.rcParams['text.latex.preamble']=[r"\usepackage{amsmath}"]
-
-palletteCounter = 0
-pallette = ['blue','red','green']
-
-def loadLatexOptions():
+def load_latex_options():
     plt.rc("text", usetex = True)
     plt.rc("font", family = 'serif')
     plt.rc("font", size = 12)
     plt.rc('text.latex', preamble=r'\usepackage{amsmath,amsfonts}')
+    plt.rcParams["mathtext.fontset"] = "cm"
 
-def plotMeanAndStd(x, y, l='', linetypes = ['-o','--','--'], axis = 0):
+def set_pallette(palette = None):
+    palletteCounter = 0
+    pallette = palette if palette else ['blue','red','green']
+
+def plot_mean_std(x, y, l='', linetypes = ['-o','--','--'], axis = 0):
     plt.plot(x, np.mean(y, axis = axis), linetypes[0], label = l)
     plt.plot(x, np.mean(y, axis = axis) + np.std(y, axis = axis) , linetypes[1], label = l + ' + std')
     plt.plot(x, np.mean(y, axis = axis) - np.std(y, axis = axis) , linetypes[2], label = l + ' - std')
     
     
     
-def plotMeanAndStd_noStdLegend(x, y, l='', linetypes = ['-o','--','--'], axis = 0):
+def plot_mean_std_nolegend(x, y, l='', linetypes = ['-o','--','--'], axis = 0):
     plt.plot(x, np.mean(y, axis = axis), linetypes[0], label = l)
     plt.plot(x, np.mean(y, axis = axis) + np.std(y, axis = axis) , linetypes[1])
     plt.plot(x, np.mean(y, axis = axis) - np.std(y, axis = axis) , linetypes[2])
     
-def plotFillBetweenStd(x, y, l='', linetypes = ['-o','--','--'], axis = 0):
+def plot_fill_std(x, y, l='', linetypes = ['-o','--','--'], axis = 0):
     global palletteCounter, pallette
     
     elementWiseMax = lambda a,b : np.array([max(ai,b) for ai in a])

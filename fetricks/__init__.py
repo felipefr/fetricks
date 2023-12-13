@@ -57,6 +57,8 @@ def get_mechanical_notation_conversor(dim_strain = None, gdim = None):
         return {2: conv2d, 3: conv3d}[gdim]
     elif(dim_strain):
         return {3: conv2d, 6: conv3d}[dim_strain]
+    
+from .plotting.misc import *
 
 # Explicit import conversions
 # from .mechanics.conversions2d import stress2voigt, strain2voigt, voigt2strain, voigt2stress, mandel2voigtStrain, mandel2voigtStress
