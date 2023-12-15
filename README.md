@@ -3,7 +3,7 @@ Author: Felipe Rocha, f.rocha.felipe@gmail.com, felipe.figueredo-rocha@ec-nantes
 
 Useful tricks and extensions for Fenics and other FEM tools in Python
 
-FE + tricks : where FE stands for Fenics, Finite Element, and the author of this (maybe) useful thing. 
+FE + tricks : where FE stands for Fenics and Finite Element.
 
 This little project is born with the aim of assembling some tricks and extensions of Fenics (2019.1) and other FEM-related routines I have been using in different codes. They are mostly concerning applications in Continuum Mechanics, but not only that. There are also data management functions wrapping HDF5 python implementation.
 
