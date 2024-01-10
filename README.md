@@ -29,6 +29,7 @@ conda install ipykernel
 - adding some useful libraries (some libraries might include some previous others, but I want to list them for documentation purposes)
 ```
 conda install -c conda-forge scipy scikit-learn
+pip install meshio=5.3.4
 ```
 
 ## Citation
