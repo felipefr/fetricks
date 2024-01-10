@@ -15,13 +15,7 @@ I should acknowledge the excellent tutorial of Jeremy Bleyer (https://comet-feni
 Install with : pip install . (origin directory where setup.py is located) . Don't run "python setup.py install", because it usually does not link correctly.
 
 ## Installation Fenics using conda or mamba
-'''ruby
-conda create -n fenicsx-env
-conda activate fenicsx-env
-conda install -c conda-forge fenics-dolfinx mpich pyvista
-'''
-
-```ruby
+```bash
 require 'redcarpet'
 markdown = Redcarpet.new("Hello World!")
 puts markdown.to_html
