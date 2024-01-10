@@ -15,10 +15,20 @@ I should acknowledge the excellent tutorial of Jeremy Bleyer (https://comet-feni
 Install with : pip install . (origin directory where setup.py is located) . Don't run "python setup.py install", because it usually does not link correctly.
 
 ## Installation Fenics using conda or mamba
+- basis fenicsx installation
 ```
 conda create -n fenicsx-env
 conda activate fenicsx-env
 conda install -c conda-forge fenics-dolfinx mpich pyvista
+```
+- adding jupyter kernel (to be recognised by other full jupyter installation, e.g. in VScode)
+```
+conda install ipykernel
+```
+
+- adding some useful libraries (some libraries might include some previous others, but I want to list them for documentation purposes)
+```
+conda install -c conda-forge scipy scikit-learn
 ```
 
 ## Citation
