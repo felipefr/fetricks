@@ -49,7 +49,7 @@ from .fenics.mesh.wrapper_gmsh import GmshIO # uses new meshio
 # Conversions
 # the default is 2d, if you want use explictly ft.conv2d or ft.conv3d, or even rename it with conv = ft.convXd
 # from .mechanics.conversions2d import *
-# from .mechanics import conversions2d as conv2d
+# from .mechanics import conversions as conv2d
 # from .mechanics import conversions3d as conv3d
 
 # def get_mechanical_notation_conversor(dim_strain = None, gdim = None):
@@ -58,20 +58,22 @@ from .fenics.mesh.wrapper_gmsh import GmshIO # uses new meshio
 #     elif(dim_strain):
 #         return {3: conv2d, 6: conv3d}[dim_strain]
     
+
+
+# Explicit import conversionss
+from .mechanics.conversions import symgrad, stress2voigt, strain2voigt, voigt2strain, voigt2stress, mandel2voigtStrain, mandel2voigtStress
+from .mechanics.conversions import tensor2mandel, mandel2tensor, tensor4th2mandel, tr_mandel, Id_mandel_np, Id_mandel_df, symgrad_mandel, symgrad_voigt
+from .mechanics.conversions import tensor2mandel_np, mandel2tensor_np, tensor4th2mandel_np
+from .mechanics.conversions import grad2mandel_vec, grad2mandel_ten, mandelgrad, mandelgrad_ten
+
+
 from .plotting.misc import *
 
-# Explicit import conversions
-# from .mechanics.conversions2d import stress2voigt, strain2voigt, voigt2strain, voigt2stress, mandel2voigtStrain, mandel2voigtStress
-# from .mechanics.conversions2d import tensor2mandel, mandel2tensor, tensor4th2mandel, tr_mandel, Id_mandel_np, Id_mandel_df, symgrad_mandel, symgrad_voigt
-# from .mechanics.conversions2d import tensor2mandel_np, mandel2tensor_np, tensor4th2mandel_np
-# from .mechanics.conversions2d import grad2mandel_vec, grad2mandel_ten, mandelgrad, mandelgrad_ten
-
-
-# __all__ = ['stress2voigt', 'strain2voigt', 'voigt2strain', 'voigt2stress', 'mandel2voigtStrain', 'mandel2voigtStress',
-# 'tensor2mandel', 'mandel2tensor', 'tensor4th2mandel', 'tr_mandel', 'Id_mandel_np', 'Id_mandel_df', 'symgrad_mandel', 'symgrad_voigt',
-# 'tensor2mandel_np', 'mandel2tensor_np',
-# 'grad2mandel_vec', 'grad2mandel_ten', 'mandelgrad', 'mandelgrad_ten',
-# 'symgrad', 'Integral',
-# 'Newton', 'Newton_automatic', 'local_project', 'local_project_given_sol', 'LocalProjector', 
-# 'Mesh', 'Gmsh',
-# 'multiscaleMaterialModel', 'multiscaleMaterialModelExpression', 'hyperelasticModel', 'hyperelasticModelExpression']
+__all__ = ['stress2voigt', 'strain2voigt', 'voigt2strain', 'voigt2stress', 'mandel2voigtStrain', 'mandel2voigtStress',
+'tensor2mandel', 'mandel2tensor', 'tensor4th2mandel', 'tr_mandel', 'Id_mandel_np', 'Id_mandel_df', 'symgrad_mandel', 'symgrad_voigt',
+'tensor2mandel_np', 'mandel2tensor_np',
+'grad2mandel_vec', 'grad2mandel_ten', 'mandelgrad', 'mandelgrad_ten',
+'symgrad', 'Integral',
+'Newton', 'Newton_automatic', 'local_project', 'local_project_given_sol', 'LocalProjector', 
+'Mesh', 'Gmsh',
+'multiscaleMaterialModel', 'multiscaleMaterialModelExpression', 'hyperelasticModel', 'hyperelasticModelExpression']

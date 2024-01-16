@@ -14,9 +14,6 @@ import numpy as np
 from timeit import default_timer as timer
 
 
-# NON-FLATTENED FUNCTIONS
-def symgrad(v): 
-    return df.sym(df.grad(v))
    
 
 # Condensed version of the Integral: test
