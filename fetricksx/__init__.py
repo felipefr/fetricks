@@ -8,7 +8,7 @@ Please report all bugs and problems to <felipe.figueredo-rocha@ec-nantes.fr>, or
 <f.rocha.felipe@gmail.com>
 """
 
-# from .fenics.la.wrapper_solvers import Newton, Newton_automatic, local_project, local_project_given_sol, LocalProjector
+from .fenics.la.wrapper_solvers import BlockSolver
 # from .fenics.mesh.mesh import Mesh
 
 # import pygmsh
@@ -69,11 +69,12 @@ from .mechanics.conversions import grad2mandel_vec, grad2mandel_ten, mandelgrad,
 
 from .plotting.misc import *
 
-__all__ = ['stress2voigt', 'strain2voigt', 'voigt2strain', 'voigt2stress', 'mandel2voigtStrain', 'mandel2voigtStress',
-'tensor2mandel', 'mandel2tensor', 'tensor4th2mandel', 'tr_mandel', 'Id_mandel_np', 'Id_mandel_df', 'symgrad_mandel', 'symgrad_voigt',
-'tensor2mandel_np', 'mandel2tensor_np',
-'grad2mandel_vec', 'grad2mandel_ten', 'mandelgrad', 'mandelgrad_ten',
-'symgrad', 'Integral',
-'Newton', 'Newton_automatic', 'local_project', 'local_project_given_sol', 'LocalProjector', 
-'Mesh', 'Gmsh',
-'multiscaleMaterialModel', 'multiscaleMaterialModelExpression', 'hyperelasticModel', 'hyperelasticModelExpression']
+__all__ = ['BlockSolver', 
+           'stress2voigt', 'strain2voigt', 'voigt2strain', 'voigt2stress', 'mandel2voigtStrain', 'mandel2voigtStress',
+            'tensor2mandel', 'mandel2tensor', 'tensor4th2mandel', 'tr_mandel', 'Id_mandel_np', 'Id_mandel_df', 'symgrad_mandel', 'symgrad_voigt',
+            'tensor2mandel_np', 'mandel2tensor_np',
+            'grad2mandel_vec', 'grad2mandel_ten', 'mandelgrad', 'mandelgrad_ten',
+            'symgrad', 'Integral',
+            'Newton', 'Newton_automatic', 'local_project', 'local_project_given_sol', 'LocalProjector', 
+            'Mesh', 'Gmsh',
+            'multiscaleMaterialModel', 'multiscaleMaterialModelExpression', 'hyperelasticModel', 'hyperelasticModelExpression']
