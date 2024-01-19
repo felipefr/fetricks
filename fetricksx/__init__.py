@@ -29,7 +29,7 @@ from .mechanics.material_models import (psi_ciarlet, psi_ciarlet_C, psi_hookean_
 # from .mechanics.multiscale_model_expression import multiscaleModelExpression
 # from .mechanics.hyperelastic_model import hyperelasticModel, hyperelasticModelExpression
 # from .mechanics.incompressible_hyperlasticity_utils import Dev, getSiso, getSvol, getDiso, getDvol
-# from .mechanics.hyperlasticity_utils import GL2CG_np, plane_strain_CG_np, get_invariants_iso_np, get_invariants_iso_np, get_GL_mandel, get_deltaGL_mandel
+from .mechanics.hyperlasticity_utils import GL2CG_np, plane_strain_CG_np, get_invariants_iso_np, get_invariants_iso_np, get_GL_mandel, get_deltaGL_mandel
 
 # from .fenics.la.conversions import (as_flatten_2x2, as_flatten_3x3, 
                                     # as_unflatten_2x2, as_cross_2x2, as_skew_2x2, flatgrad_2x2, flatsymgrad_2x2,
@@ -61,7 +61,7 @@ from .mechanics.material_models import (psi_ciarlet, psi_ciarlet_C, psi_hookean_
 
 
 # Explicit import conversionss
-from .mechanics.conversions import symgrad, stress2voigt, strain2voigt, voigt2strain, voigt2stress, mandel2voigtStrain, mandel2voigtStress
+from .mechanics.conversions import stress2voigt, strain2voigt, voigt2strain, voigt2stress, mandel2voigtStrain, mandel2voigtStress
 from .mechanics.conversions import tensor2mandel, mandel2tensor, tensor4th2mandel, tr_mandel, Id_mandel_np, Id_mandel_df, symgrad_mandel, symgrad_voigt
 from .mechanics.conversions import tensor2mandel_np, mandel2tensor_np, tensor4th2mandel_np
 from .mechanics.conversions import grad2mandel_vec, grad2mandel_ten, mandelgrad, mandelgrad_ten
@@ -74,7 +74,7 @@ __all__ = ['BlockSolver',
             'tensor2mandel', 'mandel2tensor', 'tensor4th2mandel', 'tr_mandel', 'Id_mandel_np', 'Id_mandel_df', 'symgrad_mandel', 'symgrad_voigt',
             'tensor2mandel_np', 'mandel2tensor_np',
             'grad2mandel_vec', 'grad2mandel_ten', 'mandelgrad', 'mandelgrad_ten',
-            'symgrad', 'Integral',
+            'Integral',
             'Newton', 'Newton_automatic', 'local_project', 'local_project_given_sol', 'LocalProjector', 
             'Mesh', 'Gmsh',
             'multiscaleMaterialModel', 'multiscaleMaterialModelExpression', 'hyperelasticModel', 'hyperelasticModelExpression']

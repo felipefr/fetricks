@@ -19,8 +19,8 @@ import ufl
 import numpy as np
 
 # NON-FLATTENED FUNCTIONS
-def symgrad(v): 
-    return ufl.sym(ufl.grad(v))
+# def symgrad(v): 
+#     return ufl.as_matrix([[v[0].dx(0), v[1].dx(1)], [v[0].dx(0), v[1].dx(1)]])
 
 
 # VOIGT NOTATION
@@ -107,7 +107,7 @@ def tr_mandel(X):
 
 
 def symgrad_mandel(v): # it was shown somehow to have better performance than doing it explicity
-    return tensor2mandel(symgrad(v))
+    return ufl.as_vector([v[0].dx(0), v[1].dx(1), halfsqrt2*(v[0].dx(1) + v[1].dx(0))])
     
 
 # Used to convert dPsi/deps_m in mandel notation to the correct stress in mandel notation  

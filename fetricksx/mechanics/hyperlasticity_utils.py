@@ -7,8 +7,8 @@ Created on Tue Mar 14 18:56:45 2023
 """
 
 import numpy as np
-import dolfin as df
-import fetricks as ft
+import fetricksx as ft
+import ufl
 
 # Green-Lagrange (E) to Cauchy-Green (C)
 # E is mandel
@@ -42,8 +42,8 @@ def get_invariants_iso_np(C, constraint = 'PLANE_STRAIN'):
 
 # delta E(u;v) : Directional derivative Green-Lagrange from displacements (Mandel)
 def get_deltaGL_mandel(u, v):
-    conv = ft.get_mechanical_notation_conversor(gdim = u.ufl_shape[0])
-    return conv.symgrad_mandel(v) + conv.tensor2mandel(df.grad(u).T*df.grad(v))
+    # conv = ft.get_mechanical_notation_conversor(gdim = u.ufl._shape[0])
+    return ft.symgrad_mandel(v) + ft.tensor2mandel(ufl.grad(u).T*ufl.grad(v))
 
 # Green-Lagrange from displacements (Mandel)
 # Note that E(u) = delta E(0.5*u; u) = eps(u) + 0.5*(grad(u).T*grad(u))
