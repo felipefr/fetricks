@@ -20,6 +20,7 @@ from .fenics.mesh.mesh import Mesh
 # force to use new version
 from .fenics.mesh.wrapper_gmsh import GmshIO # uses new meshio
 
+from .mechanics.multimaterial import getMultimaterialExpression, getLameExpression
 from .mechanics.material_model_interface import materialModel , materialModelExpression
 from .mechanics.isocoric_isotropic_hyperlastic_material import IsochoricIsotropicHyperelasticMaterial
 from .mechanics.material_models import (psi_ciarlet, psi_ciarlet_C, psi_hookean_nonlinear_lame, get_stress_tang_from_psi, 
@@ -39,6 +40,7 @@ from .fenics.la.operations import outer_overline_ufl, outer_underline_ufl, outer
 from .fenics.la.wrapper_solvers import (CustomNonlinearSolver, CustomNonlinearProblem)
 
 from .fenics.postprocessing.misc import load_sol, get_errors
+from .fenics.postprocessing.wrapper_io import exportXDMF_gen, exportXDMF_checkpoint_gen
 
 from .fenics.bcs.neumann import (NeumannTensorSource, NeumannVectorSource, NeumannBC, NeumannVectorBC, NeumannVectorBC_given_normal,
                                 NeumannTensorSourceCpp, NeumannVectorSourceCpp)
