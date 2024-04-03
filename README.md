@@ -14,6 +14,10 @@ I should acknowledge the excellent tutorial of Jeremy Bleyer (https://comet-feni
 ## Installation
 Install with : pip install . (origin directory where setup.py is located) . Don't run "python setup.py install", because it usually does not link correctly.
 
+If you want to keep track of files for uninstall reasons, do:
+python setup.py install --record files.txt
+xargs rm -rf < files.txt
+
 ## Citation
 Please cite 
 [![DOI](https://zenodo.org/badge/489339019.svg)](https://zenodo.org/badge/latestdoi/489339019) if this library has been useful in your research.
