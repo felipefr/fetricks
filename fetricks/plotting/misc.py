@@ -15,8 +15,8 @@ def load_latex_options():
     plt.rc("text", usetex = True)
     plt.rc("font", family = 'serif')
     plt.rc("font", size = 12)
-    plt.rc('text.latex', preamble=r'\usepackage{amsmath,amsfonts}')
-    plt.rcParams["mathtext.fontset"] = "cm"
+    # plt.rc('text.latex', preamble=r'\usepackage{amsmath,amsfonts}')
+    # plt.rcParams["mathtext.fontset"] = "cm"
 
 def set_pallette(palette = None):
     palletteCounter = 0
