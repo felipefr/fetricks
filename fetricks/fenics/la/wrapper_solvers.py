@@ -138,7 +138,6 @@ class BlockSolverIndependent:
     def __init__(self, subproblems):
         self.subproblems = subproblems
         self.n_subproblems = len(self.subproblems)
-        
         self.F = [ df.PETScVector() for i in range(self.n_subproblems) ] 
         
         # supposing lhs and bcs are equal for all problems

@@ -8,7 +8,11 @@ Please report all bugs and problems to <felipe.figueredo-rocha@ec-nantes.fr>, or
 <f.rocha.felipe@gmail.com>
 """
 
-from .fenics.la.wrapper_solvers import Newton, Newton_automatic, local_project, local_project_given_sol, LocalProjector
+from .fenics.la.wrapper_solvers import  (Newton, Newton_automatic, local_project, 
+                                        local_project_given_sol, LocalProjector,
+                                        CustomNonlinearSolver, CustomNonlinearProblem,
+                                        BlockSolver, BlockSolverIndependent)
+
 from .fenics.mesh.mesh import Mesh
 
 # import pygmsh
@@ -37,7 +41,6 @@ from .fenics.la.conversions import (as_flatten_2x2, as_flatten_3x3,
 
 from .fenics.la.operations import outer_overline_ufl, outer_underline_ufl, outer_dot_ufl, outer_dot_mandel_ufl
 
-from .fenics.la.wrapper_solvers import (CustomNonlinearSolver, CustomNonlinearProblem)
 
 from .fenics.postprocessing.misc import load_sol, get_errors
 from .fenics.postprocessing.wrapper_io import exportXDMF_gen, exportXDMF_checkpoint_gen
