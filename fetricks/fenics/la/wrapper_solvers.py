@@ -211,6 +211,20 @@ def Newton_automatic(Jac, Res, bc, du, u, callbacks = [], Nitermax = 10, tol = 1
     microsolver.solve()
     return u
 
+# Picard nonlinear iterations for mixed 
+# q_k is the first solution (convention) in the previous step
+def Picard_mixed(Res, w, q_k, bcs, tol = 1.0e-6, maxiter = 25,  zerofy = True ): 
+    q_k.vector().get_local()[:] = 0.0    
+    eps = 1.0           # error measure ||u-u_k||
+    it = 0
+    while eps > tol and it < maxiter:
+         it += 1
+         df.solve(Res ==0, w, bcs)
+         q_new, dummy = w.split(deepcopy=True)
+         diff = q_new.vector().get_local() - q_k.vector().get_local()
+         eps = np.linalg.norm(diff, ord=np.Inf)/np.linalg.norm(q_new.vector().get_local())
+         print('iter=%d: norm=%g' % (it, eps))
+         q_k.assign(q_new)   # update for next iteration
 
 # def Newton(Jac, Res, bc, du, u, callbacks = None, Nitermax = 10, tol = 1e-8): 
 

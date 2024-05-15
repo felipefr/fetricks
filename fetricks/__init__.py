@@ -8,12 +8,15 @@ Please report all bugs and problems to <felipe.figueredo-rocha@ec-nantes.fr>, or
 <f.rocha.felipe@gmail.com>
 """
 
-from .fenics.la.wrapper_solvers import  (Newton, Newton_automatic, local_project, 
+from .fenics.la.wrapper_solvers import  (Picard_mixed, Newton, Newton_automatic, local_project, 
                                         local_project_given_sol, LocalProjector,
                                         CustomNonlinearSolver, CustomNonlinearProblem,
                                         BlockSolver, BlockSolverIndependent)
 
 from .fenics.mesh.mesh import Mesh
+
+from .fenics.fem.mixed import MixedFiniteElementSpace
+
 
 # import pygmsh
 # if('built_in' in pygmsh.__all__):
