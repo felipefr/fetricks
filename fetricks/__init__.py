@@ -45,7 +45,7 @@ from .fenics.la.operations import outer_overline_ufl, outer_underline_ufl, outer
 from .fenics.postprocessing.misc import load_sol, get_errors
 from .fenics.postprocessing.wrapper_io import exportXDMF_gen, exportXDMF_checkpoint_gen
 
-from .fenics.bcs.neumann import (NeumannTensorSource, NeumannVectorSource, NeumannBC, NeumannVectorBC, NeumannVectorBC_given_normal,
+from .fenics.bcs.neumann import (NeumannTensorSource, NeumannVectorSource, NeumannScalarBC, NeumannVectorBC, NeumannVectorBC_given_normal,
                                 NeumannTensorSourceCpp, NeumannVectorSourceCpp)
 from .fenics.misc import create_quadrature_spaces_mechanics, create_DG_spaces_mechanics, symgrad, Integral, setter
 

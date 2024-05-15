@@ -159,19 +159,23 @@ class SelectBoundary(df.SubDomain):
 def NeumannVectorBC(W, t, mesh, flag, op = 'cpp'):
     if(op == "cpp"):
         g = NeumannTensorSourceCpp(mesh, t.values())
-    else:
+    elif(op == "df"):
         g = NeumannTensorSource(mesh, t.values())
-    return [df.DirichletBC(W, g , mesh.boundaries, flag)]
-
-
-def NeumannBC(W, t, mesh, flag, op = 'cpp'):
-    g = NeumannVectorSource(mesh, t.values())
-    if(op == "cpp"):
-        g = NeumannVectorSourceCpp(mesh, t.values())
     else:
-        g = NeumannVectorSource(mesh, t.values())
+        print("you have to select between cpp or df")
 
-    return [df.DirichletBC(W, g, mesh.boundaries, flag)]
+    return df.DirichletBC(W, g , mesh.boundaries, flag)
+
+
+def NeumannScalarBC(W, t, mesh, flag, op = 'cpp'):
+    if(op == 'cpp'):
+        g = NeumannVectorSourceCpp(mesh, t.values())
+    elif(op == 'df'):
+        g = NeumannVectorSource(mesh, t.values())
+    else:
+        print("you have to select between cpp or df")
+
+    return df.DirichletBC(W, g, mesh.boundaries, flag)
 
 # This is Neumann but when normal are aligned with the cartesian axes
 def NeumannVectorBC_given_normal(W, t, normal, mesh, flag):
