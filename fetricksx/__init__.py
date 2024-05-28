@@ -20,6 +20,10 @@ from .fenics.mesh.mesh import Mesh
 # force to use new version
 from .fenics.mesh.wrapper_gmsh import GmshIO # uses new meshio
 
+
+# from .fenics.fem.quadrature_function import QuadratureFunction
+
+
 # from .mechanics.material_model_interface import materialModel , materialModelExpression
 # from .mechanics.isocoric_isotropic_hyperlastic_material import IsochoricIsotropicHyperelasticMaterial
 from .mechanics.material_models import (psi_ciarlet, psi_ciarlet_C, psi_hookean_nonlinear_lame, get_stress_tang_from_psi, 
@@ -65,6 +69,8 @@ from .mechanics.conversions import stress2voigt, strain2voigt, voigt2strain, voi
 from .mechanics.conversions import tensor2mandel, mandel2tensor, tensor4th2mandel, tr_mandel, Id_mandel_np, Id_mandel_df, symgrad_mandel, symgrad_voigt
 from .mechanics.conversions import tensor2mandel_np, mandel2tensor_np, tensor4th2mandel_np
 from .mechanics.conversions import grad2mandel_vec, grad2mandel_ten, mandelgrad, mandelgrad_ten
+
+from .mechanics.truss_utils  import grad_truss, get_mesh_truss, get_tangent_truss, solve_truss, posproc_truss
 
 
 from .plotting.misc import *
