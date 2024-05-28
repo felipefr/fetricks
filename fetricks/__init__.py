@@ -57,6 +57,7 @@ from .fenics.misc import create_quadrature_spaces_mechanics, create_DG_spaces_me
 from .mechanics.conversions2d import *
 from .mechanics import conversions2d as conv2d
 from .mechanics import conversions3d as conv3d
+from .mechanics.truss_utils  import grad_truss, get_mesh_truss, get_tangent_truss
 
 def get_mechanical_notation_conversor(dim_strain = None, gdim = None):
     if(gdim):
