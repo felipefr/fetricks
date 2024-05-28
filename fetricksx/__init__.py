@@ -8,6 +8,8 @@ Please report all bugs and problems to <felipe.figueredo-rocha@ec-nantes.fr>, or
 <f.rocha.felipe@gmail.com>
 """
 
+from .mechanics.truss_utils  import (grad_truss, get_mesh_truss, get_tangent_truss, solve_truss, posproc_truss)
+
 from .fenics.la.wrapper_solvers import BlockSolver
 from .fenics.mesh.mesh import Mesh
 
@@ -70,7 +72,7 @@ from .mechanics.conversions import tensor2mandel, mandel2tensor, tensor4th2mande
 from .mechanics.conversions import tensor2mandel_np, mandel2tensor_np, tensor4th2mandel_np
 from .mechanics.conversions import grad2mandel_vec, grad2mandel_ten, mandelgrad, mandelgrad_ten
 
-from .mechanics.truss_utils  import grad_truss, get_mesh_truss, get_tangent_truss, solve_truss, posproc_truss
+
 
 
 from .plotting.misc import *

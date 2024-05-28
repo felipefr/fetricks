@@ -1,112 +1,159 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Sat Feb  5 22:45:49 2022
+Created on Wed May 29 01:09:33 2024
 
 @author: felipe
 """
 
-from ufl import Jacobian
-import dolfin as df
-import fetricks as ft
-from functools import partial
+# Example truss
 
-# def tgrad(u, t):
-#     return df.grad(df.dot(u,t)) # dot(grad(u).T, t)  
+import os, sys
+os.environ['Hufl5_DISABLE_VERSION_CHECK']='2'
+sys.path.append("/home/felipe/sources/fetricksx")
+
+import ufl 
+from dolfinx import fem, io, plot, fem
+import numpy as np
+from mpi4py import MPI
+from petsc4py import PETSc
+
+import fetricksx as ft
+import gmsh
+from functools import partial
+import dolfinx.fem.petsc
+
+def get_mesh_truss(X, cells, param):   
+    
+    gmsh.initialize()
+    gmsh.option.setNumber("General.Terminal", 0)  # to disable meshing info
+    geom = gmsh.model.geo
+    
+    points = []
+    for i, v in enumerate(X):
+        if(X.shape[1]==2):
+            points.append(geom.add_point(v[0], v[1], 0.0))
+        elif(X.shape[1]==3):
+            points.append(geom.add_point(v[0], v[1], v[2]))
+        
+    lines = []
+    for i, c in enumerate(cells):
+        lines.append(geom.add_line(c[0] + 1, c[1] + 1))
+    
+    
+    geom.synchronize()
+    
+    for l in lines:
+         gmsh.model.mesh.set_transfinite_curve(l, 2)
+    
+    
+    gmsh.model.add_physical_group(1, lines, 0)
+    
+    for phy in param["physical_groups"]:
+        gmsh.model.add_physical_group(phy[0], [points[phy[1]]], phy[2])
+        
+
+    
+    gmsh.model.mesh.generate(dim=1)
+    gmsh.write("truss.msh")
+    
+    domain, markers, facets = io.gmshio.model_to_mesh(gmsh.model, MPI.COMM_WORLD, 0, gdim=2)
+    
+    gmsh.finalize()
+    
+    return domain, markers, facets
+
+
+
+def get_tangent_truss(domain):
+    gdim = 2
+    # J = ufl.Jacobian(domain)
+    J = ufl.Jacobian(domain)[:, 0]
+    sh0 = fem.functionspace(domain, ("DG", 0, (gdim,)))
+    t_ufl = J/ufl.sqrt(ufl.inner(J,J))
+    t = fem.Function(sh0, name="Tangent_vector")
+    t.interpolate(fem.Expression(t_ufl, sh0.element.interpolation_points()))
+    
+    return t
 
 def grad_truss(u, t):
-    return df.dot(df.grad(df.dot(u,t)), t) # inner( outer(t,t) , grad(u)) 
+    return ufl.dot(ufl.grad(ufl.dot(u,t)), t) # inner( outer(t,t) , grad(u)) 
 
-
-def get_mesh_truss(X, cells):    
-    mesh = df.Mesh()
-    ed = df.MeshEditor()
-    ed.open(mesh, "interval", 1, 2)
-    ed.init_vertices( len(X))
-    for i, v in enumerate(X):
-        print(i)
-        ed.add_vertex(i, v)
-
-    ed.init_cells(len(cells))
-    for i, c in enumerate(cells):
-        print(i)
-        ed.add_cell(i, c)    
+def solve_truss(param, mesh):
+    domain, markers, facets = mesh
         
-    ed.close()
-    
-    return mesh
-
-def get_tangent_truss(mesh):
-    J = Jacobian(mesh)
-    se = df.VectorElement("DG", mesh.ufl_cell(), 0, dim = 2)
-    sh0 = df.FunctionSpace(mesh, se)
-    t = df.as_vector([J[0, 0], J[1, 0]])/df.sqrt(df.inner(J,J))
-    
-    return df.project(t, sh0)
-
-
-def flag_point(p, gdim): 
-    foo = lambda x, on_boundary: all([df.near(x[i], p[i]) for i in range(gdim)])
-    return foo
-
-def posproc_truss(param, uh):
-    mesh = uh.function_space().mesh()
-
-    se = df.VectorElement("DG", mesh.ufl_cell(), 0, dim = 1)
-    sh0 = df.FunctionSpace(mesh, se)
-    
-    
-    dx = df.Measure('dx', mesh)
-    t = get_tangent_truss(mesh)
-    grad_truss = partial(ft.grad_truss, t = t)
-    sigma_law = param['sigma_law']
+    gdim = domain.geometry.dim
+    tdim = domain.topology.dim
+    fdim = tdim - 1 # in this case are nodes
         
-    strain = grad_truss(uh)
-    stress = sigma_law(strain)
-    
-    strain_h = ft.QuadratureFunction(sh0, dxm = dx, name = 'strain')
-    strain_h.update(df.as_vector((strain,)))
-
-    stress_h = ft.QuadratureFunction(sh0, dxm = dx, name = 'stress')
-    stress_h.update(df.as_vector((stress,)))
-
-    return {'strain': strain_h, 'stress': stress_h}
-
-def solve_truss(param, mesh = None):
-    if(not mesh):
-        mesh = get_mesh_truss(param['X'], param['cells'])
-    gdim = param['X'].shape[1]
     Area = param['Area']
     sigma_law = param['sigma_law']
     
-    t = get_tangent_truss(mesh)
+    t = get_tangent_truss(domain)
     
-    grad_truss = partial(ft.grad_truss, t = t)
+    grad = partial(grad_truss, t = t)
     
-    Ue = df.VectorElement("CG", mesh.ufl_cell(), 1, dim=gdim)
-    Uh = df.FunctionSpace(mesh, Ue)    
-    
-    bcs_D = [ df.DirichletBC(Uh.sub(bc[1]), df.Constant(bc[2]), flag_point(bc[0], gdim), method = 'pointwise') for bc in param['dirichlet'] ]
-    bcs_N = [ df.PointSource(Uh.sub(bc[1]), bc[0], bc[2]) for bc in param['neumann']]
-    
-    # # Define variational problem
-    uh = df.TrialFunction(Uh) 
-    vh = df.TestFunction(Uh)
-    
-    dx = df.Measure('dx', mesh)
-    
-    a = df.inner( Area*sigma_law(grad_truss(uh)),  grad_truss(vh))*dx
-    b = df.inner( df.Constant((0.,0.)) , vh)*dx # no body forces
-    
-    A, b = df.assemble_system(a, b, bcs_D)
-    
-    for bc in bcs_N: 
-        bc.apply(b) # Only in b (I don't why)
-
-    uh = df.Function(Uh)
-    
-    # Compute solution
-    df.solve(A, uh.vector(), b)   
+    Uh = fem.functionspace(domain, ("CG", 1, (gdim,)))
         
-    return uh
+    bcs_D = []
+    for bc in param['dirichlet']:
+        bc_dofs = fem.locate_dofs_topological(Uh.sub(bc[1]), fdim, facets.find(bc[0]))
+        bcs_D.append(fem.dirichletbc(bc[2], bc_dofs, Uh.sub(bc[1])))
+    
+    load_vec = fem.Function(Uh)
+    for bc in param['neumann']: 
+        bc_dofs = fem.locate_dofs_topological(Uh.sub(bc[1]), fdim, facets.find(bc[0]))
+        load_vec.x.array[bc_dofs] = bc[2]
+     
+    # # # Define variational problem
+    uh = ufl.TrialFunction(Uh) 
+    vh = ufl.TestFunction(Uh)
+    
+    dx = ufl.Measure('dx', domain = domain)
+    
+    a_form = fem.form(ufl.inner(Area*sigma_law(grad(uh)),  grad(vh))*dx)
+    
+    F0 = fem.Constant(domain, np.zeros((gdim,)))
+    L_form = fem.form(ufl.dot(F0, vh) * dx)
 
+    A = fem.petsc.assemble_matrix(a_form, bcs=bcs_D)
+    A.assemble()
+    b = fem.petsc.create_vector(L_form)
+    
+    b.array[:] = load_vec.x.array[:]
+
+    # +
+    solver = PETSc.KSP().create(domain.comm)
+    solver.setOperators(A)
+    solver.setType(PETSc.KSP.Type.PREONLY)
+    solver.getPC().setType(PETSc.PC.Type.LU)
+
+    u = fem.Function(Uh, name="Displacement")
+
+    solver.solve(b, u.vector)
+    u.x.scatter_forward()
+
+    return u
+
+
+def posproc_truss(param, uh, domain):
+#    domain, markers, facets = get_mesh_truss(param['X'], param['cells'])
+
+    t = get_tangent_truss(domain)
+    grad = partial(grad_truss, t = t)
+    sigma_law = param['sigma_law']
+    
+    strain_ufl = grad(uh)
+    stress_ufl = sigma_law(strain_ufl)
+    
+    
+    sh0 = fem.functionspace(domain, ("DG", 0, ()))
+    stress_exp = fem.Expression(stress_ufl, sh0.element.interpolation_points())
+    stress_h = fem.Function(sh0, name="stress")
+    stress_h.interpolate(stress_exp)
+
+    strain_exp = fem.Expression(strain_ufl, sh0.element.interpolation_points())
+    strain_h = fem.Function(sh0, name="strain")
+    strain_h.interpolate(strain_exp)
+
+    return {'strain': strain_h, 'stress': stress_h}

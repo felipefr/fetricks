@@ -1,0 +1,1 @@
+/home/felipe/micromamba/envs/fenicsx-env/lib/python3.12/site-packages/fetricksx-0.1.0-py3.12.egg
