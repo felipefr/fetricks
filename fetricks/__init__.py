@@ -16,6 +16,7 @@ from .fenics.la.wrapper_solvers import  (Picard_mixed, Newton, Newton_automatic,
 from .fenics.mesh.mesh import Mesh
 
 from .fenics.fem.mixed import MixedFiniteElementSpace
+from .fenics.fem.quadrature_function import QuadratureFunction
 
 
 # import pygmsh
@@ -57,7 +58,7 @@ from .fenics.misc import create_quadrature_spaces_mechanics, create_DG_spaces_me
 from .mechanics.conversions2d import *
 from .mechanics import conversions2d as conv2d
 from .mechanics import conversions3d as conv3d
-from .mechanics.truss_utils  import grad_truss, get_mesh_truss, get_tangent_truss
+from .mechanics.truss_utils  import grad_truss, get_mesh_truss, get_tangent_truss, solve_truss, posproc_truss
 
 def get_mechanical_notation_conversor(dim_strain = None, gdim = None):
     if(gdim):
