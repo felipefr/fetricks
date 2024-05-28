@@ -42,7 +42,7 @@ def get_mesh_truss(X, cells, param):
     gmsh.model.add_physical_group(1, lines, 0)
     
     for phy in param["physical_groups"]:
-        gmsh.model.add_physical_group(phy[0], phy[1], phy[2])
+        gmsh.model.add_physical_group(phy[0], [points[phy[1]]], phy[2])
         
 
     
@@ -71,8 +71,8 @@ def get_tangent_truss(domain):
 def grad_truss(u, t):
     return ufl.dot(ufl.grad(ufl.dot(u,t)), t) # inner( outer(t,t) , grad(u)) 
 
-def solve_truss(param, domain):
-    # domain, markers, facets = get_mesh_truss(param['X'], param['cells'])
+def solve_truss(param, mesh):
+    domain, markers, facets = mesh
         
     gdim = domain.geometry.dim
     tdim = domain.topology.dim
@@ -85,13 +85,16 @@ def solve_truss(param, domain):
     grad = partial(grad_truss, t = t)
     
     Uh = fem.functionspace(domain, ("CG", 1, (gdim,)))
-    
-    bcs_D = [ fem.dirichletbc(bc[2], np.array([bc[0]*gdim + bc[1]]).astype('int32'), Uh.sub(bc[1])) for bc in param['dirichlet'] ]
+        
+    bcs_D = []
+    for bc in param['dirichlet']:
+        bc_dofs = fem.locate_dofs_topological(Uh.sub(bc[1]), 0, facets.find(bc[0]))
+        bcs_D.append(fem.dirichletbc(bc[2], bc_dofs, Uh.sub(bc[1])))
     
     load_vec = fem.Function(Uh)
-    fdim = tdim - 1
     for bc in param['neumann']: 
-        load_vec.x.array[bc[0]*gdim + bc[1]] = bc[2]
+        bc_dofs = fem.locate_dofs_topological(Uh.sub(bc[1]), 0, facets.find(bc[0]))
+        load_vec.x.array[bc_dofs] = bc[2]
      
     # # # Define variational problem
     uh = ufl.TrialFunction(Uh) 
@@ -183,26 +186,27 @@ if __name__ == '__main__':
 
 # for dirichlet and neumann: tuple of (node (int or ufl.Point), direction, value)
     param = {
-    'physical_groups': [(0,[0],1), (0,[3],2), (0,[1],3), (0,[2],4) ],
-    'dirichlet': [(0, 0, 0. ), (0, 1, 0. ),
-                  (3, 0, 0. ), (3, 1, 0. )],
-    'neumann': [(1, 1 , fy), (2, 1 , fy)], 
+    'physical_groups': [(0,0,1), (0,3,2), (0,1,3), (0,2,4) ],
+    'dirichlet': [(1, 0, 0. ), (1, 1, 0. ),
+                  (2, 0, 0. ), (2, 1, 0. )],
+    'neumann': [(3, 1 , fy), (4, 1 , fy)], 
     'X': X,
     'cells': cells
     }
     
     domain, markers, facets = get_mesh_truss(X, cells, param)
+    mesh = (domain, markers, facets)
     param['sigma_law'] =  lambda e: fem.Constant(domain, E)*e
     param['Area'] = fem.Constant(domain, 1.0)
 
-    uh = solve_truss(param, domain)
+    uh = solve_truss(param, mesh)
     zh = posproc_truss(param, uh, domain)
     
     with io.XDMFFile(MPI.COMM_WORLD, "truss.xdmf", "w") as xdmf:
         xdmf.write_mesh(domain)
         xdmf.write_function(uh)
         xdmf.write_function(zh["stress"])
-        # xdmf.write_function(zh["strain"])
+        xdmf.write_function(zh["strain"])
             
     # uh.rename('u', '')
     

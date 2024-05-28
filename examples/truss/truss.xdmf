@@ -28,5 +28,14 @@
         </Attribute>
       </Grid>
     </Grid>
+    <Grid Name="strain" GridType="Collection" CollectionType="Temporal">
+      <Grid Name="strain" GridType="Uniform">
+        <xi:include xpointer="xpointer(/Xdmf/Domain/Grid[@GridType='Uniform'][1]/*[self::Topology or self::Geometry])" />
+        <Time Value="0" />
+        <Attribute Name="strain" AttributeType="Scalar" Center="Cell">
+          <DataItem Dimensions="10 1" Format="HDF">truss.h5:/Function/strain/0</DataItem>
+        </Attribute>
+      </Grid>
+    </Grid>
   </Domain>
 </Xdmf>
