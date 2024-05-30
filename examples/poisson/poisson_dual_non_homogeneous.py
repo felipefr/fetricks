@@ -87,8 +87,11 @@ def dual(domain, param):
     
     def g_bottom(x):
         values = np.zeros((2, x.shape[1]))
+        print(x.shape[1])
         values[1, :] = -param['un_bottom']
         return values
+    
+
     
     g_top_V = fem.Function(V)
     g_bottom_V = fem.Function(V)
