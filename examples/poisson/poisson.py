@@ -10,7 +10,7 @@ import ufl
 from mpi4py import MPI
 
 
-def primal(domain):
+def poisson(domain):
     #"Standard H^1(mesh) formulation of Poisson's equation." 
     
     Q = fem.functionspace(domain, ("CG", 1))
@@ -41,6 +41,6 @@ if __name__ == "__main__":
     
     domain = mesh.create_rectangle(MPI.COMM_WORLD,[[0.0, 0.0],[1,1]],[n,n], mesh.CellType.triangle, diagonal = mesh.DiagonalType.left)
     
-    p = primal(domain)
+    p = poisson(domain)
 
     print(np.linalg.norm(p.x.array))
