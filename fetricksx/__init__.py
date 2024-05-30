@@ -8,6 +8,7 @@ Please report all bugs and problems to <felipe.figueredo-rocha@ec-nantes.fr>, or
 <f.rocha.felipe@gmail.com>
 """
 
+from .fenics.postprocessing.errors import (error_L2)
 from .mechanics.truss_utils  import (grad_truss, get_mesh_truss, get_tangent_truss, solve_truss, posproc_truss)
 
 from .fenics.la.wrapper_solvers import BlockSolver
