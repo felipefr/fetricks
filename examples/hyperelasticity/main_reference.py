@@ -43,7 +43,7 @@ def getPsi(e, param):
 
 E = 100.0
 nu = 0.3
-alpha = 200.0
+alpha = 0.0
 ty = 5.0
 
 
@@ -107,6 +107,7 @@ file_results.parameters["flush_output"] = True
 file_results.parameters["functions_share_mesh"] = True
 
 
+# df.solve(res==0, u, bc)
 # callbacks = [lambda w, dw: model.update_alpha(ft.tensor2mandel(ft.symgrad(w))) ]
 
 r = ft.Newton(a_Newton, res, bc, du, u , Nitermax = 10, tol = 1e-6)[1]
@@ -114,10 +115,11 @@ r = ft.Newton(a_Newton, res, bc, du, u , Nitermax = 10, tol = 1e-6)[1]
 
 ## Solve here Newton Raphson
 
+print(np.linalg.norm(u.vector().get_local()))
 file_results.write(u, 0.0)
 
-end = timer()
-print(end - start)
+# end = timer()
+# print(end - start)
 
-rates = [ np.log(r[i+2]/r[i+1])/np.log(r[i+1]/r[i])  for i in range(len(r) - 2) ] 
-print('rates' , rates )
+# rates = [ np.log(r[i+2]/r[i+1])/np.log(r[i+1]/r[i])  for i in range(len(r) - 2) ] 
+# print('rates' , rates )

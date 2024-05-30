@@ -1,7 +1,6 @@
 # Example truss
 
 import os, sys
-os.environ['Hufl5_DISABLE_VERSION_CHECK']='2'
 sys.path.append("/home/felipe/sources/fetricksx")
 
 import numpy as np
