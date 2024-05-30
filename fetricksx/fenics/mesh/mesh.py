@@ -27,11 +27,11 @@ import numpy as np
 # import fetricks.fenics.postprocessing.wrapper_io as iofe
 
 class Mesh(mesh.Mesh):
-    def __init__(self, meshfile, comm = MPI.COMM_WORLD):
-        temp, self.markers, self.facets = io.gmshio.read_from_msh(meshfile, comm)
-        self._cpp_object = temp._cpp_object 
-        self._ufl_domain = temp._ufl_domain
-        self._ufl_domain._ufl_cargo = temp._ufl_domain._ufl_cargo
+    def __init__(self, meshfile, comm = MPI.COMM_WORLD, gdim = 2):
+        self.domain, self.markers, self.facets = io.gmshio.read_from_msh(meshfile, comm, gdim = gdim)
+        self._cpp_object = self.domain._cpp_object 
+        self._ufl_domain = self.domain._ufl_domain
+        self._ufl_domain._ufl_cargo = self.domain._ufl_domain._ufl_cargo
         self.createMeasures()
 
         # self.vols = np.array([df.Cell(self, i).volume() for i in range(self.num_cells())])

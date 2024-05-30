@@ -10,13 +10,16 @@ import numpy as np
 from dolfinx import fem
 import ufl
 from mpi4py import MPI
+import basix
 
 def error_L2(u1, u2, degree_raise, quad_degree):
     # Create higher order function space
     degree = u1.function_space.ufl_element().degree()
     family = u1.function_space.ufl_element().family_name
     domain = u1.function_space.mesh
-    W = fem.functionspace(domain, (family, degree + degree_raise))
+    # discontinuity is useful for Hdiv elements
+    We = basix.ufl.element(family, domain.basix_cell(), degree + degree_raise, discontinuous = True)
+    W = fem.functionspace(domain, We)
     
     # Interpolate approximate solution
     u1_W = fem.Function(W)
