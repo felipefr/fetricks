@@ -14,7 +14,7 @@ import basix
 
 def error_L2(u1, u2, degree_raise, quad_degree):
     # Create higher order function space
-    degree = u1.function_space.ufl_element().degree()
+    degree = u1.function_space.ufl_element().degree
     family = u1.function_space.ufl_element().family_name
     domain = u1.function_space.mesh
     # discontinuity is useful for Hdiv elements

@@ -11,7 +11,9 @@ import matplotlib.pyplot as plt
 from timeit import default_timer as timer
 from functools import partial 
 
+import numpy.typing as npt
 import numpy as np
+import dolfinx
 from dolfinx import fem, io, mesh,plot
 import basix
 from dolfinx.fem.petsc import LinearProblem
@@ -33,14 +35,10 @@ def primal(domain, param):
     un_top = fem.Constant(domain,param['un_top'])
     un_bottom = fem.Constant(domain,param['un_bottom'])
     L = f*q*domain.dx + un_top*q*domain.ds(param['top']) + un_bottom*q*domain.ds(param['bottom'])
-    
-    tdim = domain.topology.dim
-    fdim = tdim - 1
-    left_dofs = fem.locate_dofs_topological(Q, fdim, domain.facets.find(param['left']))
-    right_dofs = fem.locate_dofs_topological(Q, fdim, domain.facets.find(param['right']))
 
-    bcs_D = [fem.dirichletbc(fem.Constant(domain,param['p_left']), left_dofs, Q),
-             fem.dirichletbc(fem.Constant(domain,param['p_right']), right_dofs, Q)]
+
+    bcs_D = [ft.dirichletbc(fem.Constant(domain,param['p_left']), param['left'], Q),
+             ft.dirichletbc(fem.Constant(domain,param['p_right']), param['right'], Q)]
 
     petsc_options={"ksp_type": "preonly", "pc_type": "lu"}
     problem = LinearProblem(a, L, bcs=bcs_D, petsc_options= petsc_options)
@@ -53,7 +51,7 @@ def dual(domain, param):
     
     Ve = basix.ufl.element("BDM", domain.domain.basix_cell(), 2, shape=(2,))
     Qe = basix.ufl.element("DG", domain.domain.basix_cell(), 1)
-    W = fem.functionspace(domain.domain, basix.ufl.mixed_element([Ve, Qe]))
+    W = fem.functionspace(domain, basix.ufl.mixed_element([Ve, Qe]))
     
     normal = ufl.FacetNormal(domain)
     
@@ -69,37 +67,8 @@ def dual(domain, param):
     p_right = fem.Constant(domain, param['p_right'])
     L = -f*q*domain.dx + p_left*ufl.dot(v,normal)*domain.ds(param['left']) + p_right*ufl.dot(v,normal)*domain.ds(param['right'])
     
-    W0 = W.sub(0)
-    V, _ = W0.collapse()
-    
-    tdim = domain.topology.dim
-    fdim = tdim - 1
-    bottom_dofs = fem.locate_dofs_topological((W0, V), fdim, domain.facets.find(param['bottom']))
-    top_dofs = fem.locate_dofs_topological((W0, V), fdim, domain.facets.find(param['top']))
-    
-    
-    x = ufl.SpatialCoordinate(domain)
-    
-    def g_top(x):
-        values = np.zeros((2, x.shape[1]))
-        values[1, :] = param['un_top']
-        return values
-    
-    def g_bottom(x):
-        values = np.zeros((2, x.shape[1]))
-        print(x.shape[1])
-        values[1, :] = -param['un_bottom']
-        return values
-    
-
-    
-    g_top_V = fem.Function(V)
-    g_bottom_V = fem.Function(V)
-    g_top_V.interpolate(g_top)
-    g_bottom_V.interpolate(g_bottom)
-    
-    bcs_N = [ fem.dirichletbc(g_top_V, top_dofs, W0),
-              fem.dirichletbc(g_bottom_V, bottom_dofs, W0)]
+    bcs_N = [ ft.neumannbc(param['un_top'], param['top'], W.sub(0)),
+              ft.neumannbc(param['un_bottom'], param['bottom'], W.sub(0))]
     
     
     # Note that without pc_factor_mat_solver_type it doesn't work. With mumps does not solve for big matrices
@@ -109,12 +78,12 @@ def dual(domain, param):
     w = problem.solve()
 
     return w
-        
+
 if __name__ == "__main__":
     
     param = {
     'f': 1.0,
-    'un_top': 1.0,
+    'un_top': -1.0,
     'un_bottom': 2.0,
     'p_left': 1.0,
     'p_right': 0.0,
@@ -125,9 +94,9 @@ if __name__ == "__main__":
     'mesh_file': 'unit_square.msh'
     }
     
-    n = 100
+    n = 200
     
-    # domain, markers, facets = get_unit_square_mesh(n)
+    ft.generate_msh_unit_square_mesh(n, param['mesh_file'])
         
     domain = ft.Mesh(param['mesh_file'])
     

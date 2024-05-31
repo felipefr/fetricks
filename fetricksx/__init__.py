@@ -13,6 +13,9 @@ from .mechanics.truss_utils  import (grad_truss, get_mesh_truss, get_tangent_tru
 
 from .fenics.la.wrapper_solvers import BlockSolver
 from .fenics.mesh.mesh import Mesh
+from .fenics.mesh.mesh_utils import generate_msh_unit_square_mesh
+
+from .fenics.bcs_utils import neumannbc, dirichletbc
 
 # import pygmsh
 # if('built_in' in pygmsh.__all__):
@@ -49,8 +52,7 @@ from .mechanics.hyperlasticity_utils import GL2CG_np, plane_strain_CG_np, get_in
 
 # from .fenics.postprocessing.misc import load_sol, get_errors
 
-# from .fenics.bcs.neumann import (NeumannTensorSource, NeumannVectorSource, NeumannBC, NeumannVectorBC, NeumannVectorBC_given_normal,
-#                                NeumannTensorSourceCpp, NeumannVectorSourceCpp)
+
 # from .fenics.misc import create_quadrature_spaces_mechanics, create_DG_spaces_mechanics, symgrad, Integral, setter
 
 # Conversions
