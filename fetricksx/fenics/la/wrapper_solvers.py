@@ -9,6 +9,9 @@ Please report all bugs and problems to <felipe.figueredo-rocha@u-pec.fr>, or
 """
 from dolfinx import fem
 from petsc4py import PETSc
+from dolfinx.fem.petsc import LinearProblem
+import ufl
+import numpy as np
 
 class BlockSolver:
     def __init__(self, lhs_form, list_rhs_form, list_sol, list_bcs):
@@ -46,3 +49,24 @@ class BlockSolver:
        for i in range(self.n_subproblems):
            self.solver.solve(self.b[i],self.list_sol[i].vector)
            self.list_sol[i].x.scatter_forward()
+
+
+# Picard nonlinear iterations for mixed 
+# q_k is the first solution (convention) in the previous step
+# set sub if q_k is just a part subcomponent of w 
+def picard(a, L, w, q_k, bcs, tol = 1.0e-6, maxiter = 25,  zerofy = True, sub = -1): 
+    q_k.x.array[:] = 0.0    
+    eps = 1.0           # error measure ||u-u_k||
+    it = 0
+    petsc_options={"ksp_type": "preonly", "pc_type": "lu", "pc_factor_mat_solver_type": "mumps"}
+    problem = LinearProblem(a, L, bcs, w, petsc_options=petsc_options)
+    while eps > tol and it < maxiter:
+         it += 1
+         problem.solve()
+         if(sub>-1):
+             q_new = w.sub(sub).collapse()         
+         else: 
+             q_new = w
+         eps = np.linalg.norm(q_new.x.array - q_k.x.array, ord=np.Inf)/np.linalg.norm(q_new.x.array)
+         print('iter=%d: norm=%g' % (it, eps))
+         q_k.x.array[:] = q_new.x.array[:]   # update for next iteration

@@ -11,25 +11,15 @@ Please report all bugs and problems to <felipe.figueredo-rocha@ec-nantes.fr>, or
 from .fenics.postprocessing.errors import (error_L2)
 from .mechanics.truss_utils  import (grad_truss, get_mesh_truss, get_tangent_truss, solve_truss, posproc_truss)
 
-from .fenics.la.wrapper_solvers import BlockSolver
+from .fenics.la.wrapper_solvers import BlockSolver, picard
 from .fenics.mesh.mesh import Mesh
 from .fenics.mesh.mesh_utils import generate_msh_unit_square_mesh
 
 from .fenics.bcs_utils import neumannbc, dirichletbc
-
-# import pygmsh
-# if('built_in' in pygmsh.__all__):
-#     from fetricks.fenics.mesh.wrapper_gmsh_legacy_pygmsh import GmshIO # uses pygmsh 6.0.2 and meshio 3.3.1
-# else: 
-#     from fetricks.fenics.mesh.wrapper_gmsh import GmshIO # uses new meshio
-    
-# force to use new version
-from .fenics.mesh.wrapper_gmsh import GmshIO # uses new meshio
-
+from .fenics.mesh.wrapper_gmsh import gmshio # uses new meshio
+from .fenics.fem_utils import mixed_functionspace
 
 # from .fenics.fem.quadrature_function import QuadratureFunction
-
-
 # from .mechanics.material_model_interface import materialModel , materialModelExpression
 # from .mechanics.isocoric_isotropic_hyperlastic_material import IsochoricIsotropicHyperelasticMaterial
 from .mechanics.material_models import (psi_ciarlet, psi_ciarlet_C, psi_hookean_nonlinear_lame, get_stress_tang_from_psi, 
