@@ -11,7 +11,7 @@ Please report all bugs and problems to <felipe.figueredo-rocha@ec-nantes.fr>, or
 from .fenics.postprocessing.errors import (error_L2)
 from .mechanics.truss_utils  import (grad_truss, get_mesh_truss, get_tangent_truss, solve_truss, posproc_truss)
 
-from .fenics.la.wrapper_solvers import BlockSolver, picard
+from .fenics.la.wrapper_solvers import custom_linear_solver, block_solver, picard
 from .fenics.mesh.mesh import Mesh
 from .fenics.mesh.mesh_utils import generate_msh_unit_square_mesh
 

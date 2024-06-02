@@ -13,42 +13,66 @@ from dolfinx.fem.petsc import LinearProblem
 import ufl
 import numpy as np
 
-class BlockSolver:
-    def __init__(self, lhs_form, list_rhs_form, list_sol, list_bcs):
-        self.list_rhs_form = list_rhs_form
-        self.list_sol = list_sol
-        self.list_bcs = list_bcs
-        self.n_subproblems = len(list_rhs_form)
-        domain = self.list_sol[0].function_space.mesh
+class custom_linear_solver:
+    def __init__(self, lhs, rhs, sol, bcs, solver = None):
+        self.sol = sol
+        self.bcs = bcs
+        domain = self.sol.function_space.mesh
         
-        # generate associated matrix
-        self.lhs_form = fem.form(lhs_form)
-        A = fem.petsc.assemble_matrix(self.lhs_form,bcs=self.list_bcs[0])
-        A.assemble()
+        if(solver): #if solver is given
+            self.solver = solver
+            self.lhs = lhs
+        else:
+            self.lhs = fem.form(lhs)
+            self.A = fem.petsc.assemble_matrix(self.lhs, bcs=self.bcs)
+            self.A.assemble()
+            self.solver = PETSc.KSP().create(domain.comm)
+            self.solver.setOperators(self.A)
+            self.solver.setType(PETSc.KSP.Type.PREONLY)
+            self.solver.getPC().setType(PETSc.PC.Type.LU)
+        
+        self.rhs = fem.form(rhs) 
+        self.b = fem.petsc.create_vector(self.rhs)
+         
+    def assembly_rhs(self):
+        with self.b.localForm() as b:
+            b.set(0.0)
+        
+        fem.petsc.assemble_vector(self.b, self.rhs)
+        fem.petsc.apply_lifting(self.b, self.lhs, self.bcs)
+        self.b.ghostUpdate(addv=PETSc.InsertMode.ADD_VALUES,mode=PETSc.ScatterMode.REVERSE)    
+        fem.petsc.set_bc(self.b,self.bcs)
 
-        self.solver = PETSc.KSP().create(domain.comm)
-        self.solver.setOperators(A)
-        self.solver.setType(PETSc.KSP.Type.PREONLY)
-        self.solver.getPC().setType(PETSc.PC.Type.LU)
+    def solve(self):  
+       self.assembly_rhs()
+       self.solver.solve(self.b,self.sol.vector)
+       self.sol.x.scatter_forward()
+
+class block_solver:
+    def __init__(self, lhs, rhs, sol, bcs):
+        self.n_subproblems = len(rhs)        
         
-        self.list_rhs_form = [fem.form(b) for b in list_rhs_form]
-        self.b = [fem.petsc.create_vector(b) for b in self.list_rhs_form]
-     
+        if(isinstance(lhs, list)):    
+            self.list_solver = [custom_linear_solver(lhs[i], rhs[i], sol[i], bcs[i]) 
+                                for i in range(self.n_subproblems)]
+        
+        else:
+            self.list_solver = [custom_linear_solver(lhs[0], rhs[0], sol[0], bcs[0])] 
+            self.list_solver += [custom_linear_solver(self.list_solver[0].lhs, rhs[i], sol[i], 
+                                 bcs[i], solver = self.list_solver[0].solver) for i in range(1, self.n_subproblems)]                    
+
+            
+         
     def assembly_rhs(self):
        for i in range(self.n_subproblems):
-           with self.b[i].localForm() as b:
-               b.set(0.0)
-           
-           fem.petsc.assemble_vector(self.b[i],self.list_rhs_form[i])
-           fem.petsc.apply_lifting(self.b[i], [self.lhs_form],[self.list_bcs[i]])
-           self.b[i].ghostUpdate(addv=PETSc.InsertMode.ADD_VALUES,mode=PETSc.ScatterMode.REVERSE)    
-           fem.petsc.set_bc(self.b[i],self.list_bcs[i])
+           self.list_solver[i].assembly_rhs()
 
     def solve(self):  
        self.assembly_rhs()
        for i in range(self.n_subproblems):
-           self.solver.solve(self.b[i],self.list_sol[i].vector)
-           self.list_sol[i].x.scatter_forward()
+           s = self.list_solver[i]
+           s.solver.solve(s.b, s.sol.vector)
+           s.sol.x.scatter_forward()
 
 
 # Picard nonlinear iterations for mixed 
