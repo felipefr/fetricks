@@ -12,6 +12,9 @@ from petsc4py import PETSc
 from dolfinx.fem.petsc import LinearProblem
 import ufl
 import numpy as np
+from scipy.sparse import csr_matrix 
+
+# petsc_options={"ksp_type": "preonly", "pc_type": "lu", "pc_factor_mat_solver_type": "mumps"}
 
 class custom_linear_solver:
     def __init__(self, lhs, rhs, sol, bcs, solver = None):
@@ -30,8 +33,9 @@ class custom_linear_solver:
             self.solver.setOperators(self.A)
             self.solver.setType(PETSc.KSP.Type.PREONLY)
             self.solver.getPC().setType(PETSc.PC.Type.LU)
+            self.solver.getPC().setFactorSolverType("mumps")
         
-        self.rhs = fem.form(rhs) 
+        self.rhs = fem.form(rhs)
         self.b = fem.petsc.create_vector(self.rhs)
          
     def assembly_rhs(self):
@@ -39,7 +43,7 @@ class custom_linear_solver:
             b.set(0.0)
         
         fem.petsc.assemble_vector(self.b, self.rhs)
-        fem.petsc.apply_lifting(self.b, self.lhs, self.bcs)
+        fem.petsc.apply_lifting(self.b, [self.lhs], [self.bcs])
         self.b.ghostUpdate(addv=PETSc.InsertMode.ADD_VALUES,mode=PETSc.ScatterMode.REVERSE)    
         fem.petsc.set_bc(self.b,self.bcs)
 
@@ -57,7 +61,7 @@ class block_solver:
                                 for i in range(self.n_subproblems)]
         
         else:
-            self.list_solver = [custom_linear_solver(lhs[0], rhs[0], sol[0], bcs[0])] 
+            self.list_solver = [custom_linear_solver(lhs, rhs[0], sol[0], bcs[0])] 
             self.list_solver += [custom_linear_solver(self.list_solver[0].lhs, rhs[i], sol[i], 
                                  bcs[i], solver = self.list_solver[0].solver) for i in range(1, self.n_subproblems)]                    
 
@@ -94,3 +98,27 @@ def picard(a, L, w, q_k, bcs, tol = 1.0e-6, maxiter = 25,  zerofy = True, sub = 
          eps = np.linalg.norm(q_new.x.array - q_k.x.array, ord=np.Inf)/np.linalg.norm(q_new.x.array)
          print('iter=%d: norm=%g' % (it, eps))
          q_k.x.array[:] = q_new.x.array[:]   # update for next iteration
+         
+
+# From Dolfiny https://github.com/michalhabera/dolfiny/blob/master/dolfiny/la.py        
+def petsc_to_scipy(A):
+    """Converts PETSc serial matrix to SciPy CSR matrix"""
+    ai, aj, av = A.getValuesCSR()
+    mat = csr_matrix((av, aj, ai))
+
+    return mat
+
+# From Dolfiny https://github.com/michalhabera/dolfiny/blob/master/dolfiny/la.py   
+def scipy_to_petsc(A):
+    """Converts SciPy CSR matrix to PETSc serial matrix."""
+    nrows = A.shape[0]
+    ncols = A.shape[1]
+
+    ai, aj, av = A.indptr, A.indices, A.data
+    mat = PETSc.Mat()
+    mat.createAIJ(size=(nrows, ncols))
+    mat.setUp()
+    mat.setValuesCSR(ai, aj, av)
+    mat.assemble()
+
+    return mat

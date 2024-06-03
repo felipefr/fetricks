@@ -14,8 +14,11 @@ Please report all bugs and problems to <felipe.figueredo-rocha@ec-nantes.fr>, or
 <f.rocha.felipe@gmail.com>
 """
 
+import numpy as np
 import ufl
-import fetricks as ft
+import fetricksx as ft
+from dolfinx import fem
+from mpi4py import MPI
 
 # Cijkl = Aik Bjl
 def outer_overline_ufl(A, B):
@@ -35,3 +38,13 @@ def outer_dot_mandel_ufl(A, B, conv = None):
     if(not conv):
         conv = ft.get_mechanical_notation_conversor(dim_strain = A.ufl_shape[0])
     return conv.tensor4th2mandel(outer_dot_ufl(conv.mandel2tensor(A), conv.mandel2tensor(B))) 
+
+
+def L2norm_given_form(form, comm):
+    val = fem.assemble_scalar(form)
+    return np.sqrt(comm.allreduce(val, op=MPI.SUM))
+
+
+def L2norm(u, dx, comm):
+    return L2norm_given_form(fem.form(ufl.inner(u, u) * dx), comm)
+

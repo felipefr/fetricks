@@ -12,12 +12,14 @@ from .fenics.postprocessing.errors import (error_L2)
 from .mechanics.truss_utils  import (grad_truss, get_mesh_truss, get_tangent_truss, solve_truss, posproc_truss)
 
 from .fenics.la.wrapper_solvers import custom_linear_solver, block_solver, picard
+from .fenics.la.operations import L2norm, L2norm_given_form
 from .fenics.mesh.mesh import Mesh
 from .fenics.mesh.mesh_utils import generate_msh_unit_square_mesh
 
 from .fenics.bcs_utils import neumannbc, dirichletbc
 from .fenics.mesh.wrapper_gmsh import gmshio # uses new meshio
 from .fenics.fem_utils import mixed_functionspace
+
 
 # from .fenics.fem.quadrature_function import QuadratureFunction
 # from .mechanics.material_model_interface import materialModel , materialModelExpression
