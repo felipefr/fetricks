@@ -20,6 +20,8 @@ from .fenics.bcs_utils import neumannbc, dirichletbc
 from .fenics.mesh.wrapper_gmsh import gmshio # uses new meshio
 from .fenics.fem_utils import mixed_functionspace
 
+from .plotting.misc import (load_latex_options, set_pallette, plot_mean_std, plot_mean_std_nolegend, plot_fill_std)
+
 
 # from .fenics.fem.quadrature_function import QuadratureFunction
 # from .mechanics.material_model_interface import materialModel , materialModelExpression
@@ -70,7 +72,7 @@ from .mechanics.conversions import grad2mandel_vec, grad2mandel_ten, mandelgrad,
 
 
 
-from .plotting.misc import *
+
 
 __all__ = ['BlockSolver', 
            'stress2voigt', 'strain2voigt', 'voigt2strain', 'voigt2stress', 'mandel2voigtStrain', 'mandel2voigtStress',
