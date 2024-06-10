@@ -21,6 +21,9 @@ class CustomNonlinearProblem(df.NonlinearProblem):
         self.a = a
         self.bcs = bcs
         self.u = u
+
+    def reset_bcs(self, bcs):
+        self.bcs = bcs
         
     def F(self, b, x = None): 
         df.assemble(self.L, tensor=b)
@@ -34,23 +37,33 @@ class CustomNonlinearProblem(df.NonlinearProblem):
 # problem should be a NonlinearVariationalProblem
 class CustomNonlinearSolver:
 
+    # bcs: original object
     def __init__(self, problem, callbacks = [], u0_satisfybc = False): 
         
         self.problem = problem
         self.callbacks = callbacks
-        
+        self.u0_satisfybc = u0_satisfybc
+    
         self.du = df.Function(self.problem.u.function_space())
         self.du.vector().set_local(np.zeros(self.du.vector().size()))
         
         self.rhs = df.PETScVector() 
         self.lhs = df.PETScMatrix()
         
+    def reset_bcs(self, bcs):
+        self.problem.reset_bcs(bcs)
+        
     def solve(self, Nitermax = 10, tol = 1e-8, report = True):
         
+        if(self.u0_satisfybc): self.homogenise_bcs()
         self.call_callbacks()
         nRes = []
-        nRes.append(self.assemble())
         
+        # iteration 1
+        nRes.append(self.assemble())
+
+        self.homogenise_bcs() # after first iteration, u satisfies bc
+                        
         nRes[0] = nRes[0] if nRes[0]>0.0 else 1.0
         niter = 0
         
@@ -61,9 +74,14 @@ class CustomNonlinearSolver:
             if(report):
                 print(" Residual:", nRes[-1]/nRes[0])
             
-            
+
         return nRes
 
+    def homogenise_bcs(self):
+        for bc_i in self.problem.bcs: # non-homogeneous dirichlet applied only in the first itereation
+            bc_i.homogenize()
+        
+        
     def newton_raphson_iteration(self):
         df.solve(self.lhs, self.du.vector(), self.rhs)
         self.problem.u.assign(self.problem.u + self.du)    
