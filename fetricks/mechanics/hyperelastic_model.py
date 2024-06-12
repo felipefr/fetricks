@@ -75,7 +75,10 @@ class hyperelasticModelExpression(ft.materialModelExpression):
     def __init__(self, mesh, param, deg_stress = 0, dim_strain = 3):
         super().__init__(mesh, param, deg_stress, dim_strain)
     
- 
+        
+    def tangent_op(self, de):
+        return df.dot(ft.as_sym_tensor_3x3(self.tangent), de) 
+    
     def param_parser(self, param):
         
         if('lamb' in param.keys()):

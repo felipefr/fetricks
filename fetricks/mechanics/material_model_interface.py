@@ -75,7 +75,7 @@ class materialModel(metaclass=abc.ABCMeta):
 
 
 
-class materialModelExpression:
+class materialModelExpression(metaclass=abc.ABCMeta):
     def __init__(self, mesh, param, deg_stress = 0, dim_strain = 3):
         
         self.param_parser(param)
@@ -92,15 +92,22 @@ class materialModelExpression:
         self.size_tan_sqrt = int(np.sqrt(self.size_tan))
         
         self.stress = ft.genericGaussPointExpression(self.strain, self.pointwise_stress , (self.size_strain,))
-        self.tangent = ft.genericGaussPointExpression(self.strain, self.pointwise_tangent , (6))
+        self.tangent = ft.genericGaussPointExpression(self.strain, self.pointwise_tangent , (6, ))
 
-    
+
+    @abc.abstractmethod     
     def param_parser(self, param):
         pass
     
+    @abc.abstractmethod     
+    def tangent_op(self, e):
+        pass
+    
+    @abc.abstractmethod 
     def pointwise_stress(self, e, cell = None): # elastic (I dont know why for the moment) # in mandel format
         pass
     
+    @abc.abstractmethod 
     def pointwise_tangent(self, e, cell = None): # elastic (I dont know why for the moment) # in mandel format
         pass
     
