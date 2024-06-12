@@ -92,7 +92,8 @@ class materialModelExpression:
         self.size_tan_sqrt = int(np.sqrt(self.size_tan))
         
         self.stress = ft.genericGaussPointExpression(self.strain, self.pointwise_stress , (self.size_strain,))
-        self.tangent = ft.genericGaussPointExpression(self.strain, self.pointwise_tangent , (self.size_tan_sqrt, self.size_tan_sqrt))
+        self.tangent = ft.genericGaussPointExpression(self.strain, self.pointwise_tangent , (6))
+
     
     def param_parser(self, param):
         pass
