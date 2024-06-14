@@ -14,11 +14,13 @@ from .mechanics.truss_utils  import (grad_truss, get_mesh_truss, get_tangent_tru
 from .fenics.la.wrapper_solvers import custom_linear_solver, block_solver, picard
 from .fenics.la.operations import L2norm, L2norm_given_form
 from .fenics.mesh.mesh import Mesh
-from .fenics.mesh.mesh_utils import generate_msh_unit_square_mesh
+from .fenics.mesh.mesh_utils import generate_rectangle_msh, generate_unit_square_msh
 
 from .fenics.bcs_utils import neumannbc, dirichletbc
 from .fenics.mesh.wrapper_gmsh import gmshio # uses new meshio
 from .fenics.fem_utils import mixed_functionspace
+from .fenics.math_utils import symgrad 
+
 
 from .plotting.misc import (load_latex_options, set_pallette, plot_mean_std, plot_mean_std_nolegend, plot_fill_std)
 
@@ -63,9 +65,8 @@ from .mechanics.hyperlasticity_utils import GL2CG_np, plane_strain_CG_np, get_in
     
 
 
-# Explicit import conversionss
-from .mechanics.conversions import stress2voigt, strain2voigt, voigt2strain, voigt2stress, mandel2voigtStrain, mandel2voigtStress
-from .mechanics.conversions import tensor2mandel, mandel2tensor, tensor4th2mandel, tr_mandel, Id_mandel_np, Id_mandel_df, symgrad_mandel, symgrad_voigt
+# Explicit import conversions
+from .mechanics.conversions import tensor2mandel, mandel2tensor, tensor4th2mandel, tr_mandel, Id_mandel_np, Id_mandel_df, symgrad_mandel
 from .mechanics.conversions import tensor2mandel_np, mandel2tensor_np, tensor4th2mandel_np
 from .mechanics.conversions import grad2mandel_vec, grad2mandel_ten, mandelgrad, mandelgrad_ten
 
@@ -74,9 +75,8 @@ from .mechanics.conversions import grad2mandel_vec, grad2mandel_ten, mandelgrad,
 
 
 
-__all__ = ['BlockSolver', 
-           'stress2voigt', 'strain2voigt', 'voigt2strain', 'voigt2stress', 'mandel2voigtStrain', 'mandel2voigtStress',
-            'tensor2mandel', 'mandel2tensor', 'tensor4th2mandel', 'tr_mandel', 'Id_mandel_np', 'Id_mandel_df', 'symgrad_mandel', 'symgrad_voigt',
+__all__ = ['symgrad', 'BlockSolver', 
+            'tensor2mandel', 'mandel2tensor', 'tensor4th2mandel', 'tr_mandel', 'Id_mandel_np', 'Id_mandel_df', 'symgrad_mandel',
             'tensor2mandel_np', 'mandel2tensor_np',
             'grad2mandel_vec', 'grad2mandel_ten', 'mandelgrad', 'mandelgrad_ten',
             'Integral',

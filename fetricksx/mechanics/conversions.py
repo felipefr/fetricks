@@ -18,54 +18,6 @@ Please report all bugs and problems to <felipe.figueredo-rocha@ec-nantes.fr>, or
 import ufl
 import numpy as np
 
-# NON-FLATTENED FUNCTIONS
-# def symgrad(v): 
-#     return ufl.as_matrix([[v[0].dx(0), v[1].dx(1)], [v[0].dx(0), v[1].dx(1)]])
-
-
-# VOIGT NOTATION
-def symgrad_voigt(v):
-    return ufl.as_vector([v[0].dx(0), v[1].dx(1), v[0].dx(1) + v[1].dx(0)])
-
-
-def stress2voigt(s):
-    return ufl.as_vector([s[0, 0], s[1, 1], 0.5*(s[0, 1] + s[1, 0]) ])
-
-
-def strain2voigt(e):
-    return ufl.as_vector([e[0, 0], e[1, 1], e[0, 1] + e[1, 0]])
-
-def voigt2strain(e):
-    return ufl.as_tensor([[e[0], 0.5*e[2]], [0.5*e[2], e[1]]])
-
-def voigt2stress(s):
-    return ufl.as_tensor([[s[0], s[2]], [s[2], s[1]]])
-    
- ## this is voigt
-def macro_strain(i):
-    Eps_Voigt = np.zeros((3,))
-    Eps_Voigt[i] = 1
-    return np.array([[Eps_Voigt[0], Eps_Voigt[2]/2.],
-                    [Eps_Voigt[2]/2., Eps_Voigt[1]]])
-                    
-                    
-# VOIGT NOTATION: Generic backend
-def stress2voigt_gen(s, backend = ufl.as_vector):
-    return backend([s[0, 0], s[1, 1], 0.5*(s[0, 1] + s[1, 0])])
-
-
-def strain2voigt_gen(e, backend = ufl.as_vector):
-    return backend([e[0, 0], e[1, 1], e[0, 1] + e[1, 0]])
-
-def voigt2strain_gen(e, backend = ufl.as_vector):
-    return backend([[e[0], 0.5*e[2]], [0.5*e[2], e[1]]])
-
-def voigt2stress_gen(s, backend = ufl.as_vector):
-    return backend([[s[0], s[2]], [s[2], s[1]]])
-
-    
-
-
 # MANDEL NOTATION RELATED FUNCTIONS
 
 sqrt2 = np.sqrt(2)

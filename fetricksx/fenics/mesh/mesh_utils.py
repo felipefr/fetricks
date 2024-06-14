@@ -8,18 +8,25 @@ Created on Fri May 31 20:10:31 2024
 
 import gmsh
 
+
 # n : number of divisions per edge
-def generate_msh_unit_square_mesh(n, msh_file): 
+def generate_unit_square_msh(msh_file, n, arrangement = 'Left/Right'): 
+    
+    return generate_msh_rectangle_mesh(msh_file, 0, 0, 1, 1, n, n, arrangement) 
+
+
+# n : number of divisions per edge
+def generate_rectangle_msh(msh_file, x0, y0, lx, ly, nx, ny, arrangement = 'Left/Right'): 
     
     gmsh.initialize()
     gmsh.option.setNumber("General.Terminal", 0)  # to disable meshing info
     geom = gmsh.model.geo
     
     p = []
-    p.append(geom.add_point(0.0, 0.0, 0.0))
-    p.append(geom.add_point(1.0, 0.0, 0.0))
-    p.append(geom.add_point(1.0, 1.0, 0.0))
-    p.append(geom.add_point(0.0, 1.0, 0.0))
+    p.append(geom.add_point(x0, y0, 0.0))
+    p.append(geom.add_point(x0 + lx, y0, 0.0))
+    p.append(geom.add_point(x0 + lx, y0 + ly, 0.0))
+    p.append(geom.add_point(x0, y0 + ly, 0.0))
 
         
     l = []
@@ -33,10 +40,10 @@ def generate_msh_unit_square_mesh(n, msh_file):
     
     geom.synchronize()
     
-    for li in l:
-        gmsh.model.mesh.set_transfinite_curve(li, n+1)
+    for li, ni in zip(l,[nx,ny,nx,ny]):
+        gmsh.model.mesh.set_transfinite_curve(li, ni+1)
     
-    gmsh.model.mesh.set_transfinite_surface(s[0],arrangement="Left")
+    gmsh.model.mesh.set_transfinite_surface(s[0],arrangement=arrangement)
     
     gmsh.model.add_physical_group(2, s, 0)
     for i in range(4):
