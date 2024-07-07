@@ -16,7 +16,8 @@ from scipy.sparse import csr_matrix
 
 # petsc_options={"ksp_type": "preonly", "pc_type": "lu", "pc_factor_mat_solver_type": "mumps"}
 
-class custom_linear_solver:
+# essentially used to solve several times with the same LHS
+class CustomLinearSolver:
     def __init__(self, lhs, rhs, sol, bcs, solver = None):
         self.sol = sol
         self.bcs = bcs
@@ -26,18 +27,21 @@ class custom_linear_solver:
             self.solver = solver
             self.lhs = lhs
         else:
-            self.lhs = fem.form(lhs)
-            self.A = fem.petsc.assemble_matrix(self.lhs, bcs=self.bcs)
-            self.A.assemble()
             self.solver = PETSc.KSP().create(domain.comm)
-            self.solver.setOperators(self.A)
             self.solver.setType(PETSc.KSP.Type.PREONLY)
             self.solver.getPC().setType(PETSc.PC.Type.LU)
             self.solver.getPC().setFactorSolverType("mumps")
-        
+            self.lhs = fem.form(lhs)
+            self.assembly_lhs()
+            
         self.rhs = fem.form(rhs)
         self.b = fem.petsc.create_vector(self.rhs)
-         
+    
+    def assembly_lhs(self):
+        self.A = fem.petsc.assemble_matrix(self.lhs, bcs=self.bcs)
+        self.A.assemble()
+        self.solver.setOperators(self.A)
+
     def assembly_rhs(self):
         with self.b.localForm() as b:
             b.set(0.0)
@@ -52,7 +56,121 @@ class custom_linear_solver:
        self.solver.solve(self.b,self.sol.vector)
        self.sol.x.scatter_forward()
 
-class block_solver:
+
+# Based on https://bleyerj.github.io/comet-fenicsx/tours/nonlinear_problems/plasticity/plasticity.html
+class CustomTangentProblem(fem.petsc.LinearProblem):
+    def assemble_rhs(self, u=None):
+        """Assemble right-hand side and lift Dirichlet bcs.
+
+        Parameters
+        ----------
+        u : dolfinx.fem.Function, optional
+            For non-zero Dirichlet bcs u_D, use this function to assemble rhs with the value u_D - u_{bc}
+            where u_{bc} is the value of the given u at the corresponding. Typically used for custom Newton methods
+            with non-zero Dirichlet bcs.
+        """
+
+        # Assemble rhs
+        with self._b.localForm() as b_loc:
+            b_loc.set(0)
+        fem.petsc.assemble_vector(self._b, self._L)
+
+        # Apply boundary conditions to the rhs
+        x0 = [] if u is None else [u.vector]
+        fem.petsc.apply_lifting(self._b, [self._a], bcs=[self.bcs], x0=x0, scale=1.0)
+        self._b.ghostUpdate(addv=PETSc.InsertMode.ADD, mode=PETSc.ScatterMode.REVERSE)
+        x0 = None if u is None else u.vector
+        fem.petsc.set_bc(self._b, self.bcs, x0, scale=1.0)
+
+    def assemble_lhs(self):
+        self._A.zeroEntries()
+        fem.petsc.assemble_matrix_mat(self._A, self._a, bcs=self.bcs)
+        self._A.assemble()
+
+    def solve_system(self):
+        # Solve linear system and update ghost values in the solution
+        self._solver.solve(self._b, self._x)
+        self.u.x.scatter_forward()
+        
+class CustomNonlinearSolver:
+    
+    tangent_problem = CustomLinearProblem(
+    tangent_form,
+    -Residual,
+    u=du,
+    bcs=bcs,
+    petsc_options={
+        "ksp_type": "preonly",
+        "pc_type": "lu",
+        "pc_factor_mat_solver_type": "mumps",
+    },
+)
+
+
+# problem should be a NonlinearVariationalProblem
+class CustomNonlinearSolver:
+
+    # bcs: original object
+    def __init__(self, problem, callbacks = [], u0_satisfybc = False): 
+        
+        self.problem = problem
+        self.callbacks = callbacks
+        self.u0_satisfybc = u0_satisfybc
+    
+        self.du = df.Function(self.problem.u.function_space())
+        self.du.vector().set_local(np.zeros(self.du.vector().size()))
+        
+        self.rhs = df.PETScVector() 
+        self.lhs = df.PETScMatrix()
+        
+    def reset_bcs(self, bcs):
+        self.problem.reset_bcs(bcs)
+        
+    def solve(self, Nitermax = 10, tol = 1e-8, report = True):
+        
+        if(self.u0_satisfybc): self.homogenise_bcs()
+        self.call_callbacks()
+        nRes = []
+        
+        # iteration 1
+        nRes.append(self.assemble())
+
+        self.homogenise_bcs() # after first iteration, u satisfies bc
+                        
+        nRes[0] = nRes[0] if nRes[0]>0.0 else 1.0
+        niter = 0
+        
+        while nRes[niter]/nRes[0] > tol and niter < Nitermax:
+            nRes.append(self.newton_raphson_iteration())
+            niter+=1
+            
+            if(report):
+                print(" Residual:", nRes[-1]/nRes[0])
+            
+
+        return nRes
+
+    def homogenise_bcs(self):
+        for bc_i in self.problem.bcs: # non-homogeneous dirichlet applied only in the first itereation
+            bc_i.homogenize()
+        
+        
+    def newton_raphson_iteration(self):
+        df.solve(self.lhs, self.du.vector(), self.rhs)
+        self.problem.u.assign(self.problem.u + self.du)    
+        self.call_callbacks()
+        return self.assemble()
+        
+    def call_callbacks(self):
+        [foo(self.problem.u, self.du) for foo in self.callbacks]
+    
+    def assemble(self):
+        self.problem.F(self.rhs)
+        self.problem.J(self.lhs)
+        
+        return self.rhs.norm("l2")
+
+class BlockSolver:
     def __init__(self, lhs, rhs, sol, bcs):
         self.n_subproblems = len(rhs)        
         

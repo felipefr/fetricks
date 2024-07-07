@@ -10,7 +10,7 @@ Please report all bugs and problems to <felipe.figueredo-rocha@ec-nantes.fr>, or
 
 import numpy as np
 
-
+# doc missing
 def convertParam(param,foo):
     
     n = len(param)
@@ -20,6 +20,9 @@ def convertParam(param,foo):
   
     return paramNew
 
+
+
+# doc missing
 convertParam2 = lambda p,f: np.array( [  f(*p_i) for p_i in p ] )
 
 def youngPoisson2lame_planeStress(nu,E):
@@ -28,10 +31,6 @@ def youngPoisson2lame_planeStress(nu,E):
     lamb = (2.0*mu*lamb)/(lamb + 2.0*mu)
     
     return lamb, mu
-
-# 2d isotropic elastitic tangent tensor versions
-def Celas_voigt(lamb,mu):
-    return np.array( [[lamb + 2*mu, lamb, 0], [lamb, lamb + 2*mu, 0], [0, 0, mu]] )
 
 def Celas_mandel(lamb,mu):
     return np.array( [[lamb + 2*mu, lamb, 0], [lamb, lamb + 2*mu, 0], [0, 0, 2*mu]] )

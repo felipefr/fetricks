@@ -33,6 +33,9 @@ class Mesh(mesh.Mesh):
         self._ufl_domain = self.domain._ufl_domain
         self._ufl_domain._ufl_cargo = self.domain._ufl_domain._ufl_cargo
         self.createMeasures()
+        self.gdim = self.domain.geometry.dim
+        self.tdim = self.domain.topology.dim
+        self.num_cells = len(self.domain.topology.connectivity(self.tdim,0))
 
         # self.vols = np.array([df.Cell(self, i).volume() for i in range(self.num_cells())])
         self.dsN = {}
@@ -48,10 +51,3 @@ class Mesh(mesh.Mesh):
          self.ds = ufl.Measure('ds', domain=self, subdomain_data=self.facets)
          self.dx = ufl.Measure('dx', domain=self, subdomain_data=self.markers)
          
-                
-    def nameNeumannBoundary(self, name, boundaryMarker):
-        self.dsN[name] = reduce(lambda x,y: x+y, [self.ds(b) for b in boundaryMarker] )
-        
-    def nameRegion(self, name, regionMarker):
-        self.dxR[name] = reduce(lambda x,y: x+y, [self.dx(r) for r in regionMarker] )
-        

@@ -1,21 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Fri Jan 21 20:17:35 2022
+Created on Sun Jul  7 01:19:48 2024
 
 @author: felipe
-
-
-This file is part of fetricks:  useful tricks and some extensions for FEniCs and other FEM-related utilities
-Obs: (fe + tricks: where "fe" stands for FEM, FEniCs and me :) ).
-
-Copyright (c) 2022-2023, Felipe Rocha.
-See file LICENSE.txt for license information.
-Please report all bugs and problems to <felipe.figueredo-rocha@ec-nantes.fr>, or
-<f.rocha.felipe@gmail.com>
 """
 
 import numpy as np
+from dolfinx import fem
 
 def create_piecewise_constant_field(domain, cell_markers, property_dict, name=None):
     "Copied from https://bleyerj.github.io/comet-fenicsx/tips/piecewise_constant_field/piecewise_constant_field.html"
@@ -40,17 +32,3 @@ def create_piecewise_constant_field(domain, cell_markers, property_dict, name=No
         cells = cell_markers.find(tag)
         k.x.array[cells] = np.full_like(cells, value, dtype=np.float64)
     return k
-
-
-# def getLameExpression(nu1,E1,nu2,E2,M, op= 'cpp', plane_stress = False ):
-    
-#     eng2lamb_ = eng2lambPlaneStress if plane_stress else eng2lamb
-    
-#     mu1 = eng2mu(nu1,E1)
-#     lamb1 = eng2lamb_(nu1,E1)
-#     mu2 = eng2mu(nu2,E2)
-#     lamb2 = eng2lamb_(nu2,E2)
-
-#     param = np.array([[lamb1, mu1], [lamb2,mu2],[lamb1,mu1], [lamb2,mu2]])
-    
-#     return getMultimaterialExpression(param, M, op = op)
