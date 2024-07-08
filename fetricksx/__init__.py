@@ -22,15 +22,16 @@ __all__ = ['symgrad', 'BlockSolver', 'CustomLinearSolver'
 from .fenics.postprocessing.errors import (error_L2)
 from .mechanics.truss_utils  import (grad_truss, get_mesh_truss, get_tangent_truss, solve_truss, posproc_truss)
 
-from .fenics.la.wrapper_solvers import CustomLinearSolver, BlockSolver, picard
+from .fenics.la.wrapper_solvers import (CustomLinearSolver, CustomNonlinearProblem, CustomLinearSolver, CustomNonlinearSolver,
+                                        CustomTangentProblem, BlockSolver, picard)
 from .fenics.la.operations import L2norm, L2norm_given_form
 from .fenics.mesh.mesh import Mesh
 from .fenics.mesh.mesh_utils import generate_rectangle_msh, generate_unit_square_msh
 
 from .fenics.bcs_utils import neumannbc, dirichletbc
 from .fenics.mesh.wrapper_gmsh import gmshio # uses new meshio
-from .fenics.fem_utils import mixed_functionspace
-from .fenics.math_utils import symgrad 
+from .fenics.fem_utils import mixed_functionspace, CustomQuadratureSpace, QuadratureEvaluator
+from .fenics.math_utils import symgrad, integral
 from .plotting.misc import (load_latex_options, set_pallette, plot_mean_std, plot_mean_std_nolegend, plot_fill_std)
 
 from .mechanics.elasticity_conversions import Celas_mandel
@@ -62,7 +63,7 @@ from .fenics.la.conversions import (as_flatten_2x2, as_flatten_3x3,
 # from .fenics.postprocessing.misc import load_sol, get_errors
 
 
-# from .fenics.misc import create_quadrature_spaces_mechanics, create_DG_spaces_mechanics, symgrad, Integral, setter
+# from .fenics.misc import create_quadrature_spaces_mechanics, create_DG_spaces_mechanics, symgrad,  setter
 
 # Conversions
 # the default is 2d, if you want use explictly ft.conv2d or ft.conv3d, or even rename it with conv = ft.convXd

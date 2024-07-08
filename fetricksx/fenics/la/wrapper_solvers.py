@@ -91,23 +91,19 @@ class CustomTangentProblem(fem.petsc.LinearProblem):
         # Solve linear system and update ghost values in the solution
         self._solver.solve(self._b, self._x)
         self.u.x.scatter_forward()
-        
-class CustomNonlinearSolver:
-    
-    tangent_problem = CustomLinearProblem(
-    tangent_form,
-    -Residual,
-    u=du,
-    bcs=bcs,
-    petsc_options={
-        "ksp_type": "preonly",
-        "pc_type": "lu",
-        "pc_factor_mat_solver_type": "mumps",
-    },
-)
-
 
 # problem should be a NonlinearVariationalProblem
+
+class CustomNonlinearProblem:
+    def __init__(self, res, u, bcs, jac):
+        self.res = res
+        self.u = u
+        self.bcs = bcs
+        self.jac = jac
+        
+
+        
+
 class CustomNonlinearSolver:
 
     # bcs: original object
@@ -117,58 +113,55 @@ class CustomNonlinearSolver:
         self.callbacks = callbacks
         self.u0_satisfybc = u0_satisfybc
     
-        self.du = df.Function(self.problem.u.function_space())
-        self.du.vector().set_local(np.zeros(self.du.vector().size()))
-        
-        self.rhs = df.PETScVector() 
-        self.lhs = df.PETScMatrix()
+        self.du = fem.Function(self.problem.u.function_space)
+ 
+        self.tangent_problem = CustomTangentProblem(
+        self.problem.jac, -self.problem.res,
+        u=self.du,
+        bcs=self.problem.bcs,
+        petsc_options={
+            "ksp_type": "preonly",
+            "pc_type": "lu",
+            "pc_factor_mat_solver_type": "mumps"})
         
     def reset_bcs(self, bcs):
         self.problem.reset_bcs(bcs)
         
-    def solve(self, Nitermax = 10, tol = 1e-8, report = True):
-        
-        if(self.u0_satisfybc): self.homogenise_bcs()
+    def solve(self, Nitermax = 10, tol = 1e-8, report = False):
+        # compute the residual norm at the beginning of the load step
         self.call_callbacks()
         nRes = []
         
-        # iteration 1
-        nRes.append(self.assemble())
+        self.tangent_problem.assemble_rhs()
+        nRes.append(self.tangent_problem._b.norm())
+        if(nRes[0]<tol): 
+            nRes[0] = 1.0
+        self.du.x.array[:] = 0.0
 
-        self.homogenise_bcs() # after first iteration, u satisfies bc
-                        
-        nRes[0] = nRes[0] if nRes[0]>0.0 else 1.0
         niter = 0
-        
-        while nRes[niter]/nRes[0] > tol and niter < Nitermax:
-            nRes.append(self.newton_raphson_iteration())
-            niter+=1
+        while nRes[niter] / nRes[0] > tol and niter < Nitermax:
+            # solve for the displacement correction
+            self.tangent_problem.assemble_lhs()
+            self.tangent_problem.solve_system()
+
+            # update the displacement increment with the current correction
+            self.problem.u.vector.axpy(1, self.du.vector)  # Du = Du + 1*du
+            self.problem.u.x.scatter_forward()
+            self.call_callbacks()
             
+            self.tangent_problem.assemble_rhs()
+            nRes.append(self.tangent_problem._b.norm())
+            
+            niter += 1
             if(report):
                 print(" Residual:", nRes[-1]/nRes[0])
-            
 
         return nRes
 
-    def homogenise_bcs(self):
-        for bc_i in self.problem.bcs: # non-homogeneous dirichlet applied only in the first itereation
-            bc_i.homogenize()
-        
-        
-    def newton_raphson_iteration(self):
-        df.solve(self.lhs, self.du.vector(), self.rhs)
-        self.problem.u.assign(self.problem.u + self.du)    
-        self.call_callbacks()
-        return self.assemble()
-        
     def call_callbacks(self):
         [foo(self.problem.u, self.du) for foo in self.callbacks]
-    
-    def assemble(self):
-        self.problem.F(self.rhs)
-        self.problem.J(self.lhs)
-        
-        return self.rhs.norm("l2")
+
+
 
 class BlockSolver:
     def __init__(self, lhs, rhs, sol, bcs):

@@ -18,6 +18,7 @@ Please report all bugs and problems to <felipe.figueredo-rocha@ec-nantes.fr>, or
 
 import ufl
 import numpy as np
+import numba
 
 # row by row convention
 # as_sym_tensor = lambda a: ufl.as_tensor( [ [ a[0], a[1], a[2]] , [a[1] , a[3], a[4]] , [a[2] , a[4], a[5]] ])
@@ -33,9 +34,11 @@ ind_sym_tensor_3x3 = np.array([0, 4, 8, 5, 2, 1]).astype('int')
 def as_sym_tensor_3x3(a):
     return ufl.as_tensor( [[ a[0], a[5], a[4]] , [a[5] , a[1], a[3]] , [a[4] , a[3], a[2]]])
 
+#@numba.jit(nopython=True)
 def as_sym_tensor_3x3_np(a):
     return np.array( [[ a[0], a[5], a[4]] , [a[5] , a[1], a[3]] , [a[4] , a[3], a[2]]])
 
+#@numba.jit(nopython=True)
 def sym_flatten_3x3_np(A):
     return 0.5*(A + A.T).flatten()[ind_sym_tensor_3x3]
 

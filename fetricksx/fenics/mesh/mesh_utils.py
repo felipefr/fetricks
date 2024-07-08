@@ -10,13 +10,13 @@ import gmsh
 
 
 # n : number of divisions per edge
-def generate_unit_square_msh(msh_file, n, arrangement = 'Left/Right'): 
+def generate_unit_square_msh(msh_file, n, arrangement = 'AlternateRight'): 
     
     return generate_msh_rectangle_mesh(msh_file, 0, 0, 1, 1, n, n, arrangement) 
 
 
 # n : number of divisions per edge
-def generate_rectangle_msh(msh_file, x0, y0, lx, ly, nx, ny, arrangement = 'Left/Right'): 
+def generate_rectangle_msh(msh_file, x0, y0, lx, ly, nx, ny, arrangement = 'AlternateRight'): 
     
     gmsh.initialize()
     gmsh.option.setNumber("General.Terminal", 0)  # to disable meshing info
@@ -43,7 +43,7 @@ def generate_rectangle_msh(msh_file, x0, y0, lx, ly, nx, ny, arrangement = 'Left
     for li, ni in zip(l,[nx,ny,nx,ny]):
         gmsh.model.mesh.set_transfinite_curve(li, ni+1)
     
-    gmsh.model.mesh.set_transfinite_surface(s[0],arrangement=arrangement)
+    gmsh.model.mesh.set_transfinite_surface(s[0], arrangement=arrangement)
     
     gmsh.model.add_physical_group(2, s, 0)
     for i in range(4):
