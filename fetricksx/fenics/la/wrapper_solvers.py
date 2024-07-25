@@ -168,12 +168,12 @@ class BlockSolver:
         self.n_subproblems = len(rhs)        
         
         if(isinstance(lhs, list)):    
-            self.list_solver = [custom_linear_solver(lhs[i], rhs[i], sol[i], bcs[i]) 
+            self.list_solver = [CustomLinearSolver(lhs[i], rhs[i], sol[i], bcs[i]) 
                                 for i in range(self.n_subproblems)]
         
         else:
-            self.list_solver = [custom_linear_solver(lhs, rhs[0], sol[0], bcs[0])] 
-            self.list_solver += [custom_linear_solver(self.list_solver[0].lhs, rhs[i], sol[i], 
+            self.list_solver = [CustomLinearSolver(lhs, rhs[0], sol[0], bcs[0])] 
+            self.list_solver += [CustomLinearSolver(self.list_solver[0].lhs, rhs[i], sol[i], 
                                  bcs[i], solver = self.list_solver[0].solver) for i in range(1, self.n_subproblems)]                    
 
             
