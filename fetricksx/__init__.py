@@ -26,7 +26,7 @@ from .fenics.la.wrapper_solvers import (CustomLinearSolver, CustomNonlinearProbl
                                         CustomTangentProblem, BlockSolver, picard)
 from .fenics.la.operations import L2norm, L2norm_given_form
 from .fenics.mesh.mesh import Mesh
-from .fenics.mesh.mesh_utils import generate_rectangle_msh, generate_unit_square_msh
+from .fenics.mesh.mesh_utils import generate_rectangle_mesh, generate_unit_square_mesh, get_cell_volume
 
 from .fenics.bcs_utils import neumannbc, dirichletbc
 from .fenics.mesh.wrapper_gmsh import gmshio # uses new meshio

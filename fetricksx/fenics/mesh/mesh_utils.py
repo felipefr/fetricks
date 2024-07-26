@@ -7,16 +7,17 @@ Created on Fri May 31 20:10:31 2024
 """
 
 import gmsh
-
+from dolfinx import fem
+import ufl
 
 # n : number of divisions per edge
-def generate_unit_square_msh(msh_file, n, arrangement = 'AlternateRight'): 
+def generate_unit_square_mesh(msh_file, n, arrangement = 'AlternateRight'): 
     
-    return generate_msh_rectangle_mesh(msh_file, 0, 0, 1, 1, n, n, arrangement) 
+    return generate_rectangle_mesh(msh_file, 0, 0, 1, 1, n, n, arrangement) 
 
 
 # n : number of divisions per edge
-def generate_rectangle_msh(msh_file, x0, y0, lx, ly, nx, ny, arrangement = 'AlternateRight'): 
+def generate_rectangle_mesh(msh_file, x0, y0, lx, ly, nx, ny, arrangement = 'AlternateRight'): 
     
     gmsh.initialize()
     gmsh.option.setNumber("General.Terminal", 0)  # to disable meshing info
@@ -57,3 +58,13 @@ def generate_rectangle_msh(msh_file, x0, y0, lx, ly, nx, ny, arrangement = 'Alte
     gmsh.finalize()
     
     return
+
+def get_cell_volume(domain):
+    Ve = fem.functionspace(domain, ("DG", 0))
+    q_degree = 3
+    vol = fem.Function(Ve)
+    fem.petsc.assemble_vector(vol.vector, fem.form(
+        1*ufl.TestFunction(Ve)*ufl.dx(metadata={"quadrature_degree": q_degree})))
+    vol.x.scatter_forward()
+    
+    return vol.x.array
