@@ -25,7 +25,6 @@ class CustomQuadratureSpace:
         self.degree_quad = degree_quad
         self.mesh = mesh
         self.basix_cell = self.mesh.basix_cell()
-        
         self.dxm = ufl.Measure("dx", domain=self.mesh, metadata={"quadrature_degree": self.degree_quad, "quadrature_scheme": "default"})
         self.W0e = basix.ufl.quadrature_element(self.basix_cell, degree=self.degree_quad, scheme = "default", value_shape= ())
         self.We = basix.ufl.quadrature_element(self.basix_cell, degree=self.degree_quad, scheme = "default", value_shape = (dim,))

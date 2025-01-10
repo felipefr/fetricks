@@ -37,6 +37,8 @@ class Mesh(mesh.Mesh):
         self._cpp_object = self.domain._cpp_object 
         self._ufl_domain = self.domain._ufl_domain
         self._ufl_domain._ufl_cargo = self.domain._ufl_domain._ufl_cargo
+        self._geometry = self.domain._geometry
+        self._topology = self.domain._topology
         self.createMeasures()
         self.gdim = self.domain.geometry.dim
         self.tdim = self.domain.topology.dim
