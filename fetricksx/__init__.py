@@ -9,6 +9,8 @@ Please report all bugs and problems to <felipe.figueredo-rocha@ec-nantes.fr>, or
 """
 
 
+
+
 __all__ = ['symgrad', 'BlockSolver', 'CustomLinearSolver'
             'tensor2mandel', 'mandel2tensor', 'tensor4th2mandel', 'tr_mandel', 'Id_mandel_np', 'Id_mandel_df', 'symgrad_mandel',
             'tensor2mandel_np', 'mandel2tensor_np',
