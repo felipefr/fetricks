@@ -18,7 +18,10 @@ Please report all bugs and problems to <felipe.figueredo-rocha@ec-nantes.fr>, or
 
 import ufl
 import numpy as np
+<<<<<<< HEAD
 # import numba
+=======
+>>>>>>> 2e56f6f2b7180942c46deb82c43ffa462f6a0966
 
 # row by row convention
 # as_sym_tensor = lambda a: ufl.as_tensor( [ [ a[0], a[1], a[2]] , [a[1] , a[3], a[4]] , [a[2] , a[4], a[5]] ])
