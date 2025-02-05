@@ -19,6 +19,51 @@ import dolfin as df
 import numpy as np
 from fetricks.fenics.misc import symgrad
 
+# Unsymmetric notation
+Id_unsym_df = df.as_vector([1.0, 1.0, 0.0, 0.0])
+Id_unsym_np = np.array([1.0, 1.0, 0.0, 0.0])
+
+def unsym2tensor_list(X):
+    return [[X[0], X[3]],
+            [X[4], X[1]]]
+
+def tensor2unsym_list(X):
+     return [X[0,0], X[1,1], X[0,1], X[1,0]]
+
+def unsym2tensor_np(X):
+    return np.array(unsym2tensor_list(X))
+
+def tensor2unsym_np(X):
+    return np.array(tensor2unsym_list(X))
+
+def unsym2tensor(X):
+    return df.as_tensor(unsym2tensor_list(X))
+
+def tensor2unsym(X):
+     return df.as_vector(tensor2unsym_list(X))
+
+def tensor4th2unsym_list(X):
+    return [[X[0,0,0,0], X[0,0,1,1], X[0,0,0,1], X[0,0,1,0]],
+            [X[1,1,0,0], X[1,1,1,1], X[1,1,0,1], X[1,1,1,0]],
+            [X[0,1,0,0], X[0,1,1,1], X[0,1,0,1], X[0,1,1,0]],
+            [X[1,0,0,0], X[1,0,1,1], X[1,0,0,1], X[1,0,1,0]]]
+
+def tensor4th2unsym(X):
+    return df.as_tensor(tensor4th2unsym_list(X))
+
+def tensor4th2unsym_np(X):
+    return np.array(tensor4th2unsym_list(X))
+
+def tr_unsym(X):
+    return X[0] + X[1]
+
+def grad_unsym(v): # it was shown somehow to have better performance than doing it explicity
+    return tensor2unsym(df.grad(v))
+    
+def macro_strain_unsym(i): 
+    Eps_unsym = np.zeros((4,))
+    Eps_unsym[i] = 1
+    return unsym2tensor_np(Eps_unsym)
 
 
 # VOIGT NOTATION
