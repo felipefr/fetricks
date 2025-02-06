@@ -84,7 +84,7 @@ def PK2_hartmannneff_C_np(C_, param):
     S = a1*np.eye(C_.shape[0]) + a2*C_ + a3*np.linalg.inv(C_)
     return S
 
-
+# bug: J = df.sqrt(I3) problem with this operation 
 def psi_ciarlet_C(C_, param): # paper german benchmarks Archives, 2021
     if(C_.ufl_shape[0] == 2):    
         C = df.as_tensor([[C_[0,0], C_[0,1], 0], [C_[1,0], C_[1,1], 0], [0, 0, 1]])
@@ -100,8 +100,25 @@ def psi_ciarlet_C(C_, param): # paper german benchmarks Archives, 2021
     
     return psi
 
+# bug: J = df.sqrt(I3) problem with this operation 
 def psi_ciarlet(F, param): # paper german benchmarks Archives, 2021
     return psi_ciarlet_C(F.T*F, param)
+
+def psi_ciarlet_F(F, param): # paper german benchmarks Archives, 2021
+    # if(C_.ufl_shape[0] == 2):    
+    #     C = df.as_tensor([[C_[0,0], C_[0,1], 0], [C_[1,0], C_[1,1], 0], [0, 0, 1]])
+
+    lamb, mu = param["lamb"], param["mu"]
+    one = df.Constant(1.0)
+    J = df.det(F) 
+    # supposing plane strain if 2d
+    I1 = df.inner(F,F) + one if (F.ufl_shape[0] == 2) else df.inner(F,F)  
+    I3 = J**2
+
+    
+    psi = 0.5*mu*(I1 - 3) + 0.25*lamb*(I3 - 1) - (0.5*lamb + mu)*df.ln(J)
+    
+    return psi
 
 
 def PK2_ciarlet_C_np(C_, param):
@@ -133,8 +150,8 @@ def psi_hookean_nonlinear_lame(e, param):
 
 
 # psi is the SEF
-# strain: should match psi convention; 
-# strain_ should be a df.variable, isomorph to strain 
+# strain_ should be a df.variable,  
+# strain: should match psi convention, isomorph to strain_ 
 def get_stress_tang_from_psi(psi, strain, strain_): 
     stress = df.diff(psi(strain), strain_)
     tang = df.diff(stress, strain_)

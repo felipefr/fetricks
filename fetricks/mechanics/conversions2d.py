@@ -58,7 +58,7 @@ def tr_unsym(X):
     return X[0] + X[1]
 
 def grad_unsym(v): # it was shown somehow to have better performance than doing it explicity
-    return tensor2unsym(df.grad(v))
+    return df.as_vector([v[0].dx(0), v[1].dx(1), v[0].dx(1), v[1].dx(0)])
     
 def macro_strain_unsym(i): 
     Eps_unsym = np.zeros((4,))

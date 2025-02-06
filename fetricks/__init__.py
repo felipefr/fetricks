@@ -32,7 +32,10 @@ from .mechanics.multimaterial import getMultimaterialExpression, getLameExpressi
 from .mechanics.material_model_interface import materialModel , materialModelExpression
 from .mechanics.isocoric_isotropic_hyperlastic_material import IsochoricIsotropicHyperelasticMaterial
 from .mechanics.material_models import (psi_ciarlet, psi_ciarlet_C, psi_hookean_nonlinear_lame, get_stress_tang_from_psi, 
-                                        PK2_ciarlet_C_np, psi_hartmannneff, psi_hartmannneff_C, PK2_hartmannneff_C_np)
+                                        PK2_ciarlet_C_np, psi_hartmannneff, psi_hartmannneff_C, PK2_hartmannneff_C_np,
+                                        psi_ciarlet_F)
+
+
 from .mechanics.generic_gausspoint_expression import genericGaussPointExpression
 from .mechanics.hyperelastic_model import hyperelasticModel, hyperelasticModelExpression
 from .mechanics.incompressible_hyperlasticity_utils import Dev, getSiso, getSvol, getDiso, getDvol
