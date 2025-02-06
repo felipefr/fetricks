@@ -40,7 +40,8 @@ from .mechanics.hyperlasticity_utils import GL2CG_np, plane_strain_CG_np, get_in
 
 from .fenics.la.conversions import (as_flatten_2x2, as_flatten_3x3, 
                                     as_unflatten_2x2, as_cross_2x2, as_skew_2x2, flatgrad_2x2, flatsymgrad_2x2,
-                                    sym_flatten_3x3_np, as_sym_tensor_3x3_np, ind_sym_tensor_3x3, as_sym_tensor_3x3)
+                                    sym_flatten_3x3_np, as_sym_tensor_3x3_np, as_sym_tensor_3x3, ind_sym_tensor_3x3,
+                                    sym_flatten_4x4_np, as_sym_tensor_4x4_np, as_sym_tensor_4x4, ind_sym_tensor_4x4 )
 
 
 from .fenics.la.operations import outer_overline_ufl, outer_underline_ufl, outer_dot_ufl, outer_dot_mandel_ufl

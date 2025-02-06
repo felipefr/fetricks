@@ -28,13 +28,33 @@ import numpy as np
 
 
 # following functions using diagonal + non_diagonal convention (non mandel)
+ind_sym_tensor_4x4 = np.array([0, 5, 10, 15, 11, 7, 3, 2, 1, 6])
+
+def as_sym_tensor_4x4_list(a):
+    return [[a[0], a[8], a[7], a[6]],
+            [a[8], a[1], a[9], a[5]],
+            [a[7], a[9], a[2], a[4]],
+            [a[6], a[5], a[4], a[3]]]
+
+def as_sym_tensor_4x4(a):
+    return df.as_tensor(as_sym_tensor_4x4_list(a))
+
+def as_sym_tensor_4x4_np(a):
+    return np.array(as_sym_tensor_4x4_list(a))
+
+def sym_flatten_4x4_np(A):
+    return 0.5*(A + A.T).flatten()[ind_sym_tensor_4x4]
+
 ind_sym_tensor_3x3 = np.array([0, 4, 8, 5, 2, 1])
 
+def as_sym_tensor_3x3_list(a):
+    return [[ a[0], a[5], a[4]] , [a[5] , a[1], a[3]] , [a[4] , a[3], a[2]]]
+
 def as_sym_tensor_3x3(a):
-    return df.as_tensor( [[ a[0], a[5], a[4]] , [a[5] , a[1], a[3]] , [a[4] , a[3], a[2]]])
+    return df.as_tensor( as_sym_tensor_3x3_list(a))
 
 def as_sym_tensor_3x3_np(a):
-    return np.array( [[ a[0], a[5], a[4]] , [a[5] , a[1], a[3]] , [a[4] , a[3], a[2]]])
+    return np.array(as_sym_tensor_3x3_list(a))
 
 def sym_flatten_3x3_np(A):
     return 0.5*(A + A.T).flatten()[ind_sym_tensor_3x3]

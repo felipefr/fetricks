@@ -24,8 +24,8 @@ Id_unsym_df = df.as_vector([1.0, 1.0, 0.0, 0.0])
 Id_unsym_np = np.array([1.0, 1.0, 0.0, 0.0])
 
 def unsym2tensor_list(X):
-    return [[X[0], X[3]],
-            [X[4], X[1]]]
+    return [[X[0], X[2]],
+            [X[3], X[1]]]
 
 def tensor2unsym_list(X):
      return [X[0,0], X[1,1], X[0,1], X[1,0]]
