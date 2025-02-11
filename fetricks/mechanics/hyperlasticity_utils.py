@@ -52,7 +52,10 @@ def get_GL_mandel(u):
     return get_deltaGL_mandel(0.5*u, u)
 
 def getF_fromE(E, R):
-    U = sp.linalg.sqrtm(E)
+    U = sp.linalg.sqrtm(2*E + np.eye(E.shape[0]))
     return R@U
 
+def getUmandel_fromEmandel(E):
+    E_ = ft.mandel2tensor_np(E)
+    return ft.tensor2mandel_np(getF_fromE(E_, np.eye(E_.shape[0])))
 
