@@ -9,6 +9,7 @@ Created on Tue Mar 14 18:56:45 2023
 import numpy as np
 import dolfin as df
 import fetricks as ft
+import scipy as sp
 
 # Green-Lagrange (E) to Cauchy-Green (C)
 # E is mandel
@@ -49,5 +50,9 @@ def get_deltaGL_mandel(u, v):
 # Note that E(u) = delta E(0.5*u; u) = eps(u) + 0.5*(grad(u).T*grad(u))
 def get_GL_mandel(u):
     return get_deltaGL_mandel(0.5*u, u)
+
+def getF_fromE(E, R):
+    U = sp.linalg.sqrtm(E)
+    return R@U
 
 

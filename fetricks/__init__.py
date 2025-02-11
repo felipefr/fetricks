@@ -39,7 +39,8 @@ from .mechanics.material_models import (psi_ciarlet, psi_ciarlet_C, psi_hookean_
 from .mechanics.generic_gausspoint_expression import genericGaussPointExpression
 from .mechanics.hyperelastic_model import hyperelasticModel, hyperelasticModelExpression
 from .mechanics.incompressible_hyperlasticity_utils import Dev, getSiso, getSvol, getDiso, getDvol
-from .mechanics.hyperlasticity_utils import GL2CG_np, plane_strain_CG_np, get_invariants_iso_np, get_invariants_iso_np, get_GL_mandel, get_deltaGL_mandel
+from .mechanics.hyperlasticity_utils import (GL2CG_np, plane_strain_CG_np, get_invariants_iso_np, 
+                                             get_invariants_iso_np, get_GL_mandel, get_deltaGL_mandel, getF_fromE)
 
 from .fenics.la.conversions import (as_flatten_2x2, as_flatten_3x3, 
                                     as_unflatten_2x2, as_cross_2x2, as_skew_2x2, flatgrad_2x2, flatsymgrad_2x2,
