@@ -19,6 +19,66 @@ import dolfin as df
 import numpy as np
 from fetricks.fenics.misc import symgrad
 
+
+# unsymmetric notation (for 3d)
+Id_unsym_df = df.as_vector(3*[1.0] + 6*[0.0])
+Id_unsym_np = np.array(3*[1.0] + 6*[0.0])
+
+def unsym2tensor_list(X):
+    return [[X[0], X[3], X[5]],
+            [X[4], X[1], X[7]],
+            [X[6], X[8], X[2]]]
+
+def tensor2unsym_list(X):
+    return [X[0,0], X[1,1], X[2,2],  # Diagonal elements
+            X[0,1], X[1,0],          # Off-diagonal (upper and lower for (0,1))
+            X[0,2], X[2,0],          # Off-diagonal (upper and lower for (0,2))
+            X[1,2], X[2,1]]          # Off-diagonal (upper and lower for (1,2))
+
+def unsym2tensor_np(X):
+    return np.array(unsym2tensor_list(X))
+
+def tensor2unsym_np(X):
+    return np.array(tensor2unsym_list(X))
+
+def unsym2tensor(X):
+    return df.as_tensor(unsym2tensor_list(X))
+
+def tensor2unsym(X):
+     return df.as_vector(tensor2unsym_list(X))
+
+def tensor4th2unsym_list(X):
+    return [[X[0,0,0,0], X[0,0,1,1], X[0,0,2,2], X[0,0,0,1], X[0,0,1,0], X[0,0,0,2], X[0,0,2,0], X[0,0,1,2], X[0,0,2,1]],
+            [X[1,1,0,0], X[1,1,1,1], X[1,1,2,2], X[1,1,0,1], X[1,1,1,0], X[1,1,0,2], X[1,1,2,0], X[1,1,1,2], X[1,1,2,1]],
+            [X[2,2,0,0], X[2,2,1,1], X[2,2,2,2], X[2,2,0,1], X[2,2,1,0], X[2,2,0,2], X[2,2,2,0], X[2,2,1,2], X[2,2,2,1]],
+            [X[0,1,0,0], X[0,1,1,1], X[0,1,2,2], X[0,1,0,1], X[0,1,1,0], X[0,1,0,2], X[0,1,2,0], X[0,1,1,2], X[0,1,2,1]],
+            [X[1,0,0,0], X[1,0,1,1], X[1,0,2,2], X[1,0,0,1], X[1,0,1,0], X[1,0,0,2], X[1,0,2,0], X[1,0,1,2], X[1,0,2,1]],
+            [X[0,2,0,0], X[0,2,1,1], X[0,2,2,2], X[0,2,0,1], X[0,2,1,0], X[0,2,0,2], X[0,2,2,0], X[0,2,1,2], X[0,2,2,1]],
+            [X[2,0,0,0], X[2,0,1,1], X[2,0,2,2], X[2,0,0,1], X[2,0,1,0], X[2,0,0,2], X[2,0,2,0], X[2,0,1,2], X[2,0,2,1]],
+            [X[1,2,0,0], X[1,2,1,1], X[1,2,2,2], X[1,2,0,1], X[1,2,1,0], X[1,2,0,2], X[1,2,2,0], X[1,2,1,2], X[1,2,2,1]],
+            [X[2,1,0,0], X[2,1,1,1], X[2,1,2,2], X[2,1,0,1], X[2,1,1,0], X[2,1,0,2], X[2,1,2,0], X[2,1,1,2], X[2,1,2,1]]]
+
+def tensor4th2unsym(X):
+    return df.as_tensor(tensor4th2unsym_list(X))
+
+def tensor4th2unsym_np(X):
+    return np.array(tensor4th2unsym_list(X))
+
+def tr_unsym(X):
+    return X[0] + X[1] + X[1]
+
+def grad_unsym(v): # it was shown somehow to have better performance than doing it explicity
+    return df.as_vector([v[0].dx(0), v[1].dx(1), v[2].dx(2), 
+                         v[0].dx(1), v[1].dx(0),
+                         v[0].dx(2), v[2].dx(0),
+                         v[1].dx(2), v[2].dx(1)])
+    
+def macro_strain_unsym(i): 
+    Eps_unsym = np.zeros((9,))
+    Eps_unsym[i] = 1
+    return unsym2tensor_np(Eps_unsym)
+
+# mandel notation
 sqrt2 = np.sqrt(2)
 halfsqrt2 = 0.5*np.sqrt(2)
 
