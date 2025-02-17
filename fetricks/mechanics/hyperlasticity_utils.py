@@ -11,6 +11,9 @@ import dolfin as df
 import fetricks as ft
 import scipy as sp
 
+import fetricks.mechanics.conversions3d as conv3d
+import fetricks.mechanics.conversions2d as conv2d
+
 # Green-Lagrange (E) to Cauchy-Green (C)
 # E is mandel
 def GL2CG_np(E):
@@ -56,6 +59,7 @@ def getF_fromE(E, R):
     return R@U
 
 def getUmandel_fromEmandel(E):
-    E_ = ft.mandel2tensor_np(E)
-    return ft.tensor2mandel_np(getF_fromE(E_, np.eye(E_.shape[0])))
+    conv = {3: conv2d, 6: conv3d}[E.shape[0]]
+    E_ = conv.mandel2tensor_np(E)
+    return conv.tensor2mandel_np(getF_fromE(E_, np.eye(E_.shape[0])))
 

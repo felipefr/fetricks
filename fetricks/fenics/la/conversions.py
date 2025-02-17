@@ -27,6 +27,39 @@ import numpy as np
 # collect_tangent = lambda m, e: np.array( [ m[i].getTangent(e[i,:]).flatten()[ind_sym_tensor] for i in range(len(m))] ).flatten()
 
 
+# 3d
+
+ind_sym_tensor_9x9 = np.array([0, 10, 20, 30, 40, 50, 60, 70, 80,
+                               1, 2, 3, 4, 5, 6, 7, 8,
+                               11, 12, 13, 14, 15, 16, 17,
+                               21, 22, 23, 24, 25, 26,
+                               31, 32, 33, 34, 35,
+                               41, 42, 43, 44,
+                               51, 52, 53,
+                               61, 62,
+                               71])
+
+def as_sym_tensor_9x9_list(a):
+    return [[a[0], a[9], a[10], a[11], a[12], a[13], a[14], a[15], a[16]],
+            [a[9], a[1], a[17], a[18], a[19], a[20], a[21], a[22], a[23]],
+            [a[10], a[17], a[2], a[24], a[25], a[26], a[27], a[28], a[29]],
+            [a[11], a[18], a[24], a[3], a[30], a[31], a[32], a[33], a[34]],
+            [a[12], a[19], a[25], a[30], a[4], a[35], a[36], a[37], a[38]],
+            [a[13], a[20], a[26], a[31], a[35], a[5], a[39], a[40], a[41]],
+            [a[14], a[21], a[27], a[32], a[36], a[39], a[6], a[42], a[43]],
+            [a[15], a[22], a[28], a[33], a[37], a[40], a[42], a[7], a[44]],
+            [a[16], a[23], a[29], a[34], a[38], a[41], a[43], a[44], a[8]]]
+
+def as_sym_tensor_9x9(a):
+    return df.as_tensor(as_sym_tensor_9x9_list(a))
+
+def as_sym_tensor_9x9_np(a):
+    return np.array(as_sym_tensor_9x9_list(a))
+
+def sym_flatten_9x9_np(A):
+    return 0.5*(A + A.T).flatten()[ind_sym_tensor_9x9]
+
+
 # following functions using diagonal + non_diagonal convention (non mandel)
 ind_sym_tensor_4x4 = np.array([0, 5, 10, 15, 11, 7, 3, 2, 1, 6])
 
