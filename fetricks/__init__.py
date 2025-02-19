@@ -17,6 +17,7 @@ from .fenics.mesh.mesh import Mesh
 
 from .fenics.fem.mixed import MixedFiniteElementSpace
 from .fenics.fem.quadrature_function import QuadratureFunction
+from .fenics.fem.quadrature_space import QuadratureSpace
 
 
 # import pygmsh

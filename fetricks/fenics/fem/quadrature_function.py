@@ -25,8 +25,9 @@ class QuadratureFunction(df.Function):
     
     def __init__(self, V, dxm = None, name = '', 
                  inner_representation = 'quadrature', outer_representation = 'uflacs'):
+        
         super().__init__(V, name = name)  
-        self.mesh = V.mesh()
+        self.mesh = V.mesh
         self.V = self.function_space()
         self.dxm = dxm if dxm else V.dxm
         self.projector = LocalProjector(self.V, self.dxm, self, inner_representation, outer_representation)
