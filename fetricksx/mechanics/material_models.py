@@ -83,6 +83,21 @@ def PK2_hartmannneff_C_np(C_, param):
     S = a1*np.eye(C_.shape[0]) + a2*C_ + a3*np.linalg.inv(C_)
     return S
 
+def psi_ciarlet_F(F, param): # paper german benchmarks Archives, 2021
+    # if(C_.ufl_shape[0] == 2):    
+    #     C = df.as_tensor([[C_[0,0], C_[0,1], 0], [C_[1,0], C_[1,1], 0], [0, 0, 1]])
+
+    lamb, mu = param["lamb"], param["mu"]
+    J = ufl.det(F) 
+    # supposing plane strain if 2d
+    I1 = ufl.inner(F,F) + 1.0 if (F.ufl_shape[0] == 2) else ufl.inner(F,F)  
+    I3 = J**2
+
+    
+    psi = 0.5*mu*(I1 - 3) + 0.25*lamb*(I3 - 1) - (0.5*lamb + mu)*ufl.ln(J)
+    
+    return psi
+
 
 def psi_ciarlet_C(C_, param): # paper german benchmarks Archives, 2021
     if(C_.ufl_shape[0] == 2):    

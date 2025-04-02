@@ -122,7 +122,7 @@ class CustomNonlinearSolver:
         petsc_options={
             "ksp_type": "preonly",
             "pc_type": "lu",
-            "pc_factor_mat_solver_type": "mumps"})
+            "pc_factor_mat_solver_type": "petsc"}) # seems faster than mumps
         
     def reset_bcs(self, bcs):
         self.problem.reset_bcs(bcs)

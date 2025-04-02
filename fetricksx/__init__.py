@@ -44,7 +44,7 @@ from .mechanics.misc import create_piecewise_constant_field
 # from .fenics.fem.quadrature_function import QuadratureFunction
 # from .mechanics.material_model_interface import materialModel , materialModelExpression
 # from .mechanics.isocoric_isotropic_hyperlastic_material import IsochoricIsotropicHyperelasticMaterial
-from .mechanics.material_models import (psi_ciarlet, psi_ciarlet_C, psi_hookean_nonlinear_lame, get_stress_tang_from_psi, 
+from .mechanics.material_models import (psi_ciarlet, psi_ciarlet_C, psi_ciarlet_F, psi_hookean_nonlinear_lame, get_stress_tang_from_psi, 
                                         PK2_ciarlet_C_np, psi_hartmannneff, psi_hartmannneff_C, PK2_hartmannneff_C_np)
 # from .mechanics.generic_gausspoint_expression import genericGaussPointExpression
 # from .mechanics.multiscale_model import multiscaleModel
@@ -82,6 +82,8 @@ from .fenics.la.conversions import (as_flatten_2x2, as_flatten_3x3,
 
 
 # Explicit import conversions
+from .mechanics import conversions as conv2d
+from .mechanics import conversions3d as conv3d
 from .mechanics.conversions import tensor2mandel, mandel2tensor, tensor4th2mandel, tr_mandel, Id_mandel_np, Id_mandel_df, symgrad_mandel
 from .mechanics.conversions import tensor2mandel_np, mandel2tensor_np, tensor4th2mandel_np
 from .mechanics.conversions import grad2mandel_vec, grad2mandel_ten, mandelgrad, mandelgrad_ten

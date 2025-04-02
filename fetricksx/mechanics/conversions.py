@@ -17,6 +17,53 @@ Please report all bugs and problems to <felipe.figueredo-rocha@ec-nantes.fr>, or
 """
 import ufl
 import numpy as np
+from fetricksx.fenics.math_utils import symgrad
+
+# Unsymmetric notation
+Id_unsym_df = ufl.as_vector([1.0, 1.0, 0.0, 0.0])
+Id_unsym_np = np.array([1.0, 1.0, 0.0, 0.0])
+
+def unsym2tensor_list(X):
+    return [[X[0], X[2]],
+            [X[3], X[1]]]
+
+def tensor2unsym_list(X):
+     return [X[0,0], X[1,1], X[0,1], X[1,0]]
+
+def unsym2tensor_np(X):
+    return np.array(unsym2tensor_list(X))
+
+def tensor2unsym_np(X):
+    return np.array(tensor2unsym_list(X))
+
+def unsym2tensor(X):
+    return ufl.as_tensor(unsym2tensor_list(X))
+
+def tensor2unsym(X):
+     return ufl.as_vector(tensor2unsym_list(X))
+
+def tensor4th2unsym_list(X):
+    return [[X[0,0,0,0], X[0,0,1,1], X[0,0,0,1], X[0,0,1,0]],
+            [X[1,1,0,0], X[1,1,1,1], X[1,1,0,1], X[1,1,1,0]],
+            [X[0,1,0,0], X[0,1,1,1], X[0,1,0,1], X[0,1,1,0]],
+            [X[1,0,0,0], X[1,0,1,1], X[1,0,0,1], X[1,0,1,0]]]
+
+def tensor4th2unsym(X):
+    return ufl.as_tensor(tensor4th2unsym_list(X))
+
+def tensor4th2unsym_np(X):
+    return np.array(tensor4th2unsym_list(X))
+
+def tr_unsym(X):
+    return X[0] + X[1]
+
+def grad_unsym(v): # it was shown somehow to have better performance than doing it explicity
+    return ufl.as_vector([v[0].dx(0), v[1].dx(1), v[0].dx(1), v[1].dx(0)])
+    
+def macro_strain_unsym(i): 
+    Eps_unsym = np.zeros((4,))
+    Eps_unsym[i] = 1
+    return unsym2tensor_np(Eps_unsym)
 
 # MANDEL NOTATION RELATED FUNCTIONS
 
