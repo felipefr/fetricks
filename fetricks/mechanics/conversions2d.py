@@ -19,6 +19,37 @@ import dolfin as df
 import numpy as np
 from fetricks.fenics.misc import symgrad
 
+# miscelaneous:
+sqrt2 = np.sqrt(2)
+halfsqrt2 = 0.5*np.sqrt(2)
+
+# Mandel notation for third-order with Aijk = Aikj symmetry
+def mandel2tensor3rd_list(X):
+    return [ [ [X[0], halfsqrt2*X[2]], [halfsqrt2*X[2], X[1]] ],
+             [ [X[3], halfsqrt2*X[5]], [halfsqrt2*X[5], X[4]] ] ]
+            
+# mandel in the last two indices. Stack rowwise for the first indexe
+def tensor3rd2mandel_list(X):
+     return [X[0,0,0], X[0,1,1], halfsqrt2*(X[0,0,1] + X[0,1,0]), 
+             X[1,0,0], X[1,1,1], halfsqrt2*(X[1,0,1] + X[1,1,0])]
+             
+def mandel2tensor3rd_np(X):
+    return np.array(mandel2tensor3rd_list(X))
+
+def tensor3rd2mandel_np(X):
+    return np.array(tensor3rd2mandel_list(X))
+
+def mandel2tensor3rd(X):
+    return df.as_tensor(mandel2tensor3rd_list(X))
+
+def tensor3rd2mandel(X):
+     return df.as_vector(tensor3rd2mandel_list(X))
+    
+def macro_hyperstrain_mandel(i): 
+    Hmandel = np.zeros((6,))
+    Hmandel[i] = 1
+    return mandel2tensor3rd_np(Hmandel)
+
 # Unsymmetric notation
 Id_unsym_df = df.as_vector([1.0, 1.0, 0.0, 0.0])
 Id_unsym_np = np.array([1.0, 1.0, 0.0, 0.0])
@@ -84,14 +115,13 @@ def voigt2strain(e):
 def voigt2stress(s):
     return df.as_tensor([[s[0], s[2]], [s[2], s[1]]])
     
- ## this is voigt
+## this is voigt
 def macro_strain(i):
     Eps_Voigt = np.zeros((3,))
     Eps_Voigt[i] = 1
     return np.array([[Eps_Voigt[0], Eps_Voigt[2]/2.],
                     [Eps_Voigt[2]/2., Eps_Voigt[1]]])
-                    
-                    
+                                        
 # VOIGT NOTATION: Generic backend
 def stress2voigt_gen(s, backend = df.as_vector):
     return backend([s[0, 0], s[1, 1], 0.5*(s[0, 1] + s[1, 0])])
@@ -110,10 +140,6 @@ def voigt2stress_gen(s, backend = df.as_vector):
 
 
 # MANDEL NOTATION RELATED FUNCTIONS
-
-sqrt2 = np.sqrt(2)
-halfsqrt2 = 0.5*np.sqrt(2)
-
 Id_mandel_df = df.as_vector([1.0, 1.0, 0.0])
 Id_mandel_np = np.array([1.0, 1.0, 0.0])
 
@@ -171,13 +197,12 @@ def mandelgrad(f, x):
 def mandelgrad_ten(f, x):
     return tensor4th2mandel(df.diff(f,x))
     
-# this is in mandel
+## it was observed that the voigt convention lead to wrong last column on the 
+## homogenised elasticity tensor in mandel notation
 def macro_strain_mandel(i): 
     Eps_Mandel = np.zeros((3,))
     Eps_Mandel[i] = 1
     return mandel2tensor_np(Eps_Mandel)
-
-
 
 # STRESS RELATED FUNCTIONS
 def sigmaLame(u, lame):

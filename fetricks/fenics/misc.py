@@ -47,9 +47,24 @@ def Integral(u,dx,shape):
             for j in range(shape[1]):
                 for dxk in dx:
                     I[i,j] += df.assemble(u[i,j]*dxk)
+
+    elif(n == 2):
+        for i in range(shape[0]):
+            for j in range(shape[1]):
+                for k in range(shape[2]):
+                    for dxk in dx:
+                        I[i,j,k] += df.assemble(u[i,j,k]*dxk)
+
+    elif(n == 4):
+        for i in range(shape[0]):
+            for j in range(shape[1]):
+                for k in range(shape[2]):
+                    for l in range(shape[3]):
+                        for dxk in dx:
+                            I[i,j,k,l] += df.assemble(u[i,j,k,l]*dxk)
     
     else:
-        print('not implement for higher order integral')
+        print('not implemented for higher order integral')
         
     
     return I
