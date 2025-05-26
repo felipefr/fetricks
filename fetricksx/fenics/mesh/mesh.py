@@ -44,17 +44,18 @@ class Mesh(mesh.Mesh):
             
         self.domain, self.markers, self.facets = io.gmshio.read_from_msh(meshfile, comm, gdim = gdim)
         
+        self._cpp_object = self.domain._cpp_object 
+        self._ufl_domain = self.domain._ufl_domain
+        
         if(dolfinx.__version__ == '0.9.0'):
-            self._cpp_object = self.domain._cpp_object 
-            self._ufl_domain = self.domain._ufl_domain
             self._ufl_domain._ufl_cargo = self.domain._ufl_domain._ufl_cargo
             self._geometry = self.domain._geometry
             self._topology = self.domain._topology
             
-            self.createMeasures()
-            self.gdim = self.domain.geometry.dim
-            self.tdim = self.domain.topology.dim
-            self.num_cells = len(self.domain.topology.connectivity(self.tdim,0))
+        self.createMeasures()
+        self.gdim = self.domain.geometry.dim
+        self.tdim = self.domain.topology.dim
+        self.num_cells = len(self.domain.topology.connectivity(self.tdim,0))
 
         # self.vols = np.array([df.Cell(self, i).volume() for i in range(self.num_cells())])
         self.dsN = {}

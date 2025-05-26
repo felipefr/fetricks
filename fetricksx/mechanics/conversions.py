@@ -19,7 +19,53 @@ import ufl
 import numpy as np
 from fetricksx.fenics.math_utils import symgrad
 
-# Unsymmetric notation
+# lexographic notation : extension of voigt for (00,01,10,11)
+Id_lex_df = ufl.as_vector([1.0, 0.0, 0.0, 1.0])
+Id_lex_np = np.array([1.0, 0.0, 0.0, 1.0])
+
+def lex2tensor_list(X):
+    return [[X[0], X[1]],
+            [X[2], X[4]]]
+
+def tensor2lex_list(X):
+     return [X[0,0], X[0,1], X[1,0], X[1,1]]
+
+def lex2tensor_np(X):
+    return np.array(lex2tensor_list(X))
+
+def tensor2lex_np(X):
+    return np.array(tensor2lex_list(X))
+
+def lex2tensor(X):
+    return ufl.as_tensor(lex2tensor_list(X))
+
+def tensor2lex(X):
+     return ufl.as_vector(tensor2lex_list(X))
+
+def tensor4th2lex_list(X):
+    return [[X[0,0,0,0], X[0,0,0,1], X[0,0,1,0], X[0,0,1,1]],
+            [X[0,1,0,0], X[0,1,0,1], X[0,1,1,0], X[0,1,1,1]],
+            [X[1,0,0,0], X[1,0,0,1], X[1,0,1,0], X[1,0,1,1]],
+            [X[1,1,0,0], X[1,1,0,1], X[1,1,1,0], X[1,0,1,1]]]
+
+def tensor4th2lex(X):
+    return ufl.as_tensor(tensor4th2lex_list(X))
+
+def tensor4th2lex_np(X):
+    return np.array(tensor4th2lex_list(X))
+
+def tr_lex(X):
+    return X[0] + X[3]
+
+def grad_lex(v): # it was shown somehow to have better performance than doing it explicity
+    return ufl.as_vector([v[0].dx(0), v[0].dx(1), v[1].dx(0), v[1].dx(1)])
+    
+def macro_strain_lex(i): 
+    Eps_unsym = np.zeros((4,))
+    Eps_unsym[i] = 1
+    return lex2tensor_np(Eps_unsym)
+
+# Unsymmetric notation : extension of voigt for (00,11,01,10)
 Id_unsym_df = ufl.as_vector([1.0, 1.0, 0.0, 0.0])
 Id_unsym_np = np.array([1.0, 1.0, 0.0, 0.0])
 

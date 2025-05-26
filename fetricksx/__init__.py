@@ -55,8 +55,9 @@ from .mechanics.hyperlasticity_utils import GL2CG_np, plane_strain_CG_np, get_in
 
 from .fenics.la.conversions import (as_flatten_2x2, as_flatten_3x3, 
                                     as_unflatten_2x2, as_cross_2x2, as_skew_2x2, flatgrad_2x2, flatsymgrad_2x2,
-                                    sym_flatten_3x3_np, as_sym_tensor_3x3_np, ind_sym_tensor_3x3, as_sym_tensor_3x3)
-
+                                    sym_flatten_3x3_np, as_sym_tensor_3x3_np, as_sym_tensor_3x3, ind_sym_tensor_3x3,
+                                    sym_flatten_4x4_np, as_sym_tensor_4x4_np, as_sym_tensor_4x4, ind_sym_tensor_4x4,
+                                    sym_flatten_9x9_np, as_sym_tensor_9x9_np, as_sym_tensor_9x9, ind_sym_tensor_9x9 )
 
 # from .fenics.la.operations import outer_overline_ufl, outer_underline_ufl, outer_dot_ufl, outer_dot_mandel_ufl
 
@@ -88,7 +89,12 @@ from .mechanics.conversions import tensor2mandel, mandel2tensor, tensor4th2mande
 from .mechanics.conversions import tensor2mandel_np, mandel2tensor_np, tensor4th2mandel_np
 from .mechanics.conversions import grad2mandel_vec, grad2mandel_ten, mandelgrad, mandelgrad_ten
 
+# lexigraphic
+from .mechanics.conversions import (Id_lex_df, Id_lex_np, lex2tensor_np, tensor2lex_np, lex2tensor, 
+    tensor2lex, tensor4th2lex, tensor4th2lex_np, tr_lex, grad_lex, macro_strain_lex) 
 
-
+# unsymetric
+from .mechanics.conversions import (Id_unsym_df, Id_unsym_np, unsym2tensor_np, tensor2unsym_np, unsym2tensor, 
+    tensor2unsym, tensor4th2unsym, tensor4th2unsym_np, tr_unsym, grad_unsym, macro_strain_unsym) 
 
 

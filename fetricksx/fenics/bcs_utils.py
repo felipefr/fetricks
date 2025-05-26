@@ -117,5 +117,8 @@ def dirichletbc(g, flag, V):
     msh = V.mesh     
     fdim = msh.topology.dim - 1
     dofs = fem.locate_dofs_topological(V, fdim, msh.facets.find(flag))
-
-    return fem.dirichletbc(g, dofs, V)
+    
+    if(type(g)==fem.function.Function):
+        return fem.dirichletbc(g, dofs)
+    else:
+        return fem.dirichletbc(g, dofs, V)
