@@ -11,21 +11,25 @@ Please report all bugs and problems to <felipe.figueredo-rocha@ec-nantes.fr>, or
 
 
 
-__all__ = ['symgrad', 'BlockSolver', 'CustomLinearSolver'
+__all__ = ['evaluate_function', 'symgrad', 'BlockSolver', 'CustomLinearSolver'
             'tensor2mandel', 'mandel2tensor', 'tensor4th2mandel', 'tr_mandel', 'Id_mandel_np', 'Id_mandel_df', 'symgrad_mandel',
             'tensor2mandel_np', 'mandel2tensor_np',
             'grad2mandel_vec', 'grad2mandel_ten', 'mandelgrad', 'mandelgrad_ten',
             'Integral',
             'Newton', 'Newton_automatic', 'local_project', 'local_project_given_sol', 'LocalProjector', 
             'Mesh', 'Gmsh',
-            'multiscaleMaterialModel', 'multiscaleMaterialModelExpression', 'hyperelasticModel', 'hyperelasticModelExpression']
+            'multiscaleMaterialModel', 'multiscaleMaterialModelExpression', 'hyperelasticModel', 'hyperelasticModelExpression',
+            'Nonlinear_SNESProblem', 'Nonlinear_SNESSolver',
+            'get_Celas_mandel']
 
 
 from .fenics.postprocessing.errors import (error_L2)
 from .mechanics.truss_utils  import (grad_truss, get_mesh_truss, get_tangent_truss, solve_truss, posproc_truss)
 
-from .fenics.la.wrapper_solvers import (CustomLinearSolver, CustomNonlinearProblem, CustomLinearSolver, CustomNonlinearSolver,
-                                        CustomTangentProblem, BlockSolver, picard)
+from .fenics.la.wrapper_solvers import (CustomLinearSolver, CustomNonlinearProblem, 
+                                        CustomLinearSolver, CustomNonlinearSolver,
+                                        CustomTangentProblem, BlockSolver, picard,
+                                        Nonlinear_SNESProblem, Nonlinear_SNESSolver)
 from .fenics.la.operations import L2norm, L2norm_given_form
 from .fenics.mesh.mesh import Mesh
 from .fenics.mesh.mesh_utils import generate_rectangle_mesh, generate_unit_square_mesh, get_cell_volume
@@ -33,10 +37,10 @@ from .fenics.mesh.mesh_utils import generate_rectangle_mesh, generate_unit_squar
 from .fenics.bcs_utils import neumannbc, dirichletbc
 from .fenics.mesh.wrapper_gmsh import gmshio # uses new meshio
 from .fenics.fem_utils import mixed_functionspace, CustomQuadratureSpace, QuadratureEvaluator
-from .fenics.math_utils import symgrad, integral
+from .fenics.math_utils import symgrad, integral, evaluate_function
 from .plotting.misc import (load_latex_options, set_pallette, plot_mean_std, plot_mean_std_nolegend, plot_fill_std)
 
-from .mechanics.elasticity_conversions import Celas_mandel
+from .mechanics.elasticity_conversions import get_Celas_mandel
 from .mechanics.misc import create_piecewise_constant_field
 
 

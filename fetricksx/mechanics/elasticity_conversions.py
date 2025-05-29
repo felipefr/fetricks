@@ -20,23 +20,27 @@ def convertParam(param,foo):
   
     return paramNew
 
-
-
 # doc missing
 convertParam2 = lambda p,f: np.array( [  f(*p_i) for p_i in p ] )
 
 def youngPoisson2lame_planeStress(nu,E):
     lamb , mu = youngPoisson2lame(nu,E)
-    
-    lamb = (2.0*mu*lamb)/(lamb + 2.0*mu)
-    
+    lamb = (2.0*mu*lamb)/(lamb + 2.0*mu)    
     return lamb, mu
 
-def Celas_mandel(lamb,mu):
+def get_Celas_mandel(param):
+    if 'lamb' in param.keys():
+        lamb , mu = param['lamb'], param['mu']
+    elif 'E' in param.keys():
+        E, nu = param['E'], param['nu']
+        lamb, mu = youngPoisson2lame(nu,E)    
+    else:
+        print("provide a valid set of parameters (E,nu) or (lamb, mu)")
+        
     return np.array( [[lamb + 2*mu, lamb, 0], [lamb, lamb + 2*mu, 0], [0, 0, 2*mu]] )
-    
+
 # Does not enforce symmetry
-def Celas_flat(lamb,mu):
+def get_Celas_flat(lamb,mu):
     return np.array( [[lamb + 2*mu, 0, 0, lamb], [0, 2*mu, 0, 0], [0, 0, 2*mu, 0], [lamb, 0, 0, lamb + 2*mu]] )
 
 youngPoisson2lame = lambda nu,E : [ nu * E/((1. - 2.*nu)*(1.+nu)) , E/(2.*(1. + nu)) ] # lamb, mu

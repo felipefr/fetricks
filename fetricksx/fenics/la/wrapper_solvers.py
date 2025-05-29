@@ -7,10 +7,9 @@ See file LICENSE.txt for license information.
 Please report all bugs and problems to <felipe.figueredo-rocha@u-pec.fr>, or
 <f.rocha.felipe@gmail.com>
 """
-from dolfinx import fem
 from petsc4py import PETSc
 from dolfinx.fem.petsc import LinearProblem
-import ufl
+from dolfinx import fem, la 
 import numpy as np
 from scipy.sparse import csr_matrix 
 
@@ -188,6 +187,73 @@ class BlockSolver:
            s = self.list_solver[i]
            s.solver.solve(s.b, s.sol.vector)
            s.sol.x.scatter_forward()
+
+
+
+class Nonlinear_SNESProblem:
+    def __init__(self, F, u, bcs, jac):
+        self.L = fem.form(F)
+        self.a = fem.form(jac)
+        self.bcs = bcs
+        self._F, self._J = None, None
+        self.u = u
+
+    def F(self, snes, x, F):
+        """Assemble residual vector."""
+        x.ghostUpdate(addv=PETSc.InsertMode.INSERT, mode=PETSc.ScatterMode.FORWARD)
+        x.copy(self.u.x.petsc_vec)
+        self.u.x.petsc_vec.ghostUpdate(addv=PETSc.InsertMode.INSERT, mode=PETSc.ScatterMode.FORWARD)
+
+        with F.localForm() as f_local:
+            f_local.set(0.0)
+            
+        fem.petsc.assemble_vector(F, self.L)
+        
+        fem.petsc.apply_lifting(F, [self.a], bcs=[self.bcs], x0=[x], alpha=-1.0)
+        F.ghostUpdate(addv=PETSc.InsertMode.ADD, mode=PETSc.ScatterMode.REVERSE)
+        fem.petsc.set_bc(F, self.bcs, x, -1.0)
+
+    def J(self, snes, x, J, P):
+        """Assemble Jacobian matrix."""
+        
+        x.ghostUpdate(addv=PETSc.InsertMode.INSERT, mode=PETSc.ScatterMode.FORWARD)
+        x.copy(self.u.x.petsc_vec)
+        self.u.x.petsc_vec.ghostUpdate(addv=PETSc.InsertMode.INSERT, mode=PETSc.ScatterMode.FORWARD)
+
+        J.zeroEntries()
+        fem.petsc.assemble_matrix(J, self.a, bcs=self.bcs)
+        J.assemble()
+
+
+class Nonlinear_SNESSolver:
+    def __init__(self, problem, u):
+        V = u.function_space
+        self.b = la.create_petsc_vector(V.dofmap.index_map, V.dofmap.index_map_bs)
+        self.J = fem.petsc.create_matrix(problem.a)
+        
+        # Create Newton solver and solve
+        self.snes = PETSc.SNES().create()
+        self.snes.setFunction(problem.F, self.b)
+        self.snes.setJacobian(problem.J, self.J)
+        
+        self.snes.setTolerances(rtol=1.0e-9, max_it=10)
+        self.snes.getKSP().setType("preonly")
+        self.snes.getKSP().setTolerances(rtol=1.0e-9)
+        self.snes.getKSP().getPC().setType("lu")
+        
+        # For SNES line search to function correctly it is necessary that the
+        # u.x.petsc_vec in the Jacobian and residual is *not* passed to
+        # snes.solve.
+        self.x = u.x.petsc_vec.copy()
+        self.x.ghostUpdate(addv=PETSc.InsertMode.INSERT, mode=PETSc.ScatterMode.FORWARD)
+    
+    def solve(self):
+        self.snes.solve(None, self.x)
+    
+    def destroy(self):
+        self.b.destroy()
+        self.J.destroy()
+        self.snes.destroy()
 
 
 # Picard nonlinear iterations for mixed 
