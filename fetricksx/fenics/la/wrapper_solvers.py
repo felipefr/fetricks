@@ -126,7 +126,7 @@ class CustomNonlinearSolver:
     def reset_bcs(self, bcs):
         self.problem.reset_bcs(bcs)
         
-    def solve(self, Nitermax = 10, tol = 1e-8, report = False, omega = 1.0):
+    def solve(self, Nitermax = 10, tol = 1e-8, report = False):
         # compute the residual norm at the beginning of the load step
         self.call_callbacks()
         nRes = []
@@ -144,7 +144,7 @@ class CustomNonlinearSolver:
             self.tangent_problem.solve_system()
 
             # update the displacement increment with the current correction
-            self.problem.u.x.petsc_vec.axpy(omega, self.du.x.petsc_vec)  # Du = Du + 1*du
+            self.problem.u.x.petsc_vec.axpy(1, self.du.x.petsc_vec)  # Du = Du + 1*du
             self.problem.u.x.scatter_forward()
             self.call_callbacks()
             
