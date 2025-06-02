@@ -28,16 +28,31 @@ def youngPoisson2lame_planeStress(nu,E):
     lamb = (2.0*mu*lamb)/(lamb + 2.0*mu)    
     return lamb, mu
 
-def get_Celas_mandel(param):
-    if 'lamb' in param.keys():
-        lamb , mu = param['lamb'], param['mu']
-    elif 'E' in param.keys():
-        E, nu = param['E'], param['nu']
-        lamb, mu = youngPoisson2lame(nu,E)    
+
+def get_Celas_mandel(param, model = 'isotropic', gdim = 2, is_axisymmetric = False):
+    if(model == 'isotropic'):
+        if 'lamb' in param.keys():
+            lamb , mu = param['lamb'], param['mu']
+        elif 'E' in param.keys():
+            E, nu = param['E'], param['nu']
+            lamb, mu = youngPoisson2lame(nu,E)    
+        else:
+            print("provide a valid set of parameters (E,nu) or (lamb, mu)")
+
+        return np.array( [[lamb + 2*mu, lamb, 0], [lamb, lamb + 2*mu, 0], [0, 0, 2*mu]] )
+    
+    elif(model == 'trans_isotropic' and is_axisymmetric):
+        E1, E3 = param['E1'], param['E3']
+        nu12, nu13, G13 = param['nu12'], param['nu13'], param['G13']
+        S = np.array( [[1/E1, -nu12/E1, -nu13/E3, 0], 
+                       [-nu12/E1, 1/E1, -nu13/E3, 0],
+                       [-nu13/E3, -nu13/E3, 1/E3, 0],
+                       [0,       0,       0,  1/(2*G13)]] )
+    
+        return np.linalg.inv(S)
+    
     else:
-        print("provide a valid set of parameters (E,nu) or (lamb, mu)")
-        
-    return np.array( [[lamb + 2*mu, lamb, 0], [lamb, lamb + 2*mu, 0], [0, 0, 2*mu]] )
+        print("provide a valid model combination: 'isotropic', 'trans_isotropic'")
 
 # Does not enforce symmetry
 def get_Celas_flat(lamb,mu):
