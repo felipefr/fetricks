@@ -39,7 +39,13 @@ def get_Celas_mandel(param, model = 'isotropic', gdim = 2, is_axisymmetric = Fal
         else:
             print("provide a valid set of parameters (E,nu) or (lamb, mu)")
 
-        return np.array( [[lamb + 2*mu, lamb, 0], [lamb, lamb + 2*mu, 0], [0, 0, 2*mu]] )
+        if(is_axisymmetric):
+            return np.array( [[lamb + 2*mu, lamb, lamb, 0], 
+                              [lamb, lamb + 2*mu, lamb, 0],
+                              [lamb, lamb, lamb + 2*mu, 0],
+                              [0,    0,     0,       2*mu]] )
+        else:
+            return np.array( [[lamb + 2*mu, lamb, 0], [lamb, lamb + 2*mu, 0], [0, 0, 2*mu]] )
     
     elif(model == 'trans_isotropic' and is_axisymmetric):
         E1, E3 = param['E1'], param['E3']
