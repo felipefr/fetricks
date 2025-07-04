@@ -78,6 +78,7 @@ def as_sym_tensor_4x4_np(a):
 def sym_flatten_4x4_np(A):
     return 0.5*(A + A.T).flatten()[ind_sym_tensor_4x4]
 
+# following functions using diagonal + non_diagonal convention (non mandel)
 ind_sym_tensor_3x3 = np.array([0, 4, 8, 5, 2, 1])
 
 def as_sym_tensor_3x3_list(a):
