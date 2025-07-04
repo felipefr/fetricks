@@ -52,7 +52,8 @@ class CustomLinearSolver:
 
     def solve(self):  
        self.assembly_rhs()
-       self.solver.solve(self.b,self.sol.vector)
+       # self.solver.solve(self.b,self.sol.vector)
+       self.solver.solve(self.b,self.sol.array)
        self.sol.x.scatter_forward()
 
 
