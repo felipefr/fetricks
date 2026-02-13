@@ -25,7 +25,7 @@ Please report all bugs and problems to <felipe.figueredo-rocha@ec-nantes.fr>, or
 """
 import ufl
 import numpy as np
-from fetricksx.fenics.math_utils import symgrad
+from fetricksx.src.fenics.math_utils import symgrad
 
 # unsymmetric notation (for 3d)
 Id_unsym_df = ufl.as_vector(3*[1.0] + 6*[0.0])

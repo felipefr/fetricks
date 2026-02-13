@@ -20,7 +20,7 @@ Please report all bugs and problems to <felipe.figueredo-rocha@ec-nantes.fr>, or
 
 """
 Known problems: 
-1) self._geometry = self.domain._geometry, ...,  is needed for dolfinx 0.9.0.
+1) self._geometry = self.mesh._geometry, ...,  is needed for dolfinx 0.9.0.
    Conversely, it is not needed for 0.8.0
 2) 
 """
@@ -30,44 +30,44 @@ import dolfinx
 from dolfinx import io, mesh
 import ufl
 from mpi4py import MPI
-from functools import reduce
-import numpy as np
-
-
-# import fetricks.fenics.postprocessing.wrapper_io as iofe
 
 class Mesh(mesh.Mesh):
-    def __init__(self, meshfile, comm = MPI.COMM_WORLD, gdim = 2):
+    def __init__(self, meshfile, comm = MPI.COMM_WORLD, gdim = 3):
         if(meshfile[-3:]=='geo'):
             geofile, meshfile = meshfile, meshfile[:-3] + "msh" 
             os.system('gmsh -{0} {1} -o {2}'.format(gdim, geofile, meshfile))
-            
-        self.domain, self.markers, self.facets = io.gmshio.read_from_msh(meshfile, comm, gdim = gdim)
         
-        self._cpp_object = self.domain._cpp_object 
-        self._ufl_domain = self.domain._ufl_domain
         
-        if(dolfinx.__version__ == '0.9.0'):
-            self._ufl_domain._ufl_cargo = self.domain._ufl_domain._ufl_cargo
-            self._geometry = self.domain._geometry
-            self._topology = self.domain._topology
+        print(meshfile)
+        meshdata = io.gmsh.read_from_msh(meshfile, comm, gdim = gdim)
+        self.mesh = meshdata.mesh
+        self.cell_tags = meshdata.cell_tags 
+        self.facet_tags = meshdata.facet_tags
+        
+        self._cpp_object = self.mesh._cpp_object 
+        self._ufl_domain = self.mesh._ufl_domain
+        
+        if(dolfinx.__version__ == '0.9.0' or '0.10.0'):
+            self._ufl_domain._ufl_cargo = self.mesh._ufl_domain._ufl_cargo
+            self._geometry = self.mesh._geometry
+            self._topology = self.mesh._topology
             
         self.createMeasures()
-        self.gdim = self.domain.geometry.dim
-        self.tdim = self.domain.topology.dim
-        self.num_cells = len(self.domain.topology.connectivity(self.tdim,0))
+        self.gdim = self.mesh.geometry.dim
+        self.tdim = self.mesh.topology.dim
+        self.num_cells = len(self.mesh.topology.connectivity(self.tdim,0))
 
         # self.vols = np.array([df.Cell(self, i).volume() for i in range(self.num_cells())])
         self.dsN = {}
         self.dxR = {}
 
     def boundaries(self):
-        return self.facets
+        return self.facet_tags
     
     def subdomains(self):
-        return self.markers
+        return self.cell_tags
     
     def createMeasures(self):
-         self.ds = ufl.Measure('ds', domain=self, subdomain_data=self.facets)
-         self.dx = ufl.Measure('dx', domain=self, subdomain_data=self.markers)
+         self.ds = ufl.Measure('ds', domain=self, subdomain_data=self.facet_tags)
+         self.dx = ufl.Measure('dx', domain=self, subdomain_data=self.cell_tags)
          

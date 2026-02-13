@@ -17,7 +17,7 @@ Please report all bugs and problems to <felipe.figueredo-rocha@ec-nantes.fr>, or
 """
 import ufl
 import numpy as np
-from fetricksx.fenics.math_utils import symgrad
+from fetricksx.src.fenics.math_utils import symgrad
 
 # lexographic notation : extension of voigt for (00,01,10,11)
 Id_lex_df = ufl.as_vector([1.0, 0.0, 0.0, 1.0])
