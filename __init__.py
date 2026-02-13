@@ -20,8 +20,11 @@ __all__ = ['evaluate_function', 'symgrad', 'BlockSolver', 'CustomLinearSolver'
             'Mesh', 'Gmsh',
             'multiscaleMaterialModel', 'multiscaleMaterialModelExpression', 'hyperelasticModel', 'hyperelasticModelExpression',
             'Nonlinear_SNESProblem', 'Nonlinear_SNESSolver',
-            'get_Celas_mandel']
+            'get_Celas_mandel' , 
+            'create_piecewise_constant_field']
 
+
+from .src.fenics.multimaterial import create_piecewise_constant_field
 
 from .src.fenics.postprocessing.errors import (error_L2)
 from .src.mechanics.truss_utils  import (grad_truss, get_mesh_truss, get_tangent_truss, solve_truss, posproc_truss)
@@ -45,16 +48,9 @@ from .src.mechanics.misc import create_piecewise_constant_field
 
 
 
-# from .src.fenics.fem.quadrature_function import QuadratureFunction
-# from .src.mechanics.material_model_interface import materialModel , materialModelExpression
-# from .src.mechanics.isocoric_isotropic_hyperlastic_material import IsochoricIsotropicHyperelasticMaterial
 from .src.mechanics.material_models import (psi_ciarlet, psi_ciarlet_C, psi_ciarlet_F, psi_hookean_nonlinear_lame, get_stress_tang_from_psi, 
                                         PK2_ciarlet_C_np, psi_hartmannneff, psi_hartmannneff_C, PK2_hartmannneff_C_np)
-# from .src.mechanics.generic_gausspoint_expression import genericGaussPointExpression
-# from .src.mechanics.multiscale_model import multiscaleModel
-# from .src.mechanics.multiscale_model_expression import multiscaleModelExpression
-# from .src.mechanics.hyperelastic_model import hyperelasticModel, hyperelasticModelExpression
-# from .src.mechanics.incompressible_hyperlasticity_utils import Dev, getSiso, getSvol, getDiso, getDvol
+
 from .src.mechanics.hyperlasticity_utils import GL2CG_np, plane_strain_CG_np, get_invariants_iso_np, get_invariants_iso_np, get_GL_mandel, get_deltaGL_mandel
 
 from .src.fenics.la.conversions import (as_flatten_2x2, as_flatten_3x3, 
@@ -62,6 +58,36 @@ from .src.fenics.la.conversions import (as_flatten_2x2, as_flatten_3x3,
                                     sym_flatten_3x3_np, as_sym_tensor_3x3_np, as_sym_tensor_3x3, ind_sym_tensor_3x3,
                                     sym_flatten_4x4_np, as_sym_tensor_4x4_np, as_sym_tensor_4x4, ind_sym_tensor_4x4,
                                     sym_flatten_9x9_np, as_sym_tensor_9x9_np, as_sym_tensor_9x9, ind_sym_tensor_9x9 )
+
+
+
+# Explicit import conversions
+from .src.mechanics import conversions as conv2d
+from .src.mechanics import conversions3d as conv3d
+from .src.mechanics.conversions import tensor2mandel, mandel2tensor, tensor4th2mandel, tr_mandel, Id_mandel_np, Id_mandel_df, symgrad_mandel
+from .src.mechanics.conversions import tensor2mandel_np, mandel2tensor_np, tensor4th2mandel_np
+from .src.mechanics.conversions import grad2mandel_vec, grad2mandel_ten, mandelgrad, mandelgrad_ten
+
+# lexigraphic
+from .src.mechanics.conversions import (Id_lex_df, Id_lex_np, lex2tensor_np, tensor2lex_np, lex2tensor, 
+    tensor2lex, tensor4th2lex, tensor4th2lex_np, tr_lex, grad_lex, macro_strain_lex) 
+
+# unsymetric
+from .src.mechanics.conversions import (Id_unsym_df, Id_unsym_np, unsym2tensor_np, tensor2unsym_np, unsym2tensor, 
+    tensor2unsym, tensor4th2unsym, tensor4th2unsym_np, tr_unsym, grad_unsym, macro_strain_unsym) 
+
+
+
+
+# from .src.fenics.fem.quadrature_function import QuadratureFunction
+# from .src.mechanics.material_model_interface import materialModel , materialModelExpression
+# from .src.mechanics.isocoric_isotropic_hyperlastic_material import IsochoricIsotropicHyperelasticMaterial
+
+# from .src.mechanics.generic_gausspoint_expression import genericGaussPointExpression
+# from .src.mechanics.multiscale_model import multiscaleModel
+# from .src.mechanics.multiscale_model_expression import multiscaleModelExpression
+# from .src.mechanics.hyperelastic_model import hyperelasticModel, hyperelasticModelExpression
+# from .src.mechanics.incompressible_hyperlasticity_utils import Dev, getSiso, getSvol, getDiso, getDvol
 
 # from .src.fenics.la.operations import outer_overline_ufl, outer_underline_ufl, outer_dot_ufl, outer_dot_mandel_ufl
 
@@ -84,21 +110,5 @@ from .src.fenics.la.conversions import (as_flatten_2x2, as_flatten_3x3,
 #     elif(dim_strain):
 #         return {3: conv2d, 6: conv3d}[dim_strain]
     
-
-
-# Explicit import conversions
-from .src.mechanics import conversions as conv2d
-from .src.mechanics import conversions3d as conv3d
-from .src.mechanics.conversions import tensor2mandel, mandel2tensor, tensor4th2mandel, tr_mandel, Id_mandel_np, Id_mandel_df, symgrad_mandel
-from .src.mechanics.conversions import tensor2mandel_np, mandel2tensor_np, tensor4th2mandel_np
-from .src.mechanics.conversions import grad2mandel_vec, grad2mandel_ten, mandelgrad, mandelgrad_ten
-
-# lexigraphic
-from .src.mechanics.conversions import (Id_lex_df, Id_lex_np, lex2tensor_np, tensor2lex_np, lex2tensor, 
-    tensor2lex, tensor4th2lex, tensor4th2lex_np, tr_lex, grad_lex, macro_strain_lex) 
-
-# unsymetric
-from .src.mechanics.conversions import (Id_unsym_df, Id_unsym_np, unsym2tensor_np, tensor2unsym_np, unsym2tensor, 
-    tensor2unsym, tensor4th2unsym, tensor4th2unsym_np, tr_unsym, grad_unsym, macro_strain_unsym) 
 
 
