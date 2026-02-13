@@ -34,7 +34,7 @@ class CustomLinearSolver:
             self.assembly_lhs()
             
         self.rhs = fem.form(rhs)
-        self.b = fem.petsc.create_vector(self.rhs)
+        self.b = fem.petsc.create_vector(self.sol.function_space) # Fix
     
     def assembly_lhs(self):
         self.A = fem.petsc.assemble_matrix(self.lhs, bcs=self.bcs)

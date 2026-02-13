@@ -1,7 +1,7 @@
 # fetricks
 Author: Felipe Rocha, f.rocha.felipe@gmail.com, felipe.figueredo-rocha@u-pec.fr
 
-Useful tricks and extensions for Fenics (in its newer version FenicX) and other FEM tools in Python
+Useful tricks and extensions for Fenics (FenicsX 0.9 in mix) and other FEM tools in Python
 
 FE + tricks : where FE stands for Fenics and Finite Element.
 
