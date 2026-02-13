@@ -108,17 +108,19 @@ def neumannbc(g, flag, V):
     msh = V.mesh    
     fdim = msh.topology.dim - 1
     V_, _ = V.collapse()
-    g_ = create_normal_contribution_bc(V_, g*ufl.FacetNormal(msh), msh.facets.find(flag))
-    dofs = fem.locate_dofs_topological((V, V_), fdim, msh.facets.find(flag))
+    g_ = create_normal_contribution_bc(V_, g*ufl.FacetNormal(msh), msh.facet_tags.find(flag))
+    dofs = fem.locate_dofs_topological((V, V_), fdim, msh.facet_tags.find(flag))
     
     return fem.dirichletbc(g_, dofs, V)
 
-def dirichletbc(g, flag, V):
+def dirichletbc(g, physical_flag, V):
     msh = V.mesh     
     fdim = msh.topology.dim - 1
-    dofs = fem.locate_dofs_topological(V, fdim, msh.facets.find(flag))
+    print(physical_flag)
+    facets = msh.facet_tags.find(msh.physical[physical_flag].tag)
+    dofs = fem.locate_dofs_topological(V, fdim, facets)
     
-    if(type(g)==fem.function.Function):
-        return fem.dirichletbc(g, dofs)
-    else:
-        return fem.dirichletbc(g, dofs, V)
+    # if(type(g)==fem.function.Function):
+    #     return fem.dirichletbc(g, dofs)
+    # else:
+    return fem.dirichletbc(g, dofs, V)

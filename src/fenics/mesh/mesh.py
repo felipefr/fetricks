@@ -43,6 +43,7 @@ class Mesh(mesh.Mesh):
         self.mesh = meshdata.mesh
         self.cell_tags = meshdata.cell_tags 
         self.facet_tags = meshdata.facet_tags
+        self.physical = meshdata.physical_groups
         
         self._cpp_object = self.mesh._cpp_object 
         self._ufl_domain = self.mesh._ufl_domain
