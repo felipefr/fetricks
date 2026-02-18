@@ -21,8 +21,10 @@ __all__ = ['evaluate_function', 'symgrad', 'BlockSolver', 'CustomLinearSolver'
             'multiscaleMaterialModel', 'multiscaleMaterialModelExpression', 'hyperelasticModel', 'hyperelasticModelExpression',
             'Nonlinear_SNESProblem', 'Nonlinear_SNESSolver',
             'get_Celas_mandel' , 
-            'create_piecewise_constant_field']
+            'create_piecewise_constant_field',
+            'XDMFReader', 'XDMFWriter']
 
+from .src.plotting.xdmf_io import (XDMFReader, XDMFWriter)
 
 from .src.fenics.multimaterial import create_piecewise_constant_field
 
