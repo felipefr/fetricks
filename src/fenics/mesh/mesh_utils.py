@@ -6,6 +6,7 @@ Created on Fri May 31 20:10:31 2024
 @author: felipe
 """
 
+import numpy as np
 import gmsh
 from dolfinx import fem
 import ufl
@@ -62,9 +63,6 @@ def generate_rectangle_mesh(msh_file, x0, y0, lx, ly, nx, ny, arrangement = 'Alt
 def get_cell_volume(domain):
     Ve = fem.functionspace(domain, ("DG", 0))
     q_degree = 3
-    vol = fem.Function(Ve)
-    fem.petsc.assemble_vector(vol.vector, fem.form(
-        1*ufl.TestFunction(Ve)*ufl.dx(metadata={"quadrature_degree": q_degree})))
-    vol.x.scatter_forward()
-    
-    return vol.x.array
+    form = fem.form(1*ufl.TestFunction(Ve)*ufl.dx(metadata={"quadrature_degree": q_degree}))
+    vols = fem.assemble_vector(form)
+    return np.array(vols.array)

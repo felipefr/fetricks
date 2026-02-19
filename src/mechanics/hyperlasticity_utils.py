@@ -9,6 +9,7 @@ Created on Tue Mar 14 18:56:45 2023
 import numpy as np
 import fetricksx as ft
 import ufl
+import scipy as sp
 
 # Green-Lagrange (E) to Cauchy-Green (C)
 # E is mandel
@@ -51,3 +52,12 @@ def get_GL_mandel(u):
     return get_deltaGL_mandel(0.5*u, u)
 
 
+
+def getF_fromE(E, R):
+    U = sp.linalg.sqrtm(2*E + np.eye(E.shape[0]))
+    return R@U
+
+def getUmandel_fromEmandel(E):
+    conv = {3: ft.conv2d, 6: ft.conv3d}[E.shape[0]]
+    E_ = conv.mandel2tensor_np(E)
+    return conv.tensor2mandel_np(getF_fromE(E_, np.eye(E_.shape[0])))

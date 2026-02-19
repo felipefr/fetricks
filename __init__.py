@@ -22,7 +22,8 @@ __all__ = ['evaluate_function', 'symgrad', 'BlockSolver', 'CustomLinearSolver'
             'Nonlinear_SNESProblem', 'Nonlinear_SNESSolver',
             'get_Celas_mandel' , 
             'create_piecewise_constant_field',
-            'XDMFReader', 'XDMFWriter']
+            'XDMFReader', 'XDMFWriter',
+            'getF_fromE', 'getUmandel_fromEmandel']
 
 from .src.plotting.xdmf_io import (XDMFReader, XDMFWriter)
 
@@ -53,7 +54,9 @@ from .src.mechanics.misc import create_piecewise_constant_field
 from .src.mechanics.material_models import (psi_ciarlet, psi_ciarlet_C, psi_ciarlet_F, psi_hookean_nonlinear_lame, get_stress_tang_from_psi, 
                                         PK2_ciarlet_C_np, psi_hartmannneff, psi_hartmannneff_C, PK2_hartmannneff_C_np)
 
-from .src.mechanics.hyperlasticity_utils import GL2CG_np, plane_strain_CG_np, get_invariants_iso_np, get_invariants_iso_np, get_GL_mandel, get_deltaGL_mandel
+from .src.mechanics.hyperlasticity_utils import (GL2CG_np, plane_strain_CG_np, get_invariants_iso_np, 
+                                                get_invariants_iso_np, get_GL_mandel, get_deltaGL_mandel,
+                                                getF_fromE, getUmandel_fromEmandel)
 
 from .src.fenics.la.conversions import (as_flatten_2x2, as_flatten_3x3, 
                                     as_unflatten_2x2, as_cross_2x2, as_skew_2x2, flatgrad_2x2, flatsymgrad_2x2,
