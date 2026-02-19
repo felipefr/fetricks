@@ -76,9 +76,18 @@ class XDMFReader(meshio.xdmf.TimeSeriesReader):
     #     return self.mesh
     
     def read_field(self, u, k = 0):
-        if(u.is_cellwise_constant()):
-            u.x.array[:] = self.read_data(k)[2][u.name][0]
+        data = self.read_data(k)
+        data = data[1] | data[2]
+        
+        if(type(data[u.name]) == type([])):
+            u.x.array[:] = data[u.name][0]
         else:
-            u.x.array[:] = self.read_data(k)[1][u.name].flatten()
+            u.x.array[:] = data[u.name].flatten()
+        
+        
+        # if(u.is_cellwise_constant()):
+        #     u.x.array[:] = self.read_data(k)[2][u.name][0]
+        # else:
+        #     u.x.array[:] = self.read_data(k)[1][u.name].flatten()
         
 
