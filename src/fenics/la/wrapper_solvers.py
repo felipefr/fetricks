@@ -84,7 +84,8 @@ class CustomTangentProblem(fem.petsc.LinearProblem):
 
     def assemble_lhs(self):
         self._A.zeroEntries()
-        fem.petsc.assemble_matrix_mat(self._A, self._a, bcs=self.bcs)
+        # fem.petsc.assemble_matrix_mat(self._A, self._a, bcs=self.bcs)
+        fem.petsc.assemble_matrix(self._A, self._a, bcs=self.bcs)
         self._A.assemble()
 
     def solve_system(self):
