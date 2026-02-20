@@ -17,7 +17,6 @@ Please report all bugs and problems to <felipe.figueredo-rocha@ec-nantes.fr>, or
 """
 import ufl
 import numpy as np
-from fetricksx.src.fenics.math_utils import symgrad
 
 # lexographic notation : extension of voigt for (00,01,10,11)
 Id_lex_df = ufl.as_vector([1.0, 0.0, 0.0, 1.0])
@@ -183,7 +182,7 @@ def macro_strain_mandel(i):
 
 # STRESS RELATED FUNCTIONS
 def sigmaLame(u, lame):
-    return lame[0]*ufl.div(u)*ufl.Identity(2) + 2*lame[1]*symgrad(u)
+    return lame[0]*ufl.div(u)*ufl.Identity(2) + 2*lame[1]*ufl.sym(ufl.grad(u))
 
 def vonMises(sig):
     s = sig - (1./3)*ufl.tr(sig)*ufl.Identity(2)

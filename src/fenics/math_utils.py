@@ -12,11 +12,7 @@ import numpy as np
 import numpy.typing as npt
 import dolfinx as dfx
 
-# NON-FLATTENED FUNCTIONS
-def symgrad(v): 
-    return ufl.sym(ufl.grad(v))
-
-# Vectorial and Tensorial integrals (Fenics integrals are scalars by default)
+# Vectorial and Tensorial integrals (Fenics integrals are scalars by default or needs test functions)
 def integral(u,dx, mesh, shape):
     
     n = len(shape)

@@ -43,7 +43,7 @@ from .src.fenics.mesh.mesh_utils import generate_rectangle_mesh, generate_unit_s
 from .src.fenics.bcs_utils import neumannbc, dirichletbc
 from .src.fenics.mesh.wrapper_gmsh import gmshio # uses new meshio
 from .src.fenics.fem_utils import mixed_functionspace, CustomQuadratureSpace, QuadratureEvaluator
-from .src.fenics.math_utils import symgrad, integral, evaluate_function
+from .src.fenics.math_utils import integral, evaluate_function
 from .src.plotting.misc import (load_latex_options, set_pallette, plot_mean_std, plot_mean_std_nolegend, plot_fill_std)
 
 from .src.mechanics.elasticity_conversions import get_Celas_mandel

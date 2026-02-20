@@ -25,7 +25,6 @@ Please report all bugs and problems to <felipe.figueredo-rocha@ec-nantes.fr>, or
 """
 import ufl
 import numpy as np
-from fetricksx.src.fenics.math_utils import symgrad
 
 # unsymmetric notation (for 3d)
 Id_unsym_df = ufl.as_vector(3*[1.0] + 6*[0.0])
@@ -139,7 +138,7 @@ def tr_mandel(X):
 
 
 def symgrad_mandel(v):
-    return tensor2mandel(symgrad(v))
+    return tensor2mandel(ufl.sym(ufl.grad(v)))
     
 # this is in mandel
 def macro_strain_mandel(i): 
